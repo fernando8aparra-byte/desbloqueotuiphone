@@ -99,7 +99,7 @@
     <div>
       <p class="brand-eyebrow">Panel técnico</p>
       <h1>Verificación de compatibilidad</h1>
-      <p class="sub">Elige el equipo, el tipo de bloqueo y registra al cliente.</p>
+      <p class="sub">Elige el equipo, el tipo de bloqueo y registra al cliente. Ahora incluye CRM técnico, asistente, ganancias y ranking.</p>
     </div>
     <div class="range-tag">iPhone 6s &rarr; 17 Pro Max</div>
   </header>
@@ -131,23 +131,75 @@
       </div>
 
       <div id="ticketFields">
-        <div class="field-label">Tipo de bloqueo</div>
-        <div class="lock-grid">
-          <button class="lock-btn" data-lock="icloud"><span class="dot"></span>iCloud</button>
-          <button class="lock-btn" data-lock="mdm"><span class="dot"></span>MDM</button>
-          <button class="lock-btn" data-lock="pin"><span class="dot"></span>PIN</button>
-          <button class="lock-btn" data-lock="compania"><span class="dot"></span>Compañía</button>
+        <div class="field-label">Paso 1 · Información del cliente</div>
+        <input type="text" class="name-input" id="clientName" placeholder="Nombre y apellido">
+        <input type="tel" class="name-input" id="clientPhone" placeholder="Teléfono del cliente">
+        <input type="tel" class="name-input" id="clientWhatsapp" placeholder="WhatsApp">
+        <textarea class="name-input textarea-input" id="clientNotes" placeholder="Notas opcionales"></textarea>
+
+        <div class="field-label">Paso 2 · Información del dispositivo</div>
+        <input type="text" class="name-input" id="deviceBrand" placeholder="Marca" value="Apple">
+        <input type="text" class="name-input" id="deviceSerial" placeholder="Número de serie (opcional)">
+        <input type="text" class="name-input" id="deviceImei" placeholder="IMEI (opcional)">
+
+        <div class="field-label">Paso 3 · Tipo de bloqueo</div>
+        <div class="lock-grid" id="lockGrid"></div>
+
+        <div class="assistant-card" id="assistantCard">
+          <p class="field-label">Asistente técnico</p>
+          <div id="assistantContent" class="assistant-empty">Selecciona marca, modelo y bloqueo para ver herramientas, procedimiento, tiempo y dificultad.</div>
         </div>
 
-        <div class="field-label">Nombre del cliente</div>
-        <input type="text" class="name-input" id="clientName" placeholder="Nombre y apellido">
+        <div class="field-label">Estado y finalización</div>
+        <select class="name-input" id="jobStatus">
+          <option value="pendiente">Pendiente</option>
+          <option value="en_proceso">En proceso</option>
+          <option value="finalizado">Finalizado</option>
+          <option value="no_exitoso">No exitoso</option>
+          <option value="cancelado">Cancelado</option>
+        </select>
+        <select class="name-input" id="jobResult">
+          <option value="pendiente">Resultado pendiente</option>
+          <option value="exitoso">Exitoso</option>
+          <option value="no_exitoso">No exitoso</option>
+        </select>
+        <input type="number" min="0" class="name-input" id="jobPrice" placeholder="Precio cobrado (MXN)">
+        <input type="number" min="0" class="name-input" id="timeSpent" placeholder="Tiempo invertido (minutos)">
+        <textarea class="name-input textarea-input" id="finishNotes" placeholder="Observaciones de finalización"></textarea>
+        <label class="check-row"><input type="checkbox" id="premiumJob"> Trabajo premium (+50 puntos)</label>
+        <label class="check-row"><input type="checkbox" id="returningClient"> Cliente recurrente (+15 puntos)</label>
 
-        <button class="submit-btn" id="submitBtn" disabled>Registrar y verificar</button>
+        <button class="submit-btn" id="submitBtn" disabled>Registrar trabajo</button>
         <p class="hint" id="hintText"></p>
       </div>
     </section>
 
   </div>
+
+  <section class="crm-grid">
+    <div class="panel">
+      <h2>Dashboard del técnico</h2>
+      <div class="kpi-grid" id="techDashboard"></div>
+      <div class="mini-chart" id="brandChart"></div>
+    </div>
+    <div class="panel">
+      <h2>Ranking global</h2>
+      <select class="name-input" id="rankingFilter">
+        <option value="historico">Histórico</option>
+        <option value="dia">Día</option>
+        <option value="semana">Semana</option>
+        <option value="mes">Mes</option>
+        <option value="anio">Año</option>
+      </select>
+      <div id="rankingList" class="ranking-list"></div>
+    </div>
+  </section>
+
+  <section class="panel admin-panel" id="adminPanel" style="display:none;">
+    <h2>Dashboard administrador</h2>
+    <p class="sub">Gestiona marcas, modelos, tipos de bloqueo, herramientas y procedimientos desde Firestore.</p>
+    <div class="admin-actions" id="adminActions"></div>
+  </section>
 
   <!-- HISTORY -->
   <div class="history">
@@ -160,6 +212,8 @@
             <th>Cliente</th>
             <th>Dispositivo</th>
             <th>Bloqueo</th>
+            <th>Estado</th>
+            <th>Precio</th>
             <th>Técnico</th>
             <th>Fecha / hora</th>
           </tr>
@@ -175,9 +229,9 @@
 <script type="module" src="auth.js"></script>
 
 <script type="module">
-import { db, VERIFICATIONS_COLLECTION } from './firebase-config.js';
+import { db, VERIFICATIONS_COLLECTION, JOBS_COLLECTION, CLIENTS_COLLECTION, EARNINGS_COLLECTION, NOTIFICATIONS_COLLECTION } from './firebase-config.js';
 import {
-  collection, addDoc, onSnapshot, query, orderBy, limit
+  collection, addDoc, onSnapshot, query, orderBy, limit, doc, setDoc, updateDoc, increment
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 /* ---------- Datos de dispositivos, agrupados por serie ---------- */
@@ -232,7 +286,23 @@ const series = [
 
 // lista plana, útil para la búsqueda y para el envío del registro
 const devices = series.flatMap(s => s.models.map(m => ({...m, group:s.key})));
-const lockLabels = {icloud:'iCloud', mdm:'MDM', pin:'PIN', compania:'Compañía'};
+const lockOptions = [
+  {key:'icloud', label:'iCloud'}, {key:'mdm', label:'MDM'}, {key:'fmi', label:'FMI'},
+  {key:'frp', label:'FRP'}, {key:'google', label:'Cuenta Google'}, {key:'operador', label:'Operador'},
+  {key:'pin', label:'Código/PIN'}, {key:'patron', label:'Patrón'}, {key:'samsung', label:'Cuenta Samsung'},
+  {key:'xiaomi', label:'Cuenta Xiaomi'}, {key:'otro', label:'Otro'}
+];
+const lockLabels = Object.fromEntries(lockOptions.map(lock => [lock.key, lock.label]));
+const knowledgeBase = {
+  default: {
+    tools:['UnlockTool','EFT Pro','3uTools','iRemoval Pro'],
+    procedure:['Validar propiedad y autorización del cliente.','Identificar modelo, serie e IMEI si aplica.','Conectar el equipo al PC y abrir la herramienta indicada.','Ejecutar el procedimiento compatible con el bloqueo.','Reiniciar y comprobar activación o acceso.'],
+    estimatedTime:'15–45 minutos',
+    difficulty:'Medio'
+  },
+  'apple|iphone 13|mdm': {tools:['iRemoval Pro','3uTools'], procedure:['Entrar en Recovery Mode.','Conectar al PC.','Abrir iRemoval Pro.','Ejecutar bypass MDM.','Reiniciar dispositivo y verificar perfil.'], estimatedTime:'15 minutos', difficulty:'Medio'},
+  'apple|iphone 13|icloud': {tools:['3uTools','iRemoval Pro'], procedure:['Confirmar estado FMI/iCloud.','Respaldar datos permitidos.','Conectar el equipo al PC.','Ejecutar flujo compatible.','Validar activación al reiniciar.'], estimatedTime:'30 minutos', difficulty:'Difícil'}
+};
 
 let selectedDevice = null;
 let selectedLock = null;
@@ -243,6 +313,21 @@ let activeSeriesKey = null; // serie elegida en el paso 1
 const deviceListContainer = document.getElementById('deviceListContainer');
 const searchInput = document.getElementById('searchInput');
 const clientNameInput = document.getElementById('clientName');
+const clientPhoneInput = document.getElementById('clientPhone');
+const clientWhatsappInput = document.getElementById('clientWhatsapp');
+const clientNotesInput = document.getElementById('clientNotes');
+const deviceBrandInput = document.getElementById('deviceBrand');
+const deviceSerialInput = document.getElementById('deviceSerial');
+const deviceImeiInput = document.getElementById('deviceImei');
+const lockGrid = document.getElementById('lockGrid');
+const assistantContent = document.getElementById('assistantContent');
+const jobStatusInput = document.getElementById('jobStatus');
+const jobResultInput = document.getElementById('jobResult');
+const jobPriceInput = document.getElementById('jobPrice');
+const timeSpentInput = document.getElementById('timeSpent');
+const finishNotesInput = document.getElementById('finishNotes');
+const premiumJobInput = document.getElementById('premiumJob');
+const returningClientInput = document.getElementById('returningClient');
 const submitBtn = document.getElementById('submitBtn');
 const hintText = document.getElementById('hintText');
 const folioLabel = document.getElementById('folioLabel');
@@ -251,6 +336,12 @@ const emptyHistory = document.getElementById('emptyHistory');
 const authGate = document.getElementById('authGate');
 const ticketFields = document.getElementById('ticketFields');
 const liveDot = document.getElementById('liveDot');
+const techDashboard = document.getElementById('techDashboard');
+const brandChart = document.getElementById('brandChart');
+const rankingList = document.getElementById('rankingList');
+const rankingFilter = document.getElementById('rankingFilter');
+const adminPanel = document.getElementById('adminPanel');
+const adminActions = document.getElementById('adminActions');
 
 document.getElementById('authGateBtn').addEventListener('click', ()=> window.openAccountPanel());
 
@@ -258,6 +349,7 @@ function selectDevice(d){
   selectedDevice = d;
   pickerOpen = false;
   renderPicker();
+  renderAssistant();
   validateForm();
 }
 
@@ -344,16 +436,90 @@ function renderPicker(){
   });
 }
 
-document.querySelectorAll('.lock-btn').forEach(btn=>{
+renderLockOptions();
+function renderLockOptions(){
+  lockGrid.innerHTML = lockOptions.map(lock => `<button class="lock-btn" data-lock="${lock.key}"><span class="dot"></span>${lock.label}</button>`).join('');
+  lockGrid.querySelectorAll('.lock-btn').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     selectedLock = btn.dataset.lock;
     document.querySelectorAll('.lock-btn').forEach(b=>b.classList.toggle('active', b.dataset.lock===selectedLock));
+    renderAssistant();
     validateForm();
   });
-});
+  });
+}
 
 searchInput.addEventListener('input', renderPicker);
-clientNameInput.addEventListener('input', validateForm);
+[clientNameInput, clientPhoneInput, clientWhatsappInput, deviceBrandInput, jobStatusInput, jobResultInput, jobPriceInput, timeSpentInput].forEach(el=>el.addEventListener('input', validateForm));
+deviceBrandInput.addEventListener('input', renderAssistant);
+
+function getAssistantData(){
+  if(!selectedDevice || !selectedLock) return knowledgeBase.default;
+  const key = `${deviceBrandInput.value.trim().toLowerCase()}|${selectedDevice.name.toLowerCase()}|${selectedLock}`;
+  return knowledgeBase[key] || knowledgeBase.default;
+}
+
+function renderAssistant(){
+  if(!selectedDevice || !selectedLock){
+    assistantContent.className = 'assistant-empty';
+    assistantContent.textContent = 'Selecciona marca, modelo y bloqueo para ver herramientas, procedimiento, tiempo y dificultad.';
+    return;
+  }
+  const data = getAssistantData();
+  assistantContent.className = '';
+  assistantContent.innerHTML = `
+    <div class="assistant-section"><strong>Herramientas requeridas</strong><div class="tool-list">${data.tools.map(tool => `<span>${tool}</span>`).join('')}</div></div>
+    <div class="assistant-section"><strong>Procedimiento</strong><ol>${data.procedure.map(step => `<li>${step}</li>`).join('')}</ol></div>
+    <div class="assistant-meta"><span>Tiempo: ${data.estimatedTime}</span><span>Dificultad: ${data.difficulty}</span></div>`;
+}
+
+function calculateLevel(points){
+  if(points >= 3000) return 5;
+  if(points >= 1001) return 4;
+  if(points >= 501) return 3;
+  if(points >= 101) return 2;
+  return 1;
+}
+
+function renderAdminPanel(profile){
+  adminPanel.style.display = profile && profile.rol === 'admin' ? 'block' : 'none';
+  adminActions.innerHTML = ['Técnicos','Modelos','Marcas','Tipos de bloqueo','Herramientas','Procedimientos'].map(item => `<button class="link-btn">Crear / editar / eliminar ${item}</button>`).join('');
+}
+
+function renderDashboardFromRows(rows){
+  const mine = rows.filter(r => !window.currentUser || r.technicianId === window.currentUser.uid || r.technician === window.currentUser.email);
+  const completed = mine.filter(r => r.status === 'finalizado' || r.result === 'exitoso');
+  const successful = mine.filter(r => r.successful || r.result === 'exitoso');
+  const total = mine.length || 1;
+  const earnings = successful.reduce((sum, r) => sum + Number(r.price || 0), 0);
+  const pending = mine.filter(r => r.status === 'pendiente').length;
+  const points = mine.reduce((sum, r) => sum + Number(r.points || 0), 0);
+  const ranked = buildRanking(rows);
+  const myPos = ranked.findIndex(r => window.currentUser && r.id === window.currentUser.uid) + 1;
+  techDashboard.innerHTML = [
+    ['Pendientes', pending], ['Completados', completed.length], ['Ganancias', formatMoney(earnings)],
+    ['Ranking', myPos > 0 ? `#${myPos}` : '—'], ['Éxito', `${Math.round((successful.length / total) * 100)}%`], ['Nivel', `Nivel ${calculateLevel(points)}`]
+  ].map(([label,value]) => `<div class="kpi"><span>${label}</span><strong>${value}</strong></div>`).join('');
+  const byBrand = mine.reduce((acc,r)=>{ acc[r.brand || 'Apple'] = (acc[r.brand || 'Apple'] || 0) + 1; return acc; }, {});
+  brandChart.innerHTML = '<strong>Trabajos por marca</strong>' + Object.entries(byBrand).map(([brand,count]) => `<div><span>${brand}</span><em style="width:${Math.min(count*18,100)}%"></em><b>${count}</b></div>`).join('');
+  rankingList.innerHTML = ranked.slice(0,10).map((r,i)=>`<div class="ranking-row"><span class="avatar mini">${r.name.slice(0,2).toUpperCase()}</span><div><strong>#${i+1} ${r.name}</strong><small>${formatMoney(r.earnings)} · ${r.jobs} trabajos · ${r.successRate}% éxito</small></div></div>`).join('') || '<p class="assistant-empty">Sin trabajos registrados.</p>';
+}
+
+function buildRanking(rows){
+  const map = new Map();
+  rows.forEach(r => {
+    const id = r.technicianId || r.technician || 'invitado';
+    const cur = map.get(id) || {id, name:r.technician || 'Técnico', earnings:0, jobs:0, success:0};
+    cur.jobs += 1;
+    if(r.successful || r.result === 'exitoso'){ cur.success += 1; cur.earnings += Number(r.price || 0); }
+    map.set(id, cur);
+  });
+  return [...map.values()].map(r => ({...r, successRate: r.jobs ? Math.round((r.success/r.jobs)*100) : 0})).sort((a,b)=>b.earnings-a.earnings);
+}
+
+function formatMoney(amount){
+  return new Intl.NumberFormat('es-MX', {style:'currency', currency:'MXN', maximumFractionDigits:0}).format(amount || 0);
+}
 
 function validateForm(){
   if(!isLoggedIn){
@@ -365,10 +531,13 @@ function validateForm(){
   if(!selectedDevice) missing.push('dispositivo');
   if(!selectedLock) missing.push('tipo de bloqueo');
   if(!clientNameInput.value.trim()) missing.push('nombre del cliente');
+  if(!clientPhoneInput.value.trim()) missing.push('teléfono');
+  if(!clientWhatsappInput.value.trim()) missing.push('WhatsApp');
+  if(!deviceBrandInput.value.trim()) missing.push('marca');
 
   if(missing.length===0){
     submitBtn.disabled = false;
-    hintText.textContent = 'Listo para registrar.';
+    hintText.textContent = 'Listo para registrar trabajo, herramientas y ganancias.';
     hintText.className = 'hint ok';
   } else {
     submitBtn.disabled = true;
@@ -384,27 +553,71 @@ async function handleSubmit(){
   submitBtn.textContent = 'Registrando...';
 
   const technicianEmail = (window.currentUser && window.currentUser.email) || 'Invitado';
+  const technicianId = (window.currentUser && window.currentUser.uid) || 'invitado';
+  const assistant = getAssistantData();
+  const price = Number(jobPriceInput.value || 0);
+  const successful = jobResultInput.value === 'exitoso';
+  const completed = ['finalizado','no_exitoso'].includes(jobStatusInput.value);
+  const points = (completed ? 10 : 0) + (successful ? 20 : 0) + (premiumJobInput.checked ? 50 : 0) + (returningClientInput.checked ? 15 : 0);
 
   const record = {
+    client: clientNameInput.value.trim(),
+    clientPhone: clientPhoneInput.value.trim(),
+    clientWhatsapp: clientWhatsappInput.value.trim(),
+    clientNotes: clientNotesInput.value.trim(),
+    brand: deviceBrandInput.value.trim(),
     device: selectedDevice.name,
     deviceYear: selectedDevice.year,
     deviceGroup: selectedDevice.group,
+    serialNumber: deviceSerialInput.value.trim(),
+    imei: deviceImeiInput.value.trim(),
     lockKey: selectedLock,
     lockLabel: lockLabels[selectedLock],
-    client: clientNameInput.value.trim(),
+    tools: assistant.tools,
+    procedure: assistant.procedure,
+    estimatedTime: assistant.estimatedTime,
+    difficulty: assistant.difficulty,
+    status: jobStatusInput.value,
+    statusHistory: [{status: jobStatusInput.value, at: new Date().toISOString()}],
+    result: jobResultInput.value,
+    price,
+    timeSpentMinutes: Number(timeSpentInput.value || 0),
+    finishNotes: finishNotesInput.value.trim(),
+    premium: premiumJobInput.checked,
+    returningClient: returningClientInput.checked,
+    points,
+    successful,
+    technicianId,
     technician: technicianEmail,
     createdAt: new Date().toISOString()
   };
 
   try{
     const docRef = await addDoc(collection(db, VERIFICATIONS_COLLECTION), record);
+    await setDoc(doc(db, JOBS_COLLECTION, docRef.id), record);
+    await addDoc(collection(db, CLIENTS_COLLECTION), {name:record.client, phone:record.clientPhone, whatsapp:record.clientWhatsapp, notes:record.clientNotes, createdAt:record.createdAt, technicianId});
+    if(successful && price > 0){
+      await addDoc(collection(db, EARNINGS_COLLECTION), {jobId:docRef.id, technicianId, technician:technicianEmail, amount:price, currency:'MXN', createdAt:record.createdAt});
+    }
+    if(window.currentUser){
+      await updateDoc(doc(db, 'users', technicianId), {
+        trabajosRealizados: increment(1),
+        trabajosExitosos: increment(successful ? 1 : 0),
+        gananciasTotales: increment(successful ? price : 0),
+        gananciasMensuales: increment(successful ? price : 0),
+        gananciasSemanales: increment(successful ? price : 0),
+        gananciasDiarias: increment(successful ? price : 0),
+        puntos: increment(points)
+      });
+      await addDoc(collection(db, NOTIFICATIONS_COLLECTION), {technicianId, type:'job_registered', message:`Trabajo ${record.status} para ${record.client}`, createdAt:record.createdAt, read:false});
+    }
     window.location.href = `check.html?id=${docRef.id}`;
   }catch(err){
     console.error('Error guardando en Firebase:', err);
     hintText.textContent = 'No se pudo guardar en Firebase. Intenta de nuevo.';
     hintText.className = 'hint err';
     submitBtn.disabled = false;
-    submitBtn.textContent = 'Registrar y verificar';
+    submitBtn.textContent = 'Registrar trabajo';
   }
 }
 submitBtn.addEventListener('click', handleSubmit);
@@ -419,6 +632,7 @@ onSnapshot(historyQuery, snapshot => {
   if(snapshot.empty){
     historyBody.innerHTML = '';
     emptyHistory.style.display = 'block';
+    renderDashboardFromRows([]);
     return;
   }
   emptyHistory.style.display = 'none';
@@ -433,14 +647,17 @@ onSnapshot(historyQuery, snapshot => {
       <td>${h.client||''}</td>
       <td>${h.device||''}</td>
       <td><span class="lock-badge" data-lock="${h.lockKey}"><span class="dot"></span>${h.lockLabel||''}</span></td>
+      <td>${h.status||'pendiente'}</td>
+      <td>${formatMoney(h.price||0)}</td>
       <td>${h.technician||''}</td>
       <td class="time-cell">${timeStr}</td>
     </tr>`;
   }).join('');
+  renderDashboardFromRows(snapshot.docs.map(docSnap => docSnap.data()));
 }, err => console.error('No se pudo leer el historial:', err));
 
 /* ---------- Reaccionar a inicio/cierre de sesión ---------- */
-window.onAuthChange(user=>{
+window.onAuthChange((user, profile)=>{
   isLoggedIn = !!user;
   if(isLoggedIn){
     authGate.style.display = 'none';
@@ -449,6 +666,7 @@ window.onAuthChange(user=>{
     authGate.style.display = 'flex';
     ticketFields.classList.add('field-disabled');
   }
+  renderAdminPanel(profile);
   validateForm();
 });
 

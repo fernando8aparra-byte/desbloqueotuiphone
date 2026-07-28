@@ -26,9 +26,22 @@ export const firebaseReady = true;
 /* Colección donde se guardan los registros de verificación */
 export const VERIFICATIONS_COLLECTION = "verificaciones";
 
-/* Colección donde se guarda el perfil de cada técnico/administrador
-   (documento con id = uid de Firebase Auth) */
+
+/* Colecciones principales para el CRM de técnicos */
 export const USERS_COLLECTION = "users";
+export const JOBS_COLLECTION = "jobs";
+export const CLIENTS_COLLECTION = "clients";
+export const BRANDS_COLLECTION = "brands";
+export const MODELS_COLLECTION = "models";
+export const LOCK_TYPES_COLLECTION = "lock_types";
+export const TOOLS_COLLECTION = "tools";
+export const PROCEDURES_COLLECTION = "procedures";
+export const RANKINGS_COLLECTION = "rankings";
+export const EARNINGS_COLLECTION = "earnings";
+export const NOTIFICATIONS_COLLECTION = "notifications";
+export const BADGES_COLLECTION = "badges";
+export const LEVELS_COLLECTION = "levels";
+export const STATISTICS_COLLECTION = "statistics";
 
 /* Analytics solo se activa si el navegador lo soporta (no falla en SSR/entornos raros) */
 isSupported().then(supported => {

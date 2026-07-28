@@ -129,36 +129,78 @@ function renderResultado(model, group, tier, lockType, screenState, iosVersion){
     </div>`;
   }
 
-  if(tier === 2){
-    info = 'Este equipo <strong>se puede desbloquear en cualquier versión de iOS</strong>.';
-    herramienta = 'Microcontrolador RP2450';
-    if(screenState === 'pin'){
-      signalBlock = `<div class="info-block signal-ok">
-        Con el equipo en pantalla de <strong>PIN / "iPhone no disponible"</strong>, va a quedar <strong>con señal</strong> después del desbloqueo.
-      </div>`;
-    } else {
-      signalBlock = `<div class="info-block signal-off">
-        Con el equipo en pantalla <strong>Hello</strong>, va a quedar <strong>sin señal</strong> — aun así, sí se logra desbloquear.
-      </div>`;
-    }
-  }
+const lockLabels = {icloud:'iCloud', mdm:'MDM', fmi:'FMI', frp:'FRP', google:'Cuenta Google', operador:'Operador', pin:'Código/PIN', patron:'Patrón', samsung:'Cuenta Samsung', xiaomi:'Cuenta Xiaomi', otro:'Otro', compania:'Compañía'};
+const certWrap = document.getElementById('certWrap');
 
-  if(tier === 3){
-    info = 'Este equipo <strong>se puede desbloquear</strong>, pero el resultado depende de la versión de iOS. Debe estar en <strong>pantalla Hello</strong>.';
-    if(iosVersion.startsWith('26.1')){
-      signalBlock = `<div class="info-block signal-off">
-        En <strong>iOS 26.1</strong> solo aplica <strong>bypass</strong> — el equipo queda <strong>sin señal</strong>.
-      </div>`;
-    } else {
-      signalBlock = `<div class="info-block">
-        Versión de iOS indicada: <strong>${iosVersion || '—'}</strong>. Valida el alcance exacto según esa versión específica antes de proceder.
-      </div>`;
-    }
-  }
+function formatMoney(amount){
+  return new Intl.NumberFormat('es-MX', {style:'currency', currency:'MXN', maximumFractionDigits:0}).format(amount || 0);
+}
 
-  if(lockType === 'mdm' || lockType === 'carrier'){
-    info += ` Para <strong>${lockLabels[lockType]}</strong>, este panel es solo referencia general — confirma el caso directamente con el proveedor principal antes de proceder.`;
-  }
+function formatDate(iso){
+  const d = iso ? new Date(iso) : new Date();
+  return d.toLocaleDateString('es-MX', {day:'2-digit', month:'long', year:'numeric'}) + ' · ' +
+         d.toLocaleTimeString('es-MX', {hour:'2-digit', minute:'2-digit'});
+}
+
+function renderRecord(record, folio){
+  certWrap.innerHTML = `
+    <div class="cert-card">
+      <div class="cert-top">
+        <div>
+          <p class="cert-eyebrow">Comprobante de verificación</p>
+          <h2 class="cert-title">${record.device}</h2>
+        </div>
+        <span class="stamp">Verificado</span>
+      </div>
+      <p class="cert-folio">${folio}</p>
+
+      <div class="cert-grid">
+        <div class="cert-item">
+          <div class="label">Cliente</div>
+          <div class="value">${record.client || '—'}</div>
+        </div>
+        <div class="cert-item">
+          <div class="label">Tipo de bloqueo</div>
+          <div class="value">
+            <span class="lock-badge" data-lock="${record.lockKey}"><span class="dot"></span>${record.lockLabel || lockLabels[record.lockKey] || '—'}</span>
+          </div>
+        </div>
+        <div class="cert-item">
+          <div class="label">Equipo</div>
+          <div class="value">${record.brand || 'Apple'} · ${record.device}</div>
+          <div class="value small">${record.deviceYear || ''} ${record.deviceGroup ? '· '+record.deviceGroup : ''}</div>
+        </div>
+        <div class="cert-item">
+          <div class="label">Contacto</div>
+          <div class="value small">Tel. ${record.clientPhone || '—'} · WhatsApp ${record.clientWhatsapp || '—'}</div>
+        </div>
+        <div class="cert-item">
+          <div class="label">Estado / resultado</div>
+          <div class="value">${record.status || 'Pendiente'}</div>
+          <div class="value small">${record.result || 'Resultado pendiente'} · ${record.timeSpentMinutes || 0} min</div>
+        </div>
+        <div class="cert-item">
+          <div class="label">Precio</div>
+          <div class="value">${formatMoney(record.price || 0)}</div>
+          <div class="value small">Puntos: ${record.points || 0}</div>
+        </div>
+        <div class="cert-item">
+          <div class="label">Técnico</div>
+          <div class="value small">${record.technician || 'Invitado'}</div>
+        </div>
+        <div class="cert-item full">
+          <div class="label">Herramientas</div>
+          <div class="value small">${(record.tools || []).join(' · ') || '—'}</div>
+        </div>
+        <div class="cert-item full">
+          <div class="label">Procedimiento</div>
+          <div class="value small">${(record.procedure || []).map((step, i) => `${i + 1}. ${step}`).join('<br>') || '—'}</div>
+        </div>
+        <div class="cert-item full">
+          <div class="label">Fecha y hora de registro</div>
+          <div class="value small">${formatDate(record.createdAt)}</div>
+        </div>
+      </div>
 
   const link = LINKS[tier];
   const linkHtml = link && link !== '#'

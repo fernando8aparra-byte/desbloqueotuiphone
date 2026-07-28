@@ -142,8 +142,11 @@ async function ensureUserProfile(user, nombre){
     trabajosExitosos: 0,
     gananciasTotales: 0,
     gananciasMensuales: 0,
+    gananciasSemanales: 0,
+    gananciasDiarias: 0,
     puntos: 0,
-    nivel: 1
+    nivel: 1,
+    insignias: []
   };
   await setDoc(ref, profile);
   return profile;
