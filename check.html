@@ -3,247 +3,64 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Resultado — Guía de Desbloqueos Apple</title>
+<title>Resultado — Compatibilidad de desbloqueo</title>
+<link rel="stylesheet" href="style.css">
 <style>
-  :root{
-    --bg:#10141A; --surface:#1A2029; --surface-2:#212836; --border:#2A3140;
-    --text:#F1F3F6; --muted:#8A93A3; --copper:#E2A33B; --copper-dim:#4A3A22;
-    --cyan:#56C2D6; --green:#6FCF7C; --red:#E2574C; --purple:#B48CDE; --radius:10px;
-  }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
-  body{
-    background:var(--bg); color:var(--text);
-    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
-    min-height:100vh; padding:0 0 60px;
-  }
-  ::selection{background:var(--copper);color:#10141A;}
-
-  header{
-    background:linear-gradient(135deg,#1A2029,#212836);
-    border-bottom:1px solid var(--border);
-    padding:28px 20px; text-align:center;
-  }
-  header h1{margin:0 0 6px;font-size:22px;letter-spacing:-.01em;}
-  header p{margin:0;color:var(--muted);font-size:13px;}
-  header .badge{
-    display:inline-block;margin-top:10px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;
-    color:var(--copper);border:1px solid var(--copper-dim);background:var(--copper-dim);
-    padding:4px 12px;border-radius:20px;
-  }
-
-  .wrap{max-width:640px;margin:0 auto;padding:24px 20px;}
-
-  .result-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;}
-  .result-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:18px;flex-wrap:wrap;}
-  .result-title{font-size:19px;font-weight:700;margin:0;}
-  .result-sub{color:var(--muted);font-size:13px;margin:4px 0 0;}
-  .verdict{
-    font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
-    border-radius:20px;padding:6px 14px;white-space:nowrap;
-  }
-  .verdict.yes{color:var(--green);border:1.5px solid var(--green);}
-  .verdict.pending{color:var(--muted);border:1.5px solid var(--border);}
-
-  .info-block{
-    background:var(--surface-2);border-left:3px solid var(--copper);border-radius:0 8px 8px 0;
-    padding:14px 16px;margin-bottom:12px;font-size:13.5px;line-height:1.55;
-  }
-  .info-block strong{color:var(--copper);}
-  .info-block.signal-ok{border-left-color:var(--green);}
-  .info-block.signal-off{border-left-color:var(--red);}
-
-  .meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
-  .meta-item{background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;}
-  .meta-item .label{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:4px;}
-  .meta-item .value{font-size:14px;font-weight:600;}
-
-  .download-btn{
-    display:block;text-align:center;background:#ff9800;color:#181206;text-decoration:none;
-    padding:13px;border-radius:8px;font-weight:700;font-size:14px;margin-bottom:10px;
-  }
-  .download-btn:hover{filter:brightness(1.05);}
-
-  .back-btn{
-    display:block;text-align:center;background:transparent;border:1px solid var(--border);color:var(--text);
-    text-decoration:none;padding:12px;border-radius:8px;font-weight:600;font-size:13.5px;
-  }
-  .back-btn:hover{border-color:var(--copper);color:var(--copper);}
-
-  .empty-card{text-align:center;padding:50px 20px;color:var(--muted);}
-  .empty-card h2{color:var(--text);font-size:17px;margin:0 0 8px;}
-
-  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:30px;}
+  .result-wrap{max-width:760px;margin:0 auto;padding:32px 20px;}
+  .result-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:26px;}
+  .result-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap;margin-bottom:18px;}
+  .result-title{font-family:'Space Grotesk',sans-serif;font-size:24px;margin:0 0 6px;}
+  .result-sub{color:var(--muted);margin:0;font-size:14px;}
+  .verdict{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;border-radius:20px;padding:8px 14px;border:1px solid var(--border);}
+  .verdict.yes{color:var(--green);border-color:var(--green);}
+  .verdict.no{color:var(--red);border-color:var(--red);}
+  .info-block{background:var(--surface-2);border-left:3px solid var(--copper);border-radius:0 10px 10px 0;padding:14px 16px;margin:12px 0;line-height:1.55;color:var(--text);}
+  .info-block.good{border-left-color:var(--green);}.info-block.bad{border-left-color:var(--red);}
+  .meta-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:18px 0;}
+  .meta-item{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:12px;}
+  .meta-item .label{font-family:'JetBrains Mono',monospace;color:var(--muted);font-size:11px;text-transform:uppercase;margin-bottom:5px;}
+  .meta-item .value{font-weight:700;}
+  .download-btn{display:block;text-align:center;background:var(--copper);color:#181206;text-decoration:none;border-radius:10px;padding:14px;font-weight:800;margin:12px 0;}
+  .back-btn{display:block;text-align:center;border:1px solid var(--border);color:var(--text);text-decoration:none;border-radius:10px;padding:12px;font-weight:700;}
 </style>
 </head>
 <body>
-
-<header>
-  <h1>Guía de Desbloqueos Apple</h1>
-  <p>Resultado de la consulta</p>
-  <span class="badge">Uso interno · Proveedor Principal</span>
-</header>
-
-<div class="wrap">
+<div class="topbar"><div class="topbar-inner"><div class="brand"><span class="brand-name">Guía de Desbloqueos Apple<small>Resultado interno</small></span></div></div></div>
+<main class="result-wrap">
   <div class="result-card" id="resultCard">Cargando resultado...</div>
-</div>
-
-<footer>Información confidencial de uso interno — no compartir fuera del equipo.</footer>
-
+</main>
 <script>
-/* ============================================================
-   EDITA AQUÍ los links de descarga de cada nivel de equipo.
-   Cuando tengas el link real, reemplaza el '#' entre comillas.
-   ============================================================ */
 const LINKS = {
-  1: '#',   // iPhone 6s al X
-  2: '#',   // iPhone XS al 11 Pro Max
-  3: '#'    // iPhone 12 al 17 Pro Max
+  1: '#', // iPhone 6s al X: reemplaza # por tu link de descarga
+  2: '#', // iPhone XS al 11 Pro Max: reemplaza # por tu link de descarga
+  3: '#'  // iPhone 12 al 17 Pro Max: reemplaza # por tu link de descarga
 };
-
-const lockLabels = {icloud:'Bloqueo de iCloud', screen:'Bloqueo de pantalla / PIN', mdm:'Bloqueo MDM', carrier:'Bloqueo de compañía telefónica'};
-
+const lockLabels = {icloud:'Bloqueo de iCloud', pin:'Bloqueo de pantalla / PIN', mdm:'Bloqueo MDM', compania:'Bloqueo de compañía telefónica'};
+const screenLabels = {hello:'Hello / activación', pin:'PIN', unavailable:'iPhone no disponible', other:'Otro'};
 const resultCard = document.getElementById('resultCard');
-
-function renderEmpty(){
-  resultCard.innerHTML = `
-    <div class="empty-card">
-      <h2>No hay datos de consulta</h2>
-      <p>Vuelve a la guía y completa el formulario para ver un resultado.</p>
-      <a class="back-btn" href="index.html" style="margin-top:16px;display:inline-block;">Volver a la guía</a>
-    </div>
-  `;
-}
-
-function renderResultado(model, group, tier, lockType, screenState, iosVersion){
-  let info = '';
-  let signalBlock = '';
-  let herramienta = null;
-  const precio = '$5 USD';
-
-  if(tier === 1){
-    info = 'Este equipo <strong>siempre se puede desbloquear</strong>. Es el nivel más sencillo de la guía.';
-    signalBlock = `<div class="info-block signal-ok">
-      Puede quedar <strong>con señal</strong>, pero hay que validarlo con el software correspondiente antes de entregarlo.
-      <br><br>Si el equipo conserva señal, cóbrale un extra al cliente sobre el precio base.
-    </div>`;
-  }
-
-const lockLabels = {icloud:'iCloud', mdm:'MDM', fmi:'FMI', frp:'FRP', google:'Cuenta Google', operador:'Operador', pin:'Código/PIN', patron:'Patrón', samsung:'Cuenta Samsung', xiaomi:'Cuenta Xiaomi', otro:'Otro', compania:'Compañía'};
-const certWrap = document.getElementById('certWrap');
-
-function formatMoney(amount){
-  return new Intl.NumberFormat('es-MX', {style:'currency', currency:'MXN', maximumFractionDigits:0}).format(amount || 0);
-}
-
-function formatDate(iso){
-  const d = iso ? new Date(iso) : new Date();
-  return d.toLocaleDateString('es-MX', {day:'2-digit', month:'long', year:'numeric'}) + ' · ' +
-         d.toLocaleTimeString('es-MX', {hour:'2-digit', minute:'2-digit'});
-}
-
-function renderRecord(record, folio){
-  certWrap.innerHTML = `
-    <div class="cert-card">
-      <div class="cert-top">
-        <div>
-          <p class="cert-eyebrow">Comprobante de verificación</p>
-          <h2 class="cert-title">${record.device}</h2>
-        </div>
-        <span class="stamp">Verificado</span>
-      </div>
-      <p class="cert-folio">${folio}</p>
-
-      <div class="cert-grid">
-        <div class="cert-item">
-          <div class="label">Cliente</div>
-          <div class="value">${record.client || '—'}</div>
-        </div>
-        <div class="cert-item">
-          <div class="label">Tipo de bloqueo</div>
-          <div class="value">
-            <span class="lock-badge" data-lock="${record.lockKey}"><span class="dot"></span>${record.lockLabel || lockLabels[record.lockKey] || '—'}</span>
-          </div>
-        </div>
-        <div class="cert-item">
-          <div class="label">Equipo</div>
-          <div class="value">${record.brand || 'Apple'} · ${record.device}</div>
-          <div class="value small">${record.deviceYear || ''} ${record.deviceGroup ? '· '+record.deviceGroup : ''}</div>
-        </div>
-        <div class="cert-item">
-          <div class="label">Contacto</div>
-          <div class="value small">Tel. ${record.clientPhone || '—'} · WhatsApp ${record.clientWhatsapp || '—'}</div>
-        </div>
-        <div class="cert-item">
-          <div class="label">Estado / resultado</div>
-          <div class="value">${record.status || 'Pendiente'}</div>
-          <div class="value small">${record.result || 'Resultado pendiente'} · ${record.timeSpentMinutes || 0} min</div>
-        </div>
-        <div class="cert-item">
-          <div class="label">Precio</div>
-          <div class="value">${formatMoney(record.price || 0)}</div>
-          <div class="value small">Puntos: ${record.points || 0}</div>
-        </div>
-        <div class="cert-item">
-          <div class="label">Técnico</div>
-          <div class="value small">${record.technician || 'Invitado'}</div>
-        </div>
-        <div class="cert-item full">
-          <div class="label">Herramientas</div>
-          <div class="value small">${(record.tools || []).join(' · ') || '—'}</div>
-        </div>
-        <div class="cert-item full">
-          <div class="label">Procedimiento</div>
-          <div class="value small">${(record.procedure || []).map((step, i) => `${i + 1}. ${step}`).join('<br>') || '—'}</div>
-        </div>
-        <div class="cert-item full">
-          <div class="label">Fecha y hora de registro</div>
-          <div class="value small">${formatDate(record.createdAt)}</div>
-        </div>
-      </div>
-
+function empty(){resultCard.innerHTML = '<h1 class="result-title">Sin datos</h1><p class="result-sub">Vuelve a index.html y completa la consulta.</p><a class="back-btn" href="index.html">Volver</a>';}
+function downloadLink(tier){
   const link = LINKS[tier];
-  const linkHtml = link && link !== '#'
-    ? `<a class="download-btn" href="${link}" target="_blank" rel="noopener">Descargar herramienta</a>`
-    : `<a class="download-btn" href="#" onclick="event.preventDefault(); alert('Todavía no hay link cargado para este nivel. Edítalo en el bloque LINKS del código.');">Descargar herramienta</a>`;
-
-  resultCard.innerHTML = `
-    <div class="result-top">
-      <div>
-        <p class="result-title">${model}</p>
-        <p class="result-sub">${lockLabels[lockType] || lockType} · ${group}</p>
-      </div>
-      <span class="verdict yes">Sí se puede</span>
-    </div>
-
-    <div class="info-block">${info}</div>
-    ${signalBlock}
-
-    <div class="meta-grid">
-      <div class="meta-item"><div class="label">Precio base</div><div class="value">${precio}</div></div>
-      <div class="meta-item"><div class="label">Herramienta</div><div class="value">${herramienta || 'No requiere adicional'}</div></div>
-    </div>
-
-    ${linkHtml}
-    <a class="back-btn" href="index.html">&larr; Volver a la guía</a>
-  `;
+  if(link && link !== '#') return `<a class="download-btn" href="${link}" target="_blank" rel="noopener">Descargar herramienta</a>`;
+  return `<a class="download-btn" href="#" onclick="event.preventDefault();alert('Edita el bloque LINKS en check.html y reemplaza # por tu link real.');">Descargar herramienta</a>`;
 }
-
-/* ---------- Leer parámetros de la URL y renderizar ---------- */
-(function init(){
-  const params = new URLSearchParams(window.location.search);
-  const model = params.get('model');
-  const group = params.get('group');
-  const tier = parseInt(params.get('tier'), 10);
-  const lockType = params.get('lock');
-  const screenState = params.get('screen') || '';
-  const iosVersion = params.get('ios') || '';
-
-  if(!model || !group || !tier || !lockType){
-    renderEmpty();
-    return;
+function details(tier, can, screen, ios){
+  if(tier === 1) return ['Siempre se puede desbloquear. Precio base $5 USD.', 'Puede quedar con señal, pero debe validarse con el software. Si queda con señal, pide más dinero.'];
+  if(tier === 2){
+    const signal = screen === 'hello' ? 'En Hello queda sin señal.' : 'En PIN o iPhone no disponible puede quedar con señal.';
+    return ['Compatible en cualquier versión de iOS para XS al 11 Pro Max. Requiere microcontrolador RP2450.', signal];
   }
-  renderResultado(model, group, tier, lockType, screenState, iosVersion);
+  if(tier === 3){
+    return can ? ['Compatible si está en Hello y iOS 26.1.', 'Solo bypass sin señal. Precio base $5 USD.'] : ['No confirmado con los datos ingresados.', 'Para 12 a 17 Pro Max debe estar en Hello y iOS 26.1; solo bypass sin señal.'];
+  }
+  return ['Modelo fuera de las reglas cargadas.', 'Agrega una regla nueva si tu procedimiento lo permite.'];
+}
+(function init(){
+  const p = new URLSearchParams(location.search);
+  const model = p.get('model'), group = p.get('group'), tier = Number(p.get('tier')), lock = p.get('lock'), screen = p.get('screen'), ios = p.get('ios') || 'No indicado', can = p.get('can') === '1';
+  if(!model || !group || !tier || !lock){ empty(); return; }
+  const lines = details(tier, can, screen, ios);
+  resultCard.innerHTML = `<div class="result-top"><div><h1 class="result-title">${model}</h1><p class="result-sub">${group} · ${lockLabels[lock] || lock}</p></div><span class="verdict ${can ? 'yes' : 'no'}">${can ? 'Sí se puede' : 'No confirmado'}</span></div><div class="info-block ${can ? 'good' : 'bad'}"><strong>Resultado:</strong> ${lines[0]}<br>${lines[1]}</div><div class="meta-grid"><div class="meta-item"><div class="label">Pantalla</div><div class="value">${screenLabels[screen] || 'No indicada'}</div></div><div class="meta-item"><div class="label">iOS</div><div class="value">${ios}</div></div><div class="meta-item"><div class="label">Precio base</div><div class="value">$5 USD</div></div><div class="meta-item"><div class="label">Herramienta extra</div><div class="value">${tier === 2 ? 'RP2450' : 'Software'}</div></div></div>${downloadLink(tier)}<a class="back-btn" href="index.html">← Nueva consulta</a>`;
 })();
 </script>
 </body>
