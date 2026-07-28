@@ -103,8 +103,12 @@
 import { db, VERIFICATIONS_COLLECTION } from './firebase-config.js';
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
-const lockLabels = {icloud:'iCloud', mdm:'MDM', pin:'PIN', compania:'Compañía'};
+const lockLabels = {icloud:'iCloud', mdm:'MDM', fmi:'FMI', frp:'FRP', google:'Cuenta Google', operador:'Operador', pin:'Código/PIN', patron:'Patrón', samsung:'Cuenta Samsung', xiaomi:'Cuenta Xiaomi', otro:'Otro', compania:'Compañía'};
 const certWrap = document.getElementById('certWrap');
+
+function formatMoney(amount){
+  return new Intl.NumberFormat('es-MX', {style:'currency', currency:'MXN', maximumFractionDigits:0}).format(amount || 0);
+}
 
 function formatDate(iso){
   const d = iso ? new Date(iso) : new Date();
@@ -136,13 +140,35 @@ function renderRecord(record, folio){
           </div>
         </div>
         <div class="cert-item">
-          <div class="label">Modelo</div>
-          <div class="value">${record.device}</div>
+          <div class="label">Equipo</div>
+          <div class="value">${record.brand || 'Apple'} · ${record.device}</div>
           <div class="value small">${record.deviceYear || ''} ${record.deviceGroup ? '· '+record.deviceGroup : ''}</div>
+        </div>
+        <div class="cert-item">
+          <div class="label">Contacto</div>
+          <div class="value small">Tel. ${record.clientPhone || '—'} · WhatsApp ${record.clientWhatsapp || '—'}</div>
+        </div>
+        <div class="cert-item">
+          <div class="label">Estado / resultado</div>
+          <div class="value">${record.status || 'Pendiente'}</div>
+          <div class="value small">${record.result || 'Resultado pendiente'} · ${record.timeSpentMinutes || 0} min</div>
+        </div>
+        <div class="cert-item">
+          <div class="label">Precio</div>
+          <div class="value">${formatMoney(record.price || 0)}</div>
+          <div class="value small">Puntos: ${record.points || 0}</div>
         </div>
         <div class="cert-item">
           <div class="label">Técnico</div>
           <div class="value small">${record.technician || 'Invitado'}</div>
+        </div>
+        <div class="cert-item full">
+          <div class="label">Herramientas</div>
+          <div class="value small">${(record.tools || []).join(' · ') || '—'}</div>
+        </div>
+        <div class="cert-item full">
+          <div class="label">Procedimiento</div>
+          <div class="value small">${(record.procedure || []).map((step, i) => `${i + 1}. ${step}`).join('<br>') || '—'}</div>
         </div>
         <div class="cert-item full">
           <div class="label">Fecha y hora de registro</div>

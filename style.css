@@ -317,3 +317,37 @@ tbody tr:hover td{background:var(--surface-2);}
   .cert-grid{grid-template-columns:1fr;}
   .cert-top{flex-direction:column;gap:10px;}
 }
+
+/* ---------- CRM técnico agregado (mantiene paleta y diseño base) ---------- */
+.textarea-input{min-height:78px;resize:vertical;line-height:1.45;}
+select.name-input{appearance:none;}
+.check-row{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12.5px;margin:0 0 10px;}
+.check-row input{accent-color:var(--copper);}
+.assistant-card{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:14px;margin:4px 0 18px;}
+.assistant-empty{color:var(--muted);font-size:12.5px;line-height:1.5;}
+.assistant-section{margin-top:10px;font-size:12.5px;line-height:1.5;}
+.assistant-section strong,.mini-chart strong{display:block;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;margin-bottom:8px;}
+.assistant-section ol{margin:8px 0 0 18px;padding:0;color:var(--muted);}
+.tool-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.tool-list span{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--copper);background:var(--copper-dim);border:1px solid rgba(226,163,59,.35);border-radius:20px;padding:5px 9px;}
+.assistant-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;}
+.assistant-meta span{background:rgba(86,194,214,.08);border:1px solid rgba(86,194,214,.2);border-radius:8px;color:var(--cyan);font-family:'JetBrains Mono',monospace;font-size:11px;padding:8px;}
+.crm-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:22px;margin-top:26px;}
+.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.kpi{background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:12px;}
+.kpi span{display:block;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:10.5px;text-transform:uppercase;margin-bottom:5px;}
+.kpi strong{font-family:'Space Grotesk',sans-serif;font-size:18px;}
+.mini-chart{margin-top:16px;}
+.mini-chart div{display:grid;grid-template-columns:90px 1fr 28px;align-items:center;gap:8px;color:var(--muted);font-size:12px;margin-top:8px;}
+.mini-chart em{display:block;height:7px;background:linear-gradient(90deg,var(--copper),var(--cyan));border-radius:10px;min-width:8px;}
+.ranking-list{display:flex;flex-direction:column;gap:8px;}
+.ranking-row{display:flex;align-items:center;gap:10px;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:10px;}
+.avatar.mini{width:32px;height:32px;font-size:12px;}
+.ranking-row div{min-width:0;}
+.ranking-row strong{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ranking-row small{display:block;color:var(--muted);font-size:11.5px;margin-top:2px;}
+.admin-panel{margin-top:26px;}
+.admin-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px;}
+.admin-actions .link-btn{width:100%;padding:10px;}
+@media (max-width:880px){.crm-grid{grid-template-columns:1fr;}.kpi-grid{grid-template-columns:1fr 1fr;}}
+@media (max-width:520px){.assistant-meta,.kpi-grid{grid-template-columns:1fr;}}
