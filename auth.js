@@ -10,6 +10,8 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
   sendPasswordResetEmail,
   updateProfile,
   signOut
@@ -54,6 +56,32 @@ const avatarInitials = document.getElementById('avatarInitials');
 const profileEmail = document.getElementById('profileEmail');
 const profileRole = document.getElementById('profileRole');
 const logoutBtn = document.getElementById('logoutBtn');
+
+/* ---------- Google Sign-In ---------- */
+const googleProvider = new GoogleAuthProvider();
+const googleLoginBtn = document.getElementById('googleLoginBtn');
+const googleRegisterBtn = document.getElementById('googleRegisterBtn');
+
+function handleGoogleSignIn(btn, errorEl){
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  signInWithPopup(auth, googleProvider)
+    .then(() => {
+      btn.disabled = false;
+      btn.textContent = originalText;
+      closeSidePanel();
+    })
+    .catch(err => {
+      btn.disabled = false;
+      btn.textContent = originalText;
+      if (err.code !== 'auth/popup-closed-by-user' && err.code !== 'auth/cancelled-popup-request') {
+        errorEl.textContent = 'No se pudo continuar con Google. Intenta de nuevo.';
+      }
+      console.error(err);
+    });
+}
+if(googleLoginBtn) googleLoginBtn.addEventListener('click', ()=> handleGoogleSignIn(googleLoginBtn, loginError));
+if(googleRegisterBtn) googleRegisterBtn.addEventListener('click', ()=> handleGoogleSignIn(googleRegisterBtn, registerError));
 
 /* ---------- Abrir / cerrar panel ---------- */
 function openPanel(){
