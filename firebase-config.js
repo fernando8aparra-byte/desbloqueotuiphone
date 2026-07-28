@@ -26,6 +26,10 @@ export const firebaseReady = true;
 /* Colección donde se guardan los registros de verificación */
 export const VERIFICATIONS_COLLECTION = "verificaciones";
 
+/* Colección donde se guarda el perfil de cada técnico/administrador
+   (documento con id = uid de Firebase Auth) */
+export const USERS_COLLECTION = "users";
+
 /* Analytics solo se activa si el navegador lo soporta (no falla en SSR/entornos raros) */
 isSupported().then(supported => {
   if (supported) getAnalytics(app);
