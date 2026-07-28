@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comprobante de verificación</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============ TOP BAR ============ -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <rect x="8" y="8" width="12" height="12" rx="2.5" stroke="#E2A33B" stroke-width="1.6"/>
+        <path d="M8 11H4M8 17H4M20 11H24M20 17H24M11 8V4M17 8V4M11 20V24M17 20V24" stroke="#E2A33B" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <span class="brand-name">Centro de Verificación<small>Diagnóstico de equipos</small></span>
+    </div>
+    <button class="hamburger-btn" id="menuBtn" aria-label="Abrir menú"><span></span><span></span><span></span></button>
+  </div>
+</div>
+
+<!-- ============ SIDE PANEL (login / perfil) ============ -->
+<div class="overlay" id="overlay"></div>
+<aside class="side-panel" id="sidePanel">
+  <div class="side-panel-head">
+    <span class="side-panel-title">Cuenta</span>
+    <button class="close-btn" id="closePanel" aria-label="Cerrar menú">&times;</button>
+  </div>
+
+  <div id="loggedOutView">
+    <p class="field-label">Iniciar sesión</p>
+    <input type="email" id="loginEmail" class="name-input" placeholder="Correo electrónico">
+    <input type="password" id="loginPassword" class="name-input" placeholder="Contraseña">
+    <button class="submit-btn" id="loginBtn">Iniciar sesión</button>
+    <p class="hint err" id="loginError"></p>
+  </div>
+
+  <div id="loggedInView" style="display:none;">
+    <div class="profile-card">
+      <div class="avatar" id="avatarInitials"></div>
+      <div class="profile-info">
+        <span class="profile-email" id="profileEmail"></span>
+        <span class="profile-role">Técnico</span>
+      </div>
+    </div>
+    <button class="submit-btn secondary-btn" id="logoutBtn">Cerrar sesión</button>
+  </div>
+</aside>
+
+<div class="cert-wrap" id="certWrap">
+  <div class="cert-card cert-not-found"><p>Cargando comprobante...</p></div>
+</div>
+
+<script type="module" src="auth.js"></script>
+
+<script type="module">
+import { db, VERIFICATIONS_COLLECTION } from './firebase-config.js';
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+const lockLabels = {icloud:'iCloud', mdm:'MDM', pin:'PIN', compania:'Compañía'};
+const certWrap = document.getElementById('certWrap');
+
+function formatDate(iso){
+  const d = iso ? new Date(iso) : new Date();
+  return d.toLocaleDateString('es-MX', {day:'2-digit', month:'long', year:'numeric'}) + ' · ' +
+         d.toLocaleTimeString('es-MX', {hour:'2-digit', minute:'2-digit'});
+}
+
+function renderRecord(record, folio){
+  certWrap.innerHTML = `
+    <div class="cert-card">
+      <div class="cert-top">
+        <div>
+          <p class="cert-eyebrow">Comprobante de verificación</p>
+          <h2 class="cert-title">${record.device}</h2>
+        </div>
+        <span class="stamp">Verificado</span>
+      </div>
+      <p class="cert-folio">${folio}</p>
+
+      <div class="cert-grid">
+        <div class="cert-item">
+          <div class="label">Cliente</div>
+          <div class="value">${record.client || '—'}</div>
+        </div>
+        <div class="cert-item">
+          <div class="label">Tipo de bloqueo</div>
+          <div class="value">
+            <span class="lock-badge" data-lock="${record.lockKey}"><span class="dot"></span>${record.lockLabel || lockLabels[record.lockKey] || '—'}</span>
+          </div>
+        </div>
+        <div class="cert-item">
+          <div class="label">Modelo</div>
+          <div class="value">${record.device}</div>
+          <div class="value small">${record.deviceYear || ''} ${record.deviceGroup ? '· '+record.deviceGroup : ''}</div>
+        </div>
+        <div class="cert-item">
+          <div class="label">Técnico</div>
+          <div class="value small">${record.technician || 'Invitado'}</div>
+        </div>
+        <div class="cert-item full">
+          <div class="label">Fecha y hora de registro</div>
+          <div class="value small">${formatDate(record.createdAt)}</div>
+        </div>
+      </div>
+
+      <div class="cert-actions">
+        <button class="submit-btn secondary-btn" onclick="window.location.href='index.html'">Volver al panel</button>
+        <button class="submit-btn" onclick="window.print()">Imprimir comprobante</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderNotFound(){
+  certWrap.innerHTML = `
+    <div class="cert-card cert-not-found">
+      <h2>No se encontró el registro</h2>
+      <p>El comprobante que buscas no existe o el enlace es incorrecto.</p>
+      <div class="cert-actions" style="justify-content:center;margin-top:16px;">
+        <button class="submit-btn" style="width:auto;" onclick="window.location.href='index.html'">Volver al panel</button>
+      </div>
+    </div>
+  `;
+}
+
+async function loadRecord(){
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+
+  if(!id){
+    renderNotFound();
+    return;
+  }
+  try{
+    const snap = await getDoc(doc(db, VERIFICATIONS_COLLECTION, id));
+    if(snap.exists()){
+      renderRecord(snap.data(), 'ORD-' + id.slice(0,6).toUpperCase());
+      return;
+    }
+  }catch(err){
+    console.error('Error leyendo el registro de Firebase:', err);
+  }
+  renderNotFound();
+}
+
+loadRecord();
+</script>
+</body>
+</html>

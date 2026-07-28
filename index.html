@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terminal de verificación de compatibilidad</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============ TOP BAR ============ -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <rect x="8" y="8" width="12" height="12" rx="2.5" stroke="#E2A33B" stroke-width="1.6"/>
+        <path d="M8 11H4M8 17H4M20 11H24M20 17H24M11 8V4M17 8V4M11 20V24M17 20V24" stroke="#E2A33B" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <span class="brand-name">Centro de Verificación<small>Diagnóstico de equipos</small></span>
+    </div>
+    <button class="hamburger-btn" id="menuBtn" aria-label="Abrir menú"><span></span><span></span><span></span></button>
+  </div>
+</div>
+
+<!-- ============ SIDE PANEL (login / perfil) ============ -->
+<div class="overlay" id="overlay"></div>
+<aside class="side-panel" id="sidePanel">
+  <div class="side-panel-head">
+    <span class="side-panel-title">Cuenta</span>
+    <button class="close-btn" id="closePanel" aria-label="Cerrar menú">&times;</button>
+  </div>
+
+  <div id="loggedOutView">
+    <p class="field-label">Iniciar sesión</p>
+    <input type="email" id="loginEmail" class="name-input" placeholder="Correo electrónico">
+    <input type="password" id="loginPassword" class="name-input" placeholder="Contraseña">
+    <button class="submit-btn" id="loginBtn">Iniciar sesión</button>
+    <p class="hint err" id="loginError"></p>
+  </div>
+
+  <div id="loggedInView" style="display:none;">
+    <div class="profile-card">
+      <div class="avatar" id="avatarInitials"></div>
+      <div class="profile-info">
+        <span class="profile-email" id="profileEmail"></span>
+        <span class="profile-role">Técnico</span>
+      </div>
+    </div>
+    <button class="submit-btn secondary-btn" id="logoutBtn">Cerrar sesión</button>
+  </div>
+</aside>
+
+<div class="wrap">
+
+  <header class="page-header">
+    <div>
+      <p class="brand-eyebrow">Panel técnico</p>
+      <h1>Verificación de compatibilidad</h1>
+      <p class="sub">Elige el equipo, el tipo de bloqueo y registra al cliente.</p>
+    </div>
+    <div class="range-tag">iPhone 6s &rarr; 17 Pro Max</div>
+  </header>
+
+  <div class="layout">
+
+    <!-- DEVICE PICKER -->
+    <section class="panel">
+      <h2>Dispositivo</h2>
+
+      <div class="search-row">
+        <input type="text" id="searchInput" placeholder="Buscar modelo (opcional), ej. 13 Pro">
+      </div>
+
+      <div id="deviceListContainer"></div>
+    </section>
+
+    <!-- TICKET -->
+    <section class="ticket">
+      <div class="ticket-head">
+        <span class="ticket-title">Orden de verificación</span>
+        <span class="folio" id="folioLabel">ORD-000001</span>
+      </div>
+      <div class="dashed"></div>
+
+      <div class="auth-gate" id="authGate" style="display:none;">
+        <p>Inicia sesión como técnico para registrar una verificación.</p>
+        <button id="authGateBtn">Iniciar sesión</button>
+      </div>
+
+      <div id="ticketFields">
+        <div class="field-label">Tipo de bloqueo</div>
+        <div class="lock-grid">
+          <button class="lock-btn" data-lock="icloud"><span class="dot"></span>iCloud</button>
+          <button class="lock-btn" data-lock="mdm"><span class="dot"></span>MDM</button>
+          <button class="lock-btn" data-lock="pin"><span class="dot"></span>PIN</button>
+          <button class="lock-btn" data-lock="compania"><span class="dot"></span>Compañía</button>
+        </div>
+
+        <div class="field-label">Nombre del cliente</div>
+        <input type="text" class="name-input" id="clientName" placeholder="Nombre y apellido">
+
+        <button class="submit-btn" id="submitBtn" disabled>Registrar y verificar</button>
+        <p class="hint" id="hintText"></p>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- HISTORY -->
+  <div class="history">
+    <h2><span class="live-dot" id="liveDot"></span>Historial de registros</h2>
+    <div class="panel" style="padding:0;">
+      <table id="historyTable">
+        <thead>
+          <tr>
+            <th>Folio</th>
+            <th>Cliente</th>
+            <th>Dispositivo</th>
+            <th>Bloqueo</th>
+            <th>Técnico</th>
+            <th>Fecha / hora</th>
+          </tr>
+        </thead>
+        <tbody id="historyBody"></tbody>
+      </table>
+      <div class="empty-history" id="emptyHistory">Aún no se registran verificaciones.</div>
+    </div>
+  </div>
+
+</div>
+
+<script type="module" src="auth.js"></script>
+
+<script type="module">
+import { db, VERIFICATIONS_COLLECTION } from './firebase-config.js';
+import {
+  collection, addDoc, onSnapshot, query, orderBy, limit
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+/* ---------- Datos de dispositivos, agrupados por serie ---------- */
+const series = [
+  {key:'iPhone 6s', label:'iPhone 6s', years:'2015', models:[
+    {name:'iPhone 6s', year:2015}, {name:'iPhone 6s Plus', year:2015}
+  ]},
+  {key:'iPhone SE', label:'iPhone SE', years:'2016–2022', models:[
+    {name:'iPhone SE (1.ª gen.)', year:2016},
+    {name:'iPhone SE (2.ª gen.)', year:2020},
+    {name:'iPhone SE (3.ª gen.)', year:2022}
+  ]},
+  {key:'iPhone 7', label:'iPhone 7', years:'2016', models:[
+    {name:'iPhone 7', year:2016}, {name:'iPhone 7 Plus', year:2016}
+  ]},
+  {key:'iPhone 8', label:'iPhone 8', years:'2017', models:[
+    {name:'iPhone 8', year:2017}, {name:'iPhone 8 Plus', year:2017}
+  ]},
+  {key:'iPhone X', label:'iPhone X · XS · XR', years:'2017–2018', models:[
+    {name:'iPhone X', year:2017}, {name:'iPhone XR', year:2018},
+    {name:'iPhone XS', year:2018}, {name:'iPhone XS Max', year:2018}
+  ]},
+  {key:'iPhone 11', label:'iPhone 11', years:'2019', models:[
+    {name:'iPhone 11', year:2019}, {name:'iPhone 11 Pro', year:2019}, {name:'iPhone 11 Pro Max', year:2019}
+  ]},
+  {key:'iPhone 12', label:'iPhone 12', years:'2020', models:[
+    {name:'iPhone 12 mini', year:2020}, {name:'iPhone 12', year:2020},
+    {name:'iPhone 12 Pro', year:2020}, {name:'iPhone 12 Pro Max', year:2020}
+  ]},
+  {key:'iPhone 13', label:'iPhone 13', years:'2021', models:[
+    {name:'iPhone 13 mini', year:2021}, {name:'iPhone 13', year:2021},
+    {name:'iPhone 13 Pro', year:2021}, {name:'iPhone 13 Pro Max', year:2021}
+  ]},
+  {key:'iPhone 14', label:'iPhone 14', years:'2022', models:[
+    {name:'iPhone 14', year:2022}, {name:'iPhone 14 Plus', year:2022},
+    {name:'iPhone 14 Pro', year:2022}, {name:'iPhone 14 Pro Max', year:2022}
+  ]},
+  {key:'iPhone 15', label:'iPhone 15', years:'2023', models:[
+    {name:'iPhone 15', year:2023}, {name:'iPhone 15 Plus', year:2023},
+    {name:'iPhone 15 Pro', year:2023}, {name:'iPhone 15 Pro Max', year:2023}
+  ]},
+  {key:'iPhone 16', label:'iPhone 16', years:'2024–2025', models:[
+    {name:'iPhone 16', year:2024}, {name:'iPhone 16 Plus', year:2024},
+    {name:'iPhone 16 Pro', year:2024}, {name:'iPhone 16 Pro Max', year:2024},
+    {name:'iPhone 16e', year:2025}
+  ]},
+  {key:'iPhone 17', label:'iPhone 17', years:'2025', models:[
+    {name:'iPhone 17', year:2025}, {name:'iPhone 17 Air', year:2025},
+    {name:'iPhone 17 Pro', year:2025}, {name:'iPhone 17 Pro Max', year:2025}
+  ]}
+];
+
+// lista plana, útil para la búsqueda y para el envío del registro
+const devices = series.flatMap(s => s.models.map(m => ({...m, group:s.key})));
+const lockLabels = {icloud:'iCloud', mdm:'MDM', pin:'PIN', compania:'Compañía'};
+
+let selectedDevice = null;
+let selectedLock = null;
+let isLoggedIn = false;
+let pickerOpen = true;      // panel de selección expandido vs. colapsado
+let activeSeriesKey = null; // serie elegida en el paso 1
+
+const deviceListContainer = document.getElementById('deviceListContainer');
+const searchInput = document.getElementById('searchInput');
+const clientNameInput = document.getElementById('clientName');
+const submitBtn = document.getElementById('submitBtn');
+const hintText = document.getElementById('hintText');
+const folioLabel = document.getElementById('folioLabel');
+const historyBody = document.getElementById('historyBody');
+const emptyHistory = document.getElementById('emptyHistory');
+const authGate = document.getElementById('authGate');
+const ticketFields = document.getElementById('ticketFields');
+const liveDot = document.getElementById('liveDot');
+
+document.getElementById('authGateBtn').addEventListener('click', ()=> window.openAccountPanel());
+
+function selectDevice(d){
+  selectedDevice = d;
+  pickerOpen = false;
+  renderPicker();
+  validateForm();
+}
+
+function renderPicker(){
+  // 1) Dispositivo ya elegido y el panel está colapsado -> tira compacta
+  if(selectedDevice && !pickerOpen){
+    deviceListContainer.innerHTML = `
+      <div class="picked-strip">
+        <div class="picked-info">
+          <span class="picked-name">${selectedDevice.name}</span>
+          <span class="picked-meta">${selectedDevice.year} · ${selectedDevice.group}</span>
+        </div>
+        <button class="link-btn" id="changeDeviceBtn">Cambiar</button>
+      </div>`;
+    document.getElementById('changeDeviceBtn').addEventListener('click', ()=>{
+      pickerOpen = true;
+      renderPicker();
+    });
+    return;
+  }
+
+  const query = searchInput.value.trim().toLowerCase();
+
+  // 2) Hay texto en el buscador -> resultados planos, sin importar el paso
+  if(query){
+    const filtered = devices.filter(d => d.name.toLowerCase().includes(query));
+    if(filtered.length === 0){
+      deviceListContainer.innerHTML = '<div class="empty-devices">Sin resultados para esta búsqueda.</div>';
+      return;
+    }
+    deviceListContainer.innerHTML = `
+      <p class="search-results-label">${filtered.length} resultado${filtered.length===1?'':'s'}</p>
+      <div class="grid">
+        ${filtered.map(d => `
+          <button class="device-card" data-name="${d.name}">
+            <span class="year">${d.year}</span>
+            <span class="name">${d.name}</span>
+          </button>`).join('')}
+      </div>`;
+    deviceListContainer.querySelectorAll('.device-card').forEach(el=>{
+      el.addEventListener('click', ()=> selectDevice(devices.find(d=>d.name===el.dataset.name)));
+    });
+    return;
+  }
+
+  // 3) Sin serie elegida -> paso 1: elegir generación
+  if(!activeSeriesKey){
+    deviceListContainer.innerHTML = `
+      <p class="step-label">Paso 1 · Elige la generación</p>
+      <div class="series-grid">
+        ${series.map(s => `
+          <button class="series-card" data-key="${s.key}">
+            <span class="series-name">${s.label}</span>
+            <span class="series-years">${s.years}</span>
+          </button>`).join('')}
+      </div>`;
+    deviceListContainer.querySelectorAll('.series-card').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        activeSeriesKey = el.dataset.key;
+        renderPicker();
+      });
+    });
+    return;
+  }
+
+  // 4) Serie elegida -> paso 2: elegir modelo exacto
+  const activeSeries = series.find(s => s.key === activeSeriesKey);
+  deviceListContainer.innerHTML = `
+    <button class="back-link" id="backToSeries">&larr; Elegir otra generación</button>
+    <p class="step-label">Paso 2 · ${activeSeries.label}</p>
+    <div class="models-list">
+      ${activeSeries.models.map(m => `
+        <button class="model-btn" data-name="${m.name}">
+          <span class="name">${m.name}</span>
+          <span class="year">${m.year}</span>
+        </button>`).join('')}
+    </div>`;
+  document.getElementById('backToSeries').addEventListener('click', ()=>{
+    activeSeriesKey = null;
+    renderPicker();
+  });
+  deviceListContainer.querySelectorAll('.model-btn').forEach(el=>{
+    el.addEventListener('click', ()=> selectDevice(devices.find(d=>d.name===el.dataset.name && d.group===activeSeriesKey)));
+  });
+}
+
+document.querySelectorAll('.lock-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    selectedLock = btn.dataset.lock;
+    document.querySelectorAll('.lock-btn').forEach(b=>b.classList.toggle('active', b.dataset.lock===selectedLock));
+    validateForm();
+  });
+});
+
+searchInput.addEventListener('input', renderPicker);
+clientNameInput.addEventListener('input', validateForm);
+
+function validateForm(){
+  if(!isLoggedIn){
+    submitBtn.disabled = true;
+    hintText.textContent = '';
+    return;
+  }
+  const missing = [];
+  if(!selectedDevice) missing.push('dispositivo');
+  if(!selectedLock) missing.push('tipo de bloqueo');
+  if(!clientNameInput.value.trim()) missing.push('nombre del cliente');
+
+  if(missing.length===0){
+    submitBtn.disabled = false;
+    hintText.textContent = 'Listo para registrar.';
+    hintText.className = 'hint ok';
+  } else {
+    submitBtn.disabled = true;
+    hintText.textContent = `Falta: ${missing.join(', ')}.`;
+    hintText.className = 'hint';
+  }
+}
+
+/* ---------- Guardar registro en Firestore y redirigir a check.html ---------- */
+async function handleSubmit(){
+  if(submitBtn.disabled) return;
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Registrando...';
+
+  const technicianEmail = (window.currentUser && window.currentUser.email) || 'Invitado';
+
+  const record = {
+    device: selectedDevice.name,
+    deviceYear: selectedDevice.year,
+    deviceGroup: selectedDevice.group,
+    lockKey: selectedLock,
+    lockLabel: lockLabels[selectedLock],
+    client: clientNameInput.value.trim(),
+    technician: technicianEmail,
+    createdAt: new Date().toISOString()
+  };
+
+  try{
+    const docRef = await addDoc(collection(db, VERIFICATIONS_COLLECTION), record);
+    window.location.href = `check.html?id=${docRef.id}`;
+  }catch(err){
+    console.error('Error guardando en Firebase:', err);
+    hintText.textContent = 'No se pudo guardar en Firebase. Intenta de nuevo.';
+    hintText.className = 'hint err';
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Registrar y verificar';
+  }
+}
+submitBtn.addEventListener('click', handleSubmit);
+
+/* ---------- Historial en tiempo real ---------- */
+function pad(n){ return n.toString().padStart(6,'0'); }
+
+const historyQuery = query(collection(db, VERIFICATIONS_COLLECTION), orderBy('createdAt','desc'), limit(25));
+onSnapshot(historyQuery, snapshot => {
+  folioLabel.textContent = `ORD-${pad(snapshot.size+1)}`;
+
+  if(snapshot.empty){
+    historyBody.innerHTML = '';
+    emptyHistory.style.display = 'block';
+    return;
+  }
+  emptyHistory.style.display = 'none';
+  historyBody.innerHTML = snapshot.docs.map(docSnap=>{
+    const h = docSnap.data();
+    const d = h.createdAt ? new Date(h.createdAt) : new Date();
+    const timeStr = d.toLocaleDateString('es-MX', {day:'2-digit', month:'2-digit', year:'numeric'}) + ' · ' +
+                    d.toLocaleTimeString('es-MX', {hour:'2-digit', minute:'2-digit'});
+    const folio = 'ORD-' + docSnap.id.slice(0,6).toUpperCase();
+    return `<tr onclick="window.location.href='check.html?id=${docSnap.id}'">
+      <td class="folio-cell">${folio}</td>
+      <td>${h.client||''}</td>
+      <td>${h.device||''}</td>
+      <td><span class="lock-badge" data-lock="${h.lockKey}"><span class="dot"></span>${h.lockLabel||''}</span></td>
+      <td>${h.technician||''}</td>
+      <td class="time-cell">${timeStr}</td>
+    </tr>`;
+  }).join('');
+}, err => console.error('No se pudo leer el historial:', err));
+
+/* ---------- Reaccionar a inicio/cierre de sesión ---------- */
+window.onAuthChange(user=>{
+  isLoggedIn = !!user;
+  if(isLoggedIn){
+    authGate.style.display = 'none';
+    ticketFields.classList.remove('field-disabled');
+  } else {
+    authGate.style.display = 'flex';
+    ticketFields.classList.add('field-disabled');
+  }
+  validateForm();
+});
+
+renderPicker();
+</script>
+</body>
+</html>
