@@ -21,6 +21,10 @@
   .meta-item .label{font-family:'JetBrains Mono',monospace;color:var(--muted);font-size:11px;text-transform:uppercase;margin-bottom:5px;}
   .meta-item .value{font-weight:700;}
   .download-btn{display:block;text-align:center;background:var(--copper);color:#181206;text-decoration:none;border-radius:10px;padding:14px;font-weight:800;margin:12px 0;}
+  .tool-result-list{display:grid;gap:8px;margin:14px 0;}
+  .tool-result-list div{background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:13px;}
+  .tool-result-list .ok{color:var(--green);font-weight:800;margin-right:8px;}
+  .tool-result-list .missing{color:var(--muted);font-weight:800;margin-right:8px;}
   .back-btn{display:block;text-align:center;border:1px solid var(--border);color:var(--text);text-decoration:none;border-radius:10px;padding:12px;font-weight:700;}
 </style>
 </head>
@@ -33,7 +37,8 @@
 const LINKS = {
   1: '#', // iPhone 6s al X: reemplaza # por tu link de descarga
   2: '#', // iPhone XS al 11 Pro Max: reemplaza # por tu link de descarga
-  3: '#'  // iPhone 12 al 17 Pro Max: reemplaza # por tu link de descarga
+  3: '#', // iPhone 12 al 17 Pro Max: reemplaza # por tu link de descarga
+  4: '#'  // Android: reemplaza # por tu link de descarga
 };
 const lockLabels = {icloud:'Bloqueo de iCloud', pin:'Bloqueo de pantalla / PIN', mdm:'Bloqueo MDM', compania:'Bloqueo de compañía telefónica'};
 const screenLabels = {hello:'Hello / activación', pin:'PIN', unavailable:'iPhone no disponible', other:'Otro'};
@@ -53,14 +58,18 @@ function details(tier, can, screen, ios){
   if(tier === 3){
     return can ? ['Compatible si está en Hello y iOS 26.1.', 'Solo bypass sin señal. Precio base $5 USD.'] : ['No confirmado con los datos ingresados.', 'Para 12 a 17 Pro Max debe estar en Hello y iOS 26.1; solo bypass sin señal.'];
   }
+  if(tier === 4) return ['Android requiere revisión por marca, parche de seguridad y tipo de bloqueo.', 'Se recomienda diagnosticar con herramienta FRP/ADB antes de confirmar señal o liberación de compañía.'];
   return ['Modelo fuera de las reglas cargadas.', 'Agrega una regla nueva si tu procedimiento lo permite.'];
 }
 (function init(){
   const p = new URLSearchParams(location.search);
   const model = p.get('model'), group = p.get('group'), tier = Number(p.get('tier')), lock = p.get('lock'), screen = p.get('screen'), ios = p.get('ios') || 'No indicado', can = p.get('can') === '1';
+  const tools = (p.get('tools') || '').split('|').filter(Boolean);
+  const installed = (p.get('installed') || '').split('|').filter(Boolean);
   if(!model || !group || !tier || !lock){ empty(); return; }
   const lines = details(tier, can, screen, ios);
-  resultCard.innerHTML = `<div class="result-top"><div><h1 class="result-title">${model}</h1><p class="result-sub">${group} · ${lockLabels[lock] || lock}</p></div><span class="verdict ${can ? 'yes' : 'no'}">${can ? 'Sí se puede' : 'No confirmado'}</span></div><div class="info-block ${can ? 'good' : 'bad'}"><strong>Resultado:</strong> ${lines[0]}<br>${lines[1]}</div><div class="meta-grid"><div class="meta-item"><div class="label">Pantalla</div><div class="value">${screenLabels[screen] || 'No indicada'}</div></div><div class="meta-item"><div class="label">iOS</div><div class="value">${ios}</div></div><div class="meta-item"><div class="label">Precio base</div><div class="value">$5 USD</div></div><div class="meta-item"><div class="label">Herramienta extra</div><div class="value">${tier === 2 ? 'RP2450' : 'Software'}</div></div></div>${downloadLink(tier)}<a class="back-btn" href="index.html">← Nueva consulta</a>`;
+  const toolHtml = tools.length ? `<div class="tool-result-list">${tools.map(tool => `<div><span class="${installed.includes(tool) ? 'ok' : 'missing'}">${installed.includes(tool) ? '✓' : '—'}</span>${tool}</div>`).join('')}</div>` : '';
+  resultCard.innerHTML = `<div class="result-top"><div><h1 class="result-title">${model}</h1><p class="result-sub">${group} · ${lockLabels[lock] || lock}</p></div><span class="verdict ${can ? 'yes' : 'no'}">${can ? 'Sí se puede' : 'No confirmado'}</span></div><div class="info-block ${can ? 'good' : 'bad'}"><strong>Resultado:</strong> ${lines[0]}<br>${lines[1]}</div><div class="meta-grid"><div class="meta-item"><div class="label">Pantalla</div><div class="value">${screenLabels[screen] || 'No indicada'}</div></div><div class="meta-item"><div class="label">iOS/versión</div><div class="value">${ios}</div></div><div class="meta-item"><div class="label">Precio base</div><div class="value">$5 USD</div></div><div class="meta-item"><div class="label">Herramienta extra</div><div class="value">${tier === 2 ? 'RP2450' : 'Software'}</div></div></div>${toolHtml}${downloadLink(tier)}<a class="back-btn" href="index.html">← Nueva consulta</a>`;
 })();
 </script>
 </body>

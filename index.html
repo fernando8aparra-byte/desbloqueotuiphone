@@ -89,6 +89,11 @@
         <span class="profile-role" id="profileRole">Técnico</span>
       </div>
     </div>
+    <div class="profile-tools-card">
+      <p class="field-label">Herramientas instaladas</p>
+      <div id="profileToolsList" class="profile-tools-list"></div>
+      <p class="hint">Marca las herramientas que ya tienes. Se mostrará una palomita en la compatibilidad.</p>
+    </div>
     <button class="submit-btn secondary-btn" id="logoutBtn">Cerrar sesión</button>
   </div>
 </aside>
@@ -110,8 +115,13 @@
     <section class="panel">
       <h2>Dispositivo</h2>
 
+      <div class="device-type-toggle" id="deviceTypeToggle">
+        <button type="button" class="chip active" data-type="iphone">iPhone</button>
+        <button type="button" class="chip" data-type="android">Android</button>
+      </div>
+
       <div class="search-row">
-        <input type="text" id="searchInput" placeholder="Buscar modelo (opcional), ej. 13 Pro">
+        <input type="text" id="searchInput" placeholder="Buscar modelo (opcional), ej. 13 Pro, Galaxy S24">
       </div>
 
       <div id="deviceListContainer"></div>
@@ -247,58 +257,35 @@ import {
   collection, addDoc, onSnapshot, query, orderBy, limit, doc, setDoc, updateDoc, increment
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
-/* ---------- Datos de dispositivos, agrupados por serie ---------- */
-const series = [
-  {key:'iPhone 6s', label:'iPhone 6s', years:'2015', models:[
-    {name:'iPhone 6s', year:2015}, {name:'iPhone 6s Plus', year:2015}
-  ]},
-  {key:'iPhone SE', label:'iPhone SE', years:'2016–2022', models:[
-    {name:'iPhone SE (1.ª gen.)', year:2016},
-    {name:'iPhone SE (2.ª gen.)', year:2020},
-    {name:'iPhone SE (3.ª gen.)', year:2022}
-  ]},
-  {key:'iPhone 7', label:'iPhone 7', years:'2016', models:[
-    {name:'iPhone 7', year:2016}, {name:'iPhone 7 Plus', year:2016}
-  ]},
-  {key:'iPhone 8', label:'iPhone 8', years:'2017', models:[
-    {name:'iPhone 8', year:2017}, {name:'iPhone 8 Plus', year:2017}
-  ]},
-  {key:'iPhone X', label:'iPhone X · XS · XR', years:'2017–2018', models:[
-    {name:'iPhone X', year:2017}, {name:'iPhone XR', year:2018},
-    {name:'iPhone XS', year:2018}, {name:'iPhone XS Max', year:2018}
-  ]},
-  {key:'iPhone 11', label:'iPhone 11', years:'2019', models:[
-    {name:'iPhone 11', year:2019}, {name:'iPhone 11 Pro', year:2019}, {name:'iPhone 11 Pro Max', year:2019}
-  ]},
-  {key:'iPhone 12', label:'iPhone 12', years:'2020', models:[
-    {name:'iPhone 12 mini', year:2020}, {name:'iPhone 12', year:2020},
-    {name:'iPhone 12 Pro', year:2020}, {name:'iPhone 12 Pro Max', year:2020}
-  ]},
-  {key:'iPhone 13', label:'iPhone 13', years:'2021', models:[
-    {name:'iPhone 13 mini', year:2021}, {name:'iPhone 13', year:2021},
-    {name:'iPhone 13 Pro', year:2021}, {name:'iPhone 13 Pro Max', year:2021}
-  ]},
-  {key:'iPhone 14', label:'iPhone 14', years:'2022', models:[
-    {name:'iPhone 14', year:2022}, {name:'iPhone 14 Plus', year:2022},
-    {name:'iPhone 14 Pro', year:2022}, {name:'iPhone 14 Pro Max', year:2022}
-  ]},
-  {key:'iPhone 15', label:'iPhone 15', years:'2023', models:[
-    {name:'iPhone 15', year:2023}, {name:'iPhone 15 Plus', year:2023},
-    {name:'iPhone 15 Pro', year:2023}, {name:'iPhone 15 Pro Max', year:2023}
-  ]},
-  {key:'iPhone 16', label:'iPhone 16', years:'2024–2025', models:[
-    {name:'iPhone 16', year:2024}, {name:'iPhone 16 Plus', year:2024},
-    {name:'iPhone 16 Pro', year:2024}, {name:'iPhone 16 Pro Max', year:2024},
-    {name:'iPhone 16e', year:2025}
-  ]},
-  {key:'iPhone 17', label:'iPhone 17', years:'2025', models:[
-    {name:'iPhone 17', year:2025}, {name:'iPhone 17 Air', year:2025},
-    {name:'iPhone 17 Pro', year:2025}, {name:'iPhone 17 Pro Max', year:2025}
-  ]}
+/* ---------- Datos de dispositivos, agrupados por plataforma y serie ---------- */
+const iphoneSeries = [
+  {key:'iPhone 6s', label:'iPhone 6s', years:'2015', models:[{name:'iPhone 6s', year:2015}, {name:'iPhone 6s Plus', year:2015}]},
+  {key:'iPhone 7', label:'iPhone 7', years:'2016', models:[{name:'iPhone 7', year:2016}, {name:'iPhone 7 Plus', year:2016}]},
+  {key:'iPhone 8', label:'iPhone 8', years:'2017', models:[{name:'iPhone 8', year:2017}, {name:'iPhone 8 Plus', year:2017}]},
+  {key:'iPhone X', label:'iPhone X', years:'2017', models:[{name:'iPhone X', year:2017}]},
+  {key:'iPhone XS', label:'iPhone XS · XR', years:'2018', models:[{name:'iPhone XR', year:2018}, {name:'iPhone XS', year:2018}, {name:'iPhone XS Max', year:2018}]},
+  {key:'iPhone 11', label:'iPhone 11', years:'2019', models:[{name:'iPhone 11', year:2019}, {name:'iPhone 11 Pro', year:2019}, {name:'iPhone 11 Pro Max', year:2019}]},
+  {key:'iPhone 12', label:'iPhone 12', years:'2020', models:[{name:'iPhone 12 mini', year:2020}, {name:'iPhone 12', year:2020}, {name:'iPhone 12 Pro', year:2020}, {name:'iPhone 12 Pro Max', year:2020}]},
+  {key:'iPhone 13', label:'iPhone 13', years:'2021', models:[{name:'iPhone 13 mini', year:2021}, {name:'iPhone 13', year:2021}, {name:'iPhone 13 Pro', year:2021}, {name:'iPhone 13 Pro Max', year:2021}]},
+  {key:'iPhone 14', label:'iPhone 14', years:'2022', models:[{name:'iPhone 14', year:2022}, {name:'iPhone 14 Plus', year:2022}, {name:'iPhone 14 Pro', year:2022}, {name:'iPhone 14 Pro Max', year:2022}]},
+  {key:'iPhone 15', label:'iPhone 15', years:'2023', models:[{name:'iPhone 15', year:2023}, {name:'iPhone 15 Plus', year:2023}, {name:'iPhone 15 Pro', year:2023}, {name:'iPhone 15 Pro Max', year:2023}]},
+  {key:'iPhone 16', label:'iPhone 16', years:'2024–2025', models:[{name:'iPhone 16', year:2024}, {name:'iPhone 16 Plus', year:2024}, {name:'iPhone 16 Pro', year:2024}, {name:'iPhone 16 Pro Max', year:2024}, {name:'iPhone 16e', year:2025}]},
+  {key:'iPhone 17', label:'iPhone 17', years:'2025', models:[{name:'iPhone 17', year:2025}, {name:'iPhone 17 Air', year:2025}, {name:'iPhone 17 Pro', year:2025}, {name:'iPhone 17 Pro Max', year:2025}]}
 ];
-
-// lista plana, útil para la búsqueda y para el envío del registro
-const devices = series.flatMap(s => s.models.map(m => ({...m, group:s.key})));
+const androidSeries = [
+  {key:'Samsung Galaxy S', label:'Samsung Galaxy S', years:'S20–S26', models:['Galaxy S20','Galaxy S21','Galaxy S22','Galaxy S23','Galaxy S24','Galaxy S25','Galaxy S26'].map((name,i)=>({name, year:2020+i}))},
+  {key:'Samsung Galaxy A', label:'Samsung Galaxy A', years:'A10–A55', models:['Galaxy A10','Galaxy A20','Galaxy A30','Galaxy A50','Galaxy A51','Galaxy A52','Galaxy A53','Galaxy A54','Galaxy A55'].map(name=>({name, year:'Android'}))},
+  {key:'Xiaomi Redmi', label:'Xiaomi / Redmi', years:'Popular', models:['Redmi Note 10','Redmi Note 11','Redmi Note 12','Redmi Note 13','Redmi Note 14','Xiaomi 12','Xiaomi 13','Xiaomi 14','POCO X6'].map(name=>({name, year:'Android'}))},
+  {key:'Motorola', label:'Motorola', years:'Popular', models:['Moto G Power','Moto G Stylus','Moto G Play','Moto Edge 30','Moto Edge 40','Moto Edge 50'].map(name=>({name, year:'Android'}))},
+  {key:'Google Pixel', label:'Google Pixel', years:'Pixel 6–10', models:['Pixel 6','Pixel 6 Pro','Pixel 7','Pixel 7 Pro','Pixel 8','Pixel 8 Pro','Pixel 9','Pixel 9 Pro','Pixel 10','Pixel 10 Pro'].map(name=>({name, year:'Android'}))}
+];
+const catalogs = {iphone: iphoneSeries, android: androidSeries};
+const platformLabels = {iphone:'iPhone', android:'Android'};
+const allTools = ['Software iPhone 6s-X','Software XS-11 Pro Max','Microcontrolador RP2450','Software iPhone 12-17','Herramienta FRP Android','ADB/Fastboot','Odin','MTK Client'];
+let installedTools = JSON.parse(localStorage.getItem('installedTools:v1') || '[]');
+let currentDeviceType = 'iphone';
+let series = catalogs[currentDeviceType];
+let devices = series.flatMap(s => s.models.map(m => ({...m, group:s.key, platform:currentDeviceType})));
 const lockOptions = [
   {key:'icloud', label:'Bloqueo de iCloud'},
   {key:'pin', label:'Bloqueo de pantalla / PIN'},
@@ -323,6 +310,8 @@ let isLoggedIn = false;
 let pickerOpen = true;      // panel de selección expandido vs. colapsado
 let activeSeriesKey = null; // serie elegida en el paso 1
 
+const deviceTypeToggle = document.getElementById('deviceTypeToggle');
+const profileToolsList = document.getElementById('profileToolsList');
 const deviceListContainer = document.getElementById('deviceListContainer');
 const searchInput = document.getElementById('searchInput');
 const clientNameInput = document.getElementById('clientName');
@@ -360,10 +349,44 @@ const rankingFilter = document.getElementById('rankingFilter');
 const adminPanel = document.getElementById('adminPanel');
 const adminActions = document.getElementById('adminActions');
 
+function refreshDeviceCatalog(){
+  series = catalogs[currentDeviceType];
+  devices = series.flatMap(s => s.models.map(m => ({...m, group:s.key, platform:currentDeviceType})));
+}
+
+function setDeviceType(type){
+  currentDeviceType = type;
+  activeSeriesKey = null;
+  selectedDevice = null;
+  pickerOpen = true;
+  searchInput.value = '';
+  deviceBrandInput.value = type === 'iphone' ? 'Apple' : '';
+  refreshDeviceCatalog();
+  deviceTypeToggle.querySelectorAll('.chip').forEach(btn => btn.classList.toggle('active', btn.dataset.type === type));
+  renderPicker();
+  renderAssistant();
+  validateForm();
+}
+
+deviceTypeToggle.querySelectorAll('.chip').forEach(btn => btn.addEventListener('click', () => setDeviceType(btn.dataset.type)));
+
+function renderProfileTools(){
+  if(!profileToolsList) return;
+  profileToolsList.innerHTML = allTools.map(tool => `
+    <label class="tool-check-row"><input type="checkbox" value="${tool}" ${installedTools.includes(tool) ? 'checked' : ''}><span class="checkmark">✓</span>${tool}</label>`).join('');
+  profileToolsList.querySelectorAll('input').forEach(input => input.addEventListener('change', () => {
+    installedTools = [...profileToolsList.querySelectorAll('input:checked')].map(el => el.value);
+    localStorage.setItem('installedTools:v1', JSON.stringify(installedTools));
+    renderAssistant();
+  }));
+}
+renderProfileTools();
+
 document.getElementById('authGateBtn').addEventListener('click', ()=> window.openAccountPanel());
 
 function selectDevice(d){
   selectedDevice = d;
+  deviceBrandInput.value = d.platform === 'iphone' ? 'Apple' : deviceBrandInput.value.trim();
   pickerOpen = false;
   renderPicker();
   renderAssistant();
@@ -473,6 +496,7 @@ deviceBrandInput.addEventListener('input', renderAssistant);
 
 function getTier(device){
   if(!device) return 0;
+  if(device.platform === 'android') return 4;
   const name = device.name.toLowerCase();
   if(name.includes('iphone 6s') || name.includes('iphone 7') || name.includes('iphone 8') || name === 'iphone x' || name.includes('se')) return 1;
   if(name.includes('iphone xr') || name.includes('iphone xs') || name.includes('iphone 11')) return 2;
@@ -485,14 +509,16 @@ function getCompatibility(){
   const tier = getTier(selectedDevice);
   const screen = screenStateInput.value;
   const ios = iosVersionInput.value.trim();
-  const base = {tier, canUnlock:true, price:'$5 USD', signal:'Por validar', tool:'Herramienta pendiente de link', notes:[], needs:['Validar autorización del cliente.']};
+  const base = {tier, canUnlock:true, price:'$5 USD', signal:'Por validar', tool:'Herramienta pendiente de link', tools:['Software'], notes:[], needs:['Validar autorización del cliente.']};
   if(tier === 1){
     base.group = 'iPhone 6s al iPhone X';
     base.signal = 'Puede quedar con señal si el software lo valida';
+    base.tools = ['Software iPhone 6s-X'];
     base.notes.push('Siempre se puede desbloquear en este rango. Si queda con señal, pide más dinero al cliente.');
   }else if(tier === 2){
     base.group = 'iPhone XS al iPhone 11 Pro Max';
     base.tool = 'Microcontrolador RP2450 + herramienta';
+    base.tools = ['Software XS-11 Pro Max','Microcontrolador RP2450'];
     base.needs.push('Microcontrolador RP2450.');
     if(screen === 'pin' || screen === 'unavailable'){
       base.signal = 'Puede quedar con señal';
@@ -508,12 +534,18 @@ function getCompatibility(){
   }else if(tier === 3){
     base.group = 'iPhone 12 al iPhone 17 Pro Max';
     base.signal = 'Bypass sin señal';
+    base.tools = ['Software iPhone 12-17'];
     if(screen === 'hello' && ios === '26.1'){
       base.notes.push('Compatible: debe estar en pantalla Hello y en iOS 26.1. Solo bypass sin señal.');
     }else{
       base.canUnlock = false;
       base.notes.push('Para iPhone 12 a 17 Pro Max debe estar en Hello y iOS 26.1.');
     }
+  }else if(tier === 4){
+    base.group = 'Android';
+    base.signal = selectedLock === 'compania' ? 'Depende de operadora/IMEI' : 'Sin garantía de señal';
+    base.tools = ['Herramienta FRP Android','ADB/Fastboot'];
+    base.notes.push('Android requiere diagnóstico por marca, versión y parche de seguridad. Se muestra como revisión técnica.');
   }else{
     return {tier:0, canUnlock:false, group:'No cubierto', price:'—', signal:'No disponible', tool:'—', notes:['Este modelo no está dentro de las reglas cargadas.'], needs:[]};
   }
@@ -529,14 +561,15 @@ function renderCompatibility(){
     return;
   }
   compatCard.className = `compat-card ${data.canUnlock ? 'ok' : 'no'}`;
-  compatCard.innerHTML = `<strong>${data.canUnlock ? 'Sí se puede' : 'No confirmado'}</strong><span>${data.group} · ${data.signal} · Precio base ${data.price}</span><small>${data.notes.join(' ')}</small>`;
+  const toolStatus = (data.tools || []).map(tool => `${installedTools.includes(tool) ? '✅' : '☐'} ${tool}`).join(' · ');
+  compatCard.innerHTML = `<strong>${data.canUnlock ? 'Sí se puede' : 'No confirmado'}</strong><span>${data.group} · ${data.signal} · Precio base ${data.price}</span><small>${data.notes.join(' ')}</small><small>Herramientas: ${toolStatus}</small>`;
   checkBtn.disabled = false;
 }
 
 function goToCheck(){
   const data = getCompatibility();
   if(!data) return;
-  const params = new URLSearchParams({model:selectedDevice.name, group:data.group, tier:String(data.tier), lock:selectedLock, screen:screenStateInput.value, ios:iosVersionInput.value.trim(), can:data.canUnlock?'1':'0'});
+  const params = new URLSearchParams({model:selectedDevice.name, group:data.group, tier:String(data.tier), lock:selectedLock, screen:screenStateInput.value, ios:iosVersionInput.value.trim(), can:data.canUnlock?'1':'0', tools:(data.tools || []).join('|'), installed:installedTools.join('|')});
   window.location.href = `check.html?${params.toString()}`;
 }
 checkBtn.addEventListener('click', goToCheck);
@@ -646,6 +679,7 @@ async function handleSubmit(){
   const technicianEmail = (window.currentUser && window.currentUser.email) || 'Invitado';
   const technicianId = (window.currentUser && window.currentUser.uid) || 'invitado';
   const assistant = getAssistantData();
+  const compatibility = getCompatibility();
   const price = Number(jobPriceInput.value || 0);
   const successful = jobResultInput.value === 'exitoso';
   const completed = ['finalizado','no_exitoso'].includes(jobStatusInput.value);
@@ -664,6 +698,13 @@ async function handleSubmit(){
     imei: deviceImeiInput.value.trim(),
     lockKey: selectedLock,
     lockLabel: lockLabels[selectedLock],
+    screenState: screenStateInput.value,
+    iosVersion: iosVersionInput.value.trim(),
+    compatibilityGroup: compatibility ? compatibility.group : '',
+    compatibilityCanUnlock: compatibility ? compatibility.canUnlock : false,
+    compatibilitySignal: compatibility ? compatibility.signal : '',
+    compatibilityPrice: compatibility ? compatibility.price : '$5 USD',
+    compatibilityTools: compatibility ? compatibility.tools : [],
     tools: assistant.tools,
     procedure: assistant.procedure,
     estimatedTime: assistant.estimatedTime,
@@ -702,7 +743,8 @@ async function handleSubmit(){
       });
       await addDoc(collection(db, NOTIFICATIONS_COLLECTION), {technicianId, type:'job_registered', message:`Trabajo ${record.status} para ${record.client}`, createdAt:record.createdAt, read:false});
     }
-    window.location.href = `check.html?id=${docRef.id}`;
+    const params = new URLSearchParams({id:docRef.id, model:selectedDevice.name, group:record.compatibilityGroup, tier:String(compatibility ? compatibility.tier : 0), lock:selectedLock, screen:screenStateInput.value, ios:iosVersionInput.value.trim(), can:record.compatibilityCanUnlock?'1':'0', tools:(record.compatibilityTools || []).join('|'), installed:installedTools.join('|')});
+    window.location.href = `check.html?${params.toString()}`;
   }catch(err){
     console.error('Error guardando en Firebase:', err);
     hintText.textContent = 'No se pudo guardar en Firebase. Intenta de nuevo.';
