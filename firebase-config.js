@@ -1,6 +1,6 @@
 /* ============================================================
    CONFIGURACIÓN DE FIREBASE (SDK modular v10)
-   Proyecto: merchct-d059a
+   Proyecto: mensaje-76bbc
    ============================================================ */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAnalytics, isSupported } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-analytics.js";
@@ -8,14 +8,14 @@ import { getAuth } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-aut
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBRCq0FuAY5NYBcQFv03WmdmUSehi1L_B4",
-  authDomain: "merchct-d059a.firebaseapp.com",
-  databaseURL: "https://merchct-d059a-default-rtdb.firebaseio.com",
-  projectId: "merchct-d059a",
-  storageBucket: "merchct-d059a.firebasestorage.app",
-  messagingSenderId: "290525612160",
-  appId: "1:290525612160:web:1aca5527196597c3eebe65",
-  measurementId: "G-5VE65DCLCW"
+  apiKey: "AIzaSyDUE6QZa8ClQLNPXSuv0QFa2myLIAT2Y9s",
+  authDomain: "mensaje-76bbc.firebaseapp.com",
+  databaseURL: "https://mensaje-76bbc-default-rtdb.firebaseio.com",
+  projectId: "mensaje-76bbc",
+  storageBucket: "mensaje-76bbc.firebasestorage.app",
+  messagingSenderId: "257129078581",
+  appId: "1:257129078581:web:48c923addfa3d28526f67c",
+  measurementId: "G-7F10K2Z3VJ"
 };
 
 export const app = initializeApp(firebaseConfig);
