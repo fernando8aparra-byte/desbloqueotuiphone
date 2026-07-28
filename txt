@@ -1,1 +1,418 @@
+Sistema de Gestión para Técnicos de Desbloqueo
 
+Objetivo
+
+Crear una plataforma web donde múltiples técnicos puedan registrar trabajos de desbloqueo, consultar procedimientos y herramientas necesarias, registrar ganancias y competir mediante un ranking en tiempo real.
+
+La aplicación debe utilizar la estructura actual existente y adaptarla para incorporar los nuevos módulos descritos a continuación.
+
+⸻
+
+MÓDULO 1: AUTENTICACIÓN
+
+Funciones
+
+* Registro de técnicos.
+* Inicio de sesión.
+* Recuperación de contraseña.
+* Roles:
+    * Administrador.
+    * Técnico.
+
+Datos del técnico
+
+* ID único.
+* Nombre.
+* Correo electrónico.
+* Foto de perfil.
+* Fecha de registro.
+* Trabajos realizados.
+* Trabajos exitosos.
+* Ganancias totales.
+* Ganancias mensuales.
+* Puntos acumulados.
+* Nivel.
+
+⸻
+
+MÓDULO 2: NUEVO TRABAJO
+
+Flujo completo
+
+Paso 1: Información del cliente
+
+Campos:
+
+* Nombre del cliente.
+* Teléfono del cliente.
+* WhatsApp.
+* Notas opcionales.
+
+Paso 2: Información del dispositivo
+
+Campos:
+
+* Marca.
+* Modelo.
+* Número de serie (opcional).
+* IMEI (opcional).
+
+Ejemplo:
+
+Marca: Apple
+
+Modelo: iPhone 13
+
+⸻
+
+Paso 3: Tipo de bloqueo
+
+Opciones configurables:
+
+* iCloud
+* MDM
+* FMI
+* FRP
+* Cuenta Google
+* Operador
+* Código/PIN
+* Patrón
+* Cuenta Samsung
+* Cuenta Xiaomi
+* Otro
+
+El administrador podrá agregar nuevos tipos de bloqueo.
+
+⸻
+
+MÓDULO 3: ASISTENTE TÉCNICO
+
+Cuando el técnico seleccione:
+
+* Marca
+* Modelo
+* Tipo de bloqueo
+
+El sistema deberá consultar la base de datos y mostrar automáticamente:
+
+Herramientas necesarias
+
+Ejemplo:
+
+Herramientas requeridas:
+
+* UnlockTool
+* EFT Pro
+* 3uTools
+* iRemoval Pro
+
+Procedimiento
+
+Ejemplo:
+
+1. Entrar en Recovery Mode.
+2. Conectar al PC.
+3. Abrir herramienta.
+4. Ejecutar bypass.
+5. Reiniciar dispositivo.
+
+Tiempo estimado
+
+15 minutos
+
+Nivel de dificultad
+
+* Fácil
+* Medio
+* Difícil
+* Experto
+
+⸻
+
+MÓDULO 4: ESTADO DEL TRABAJO
+
+Estados posibles:
+
+* Pendiente
+* En proceso
+* Finalizado
+* No exitoso
+* Cancelado
+
+Cada cambio debe registrarse con fecha y hora.
+
+⸻
+
+MÓDULO 5: FINALIZACIÓN DEL TRABAJO
+
+Al terminar:
+
+Campos:
+
+* Resultado.
+* Precio cobrado.
+* Tiempo invertido.
+* Observaciones.
+
+Ejemplo:
+
+Resultado:
+Exitoso
+
+Precio:
+$1,500 MXN
+
+Tiempo:
+45 minutos
+
+Notas:
+Desbloqueo completado sin errores.
+
+⸻
+
+MÓDULO 6: SISTEMA DE GANANCIAS
+
+Cada trabajo exitoso suma automáticamente:
+
+* Ganancias totales.
+* Ganancias mensuales.
+* Ganancias semanales.
+* Ganancias diarias.
+
+Debe existir un historial financiero completo.
+
+⸻
+
+MÓDULO 7: RANKING GLOBAL
+
+Página pública para técnicos registrados.
+
+Ranking por ganancias
+
+Mostrar:
+
+Posición
+
+Foto
+
+Nombre
+
+Ganancias
+
+Trabajos
+
+Porcentaje de éxito
+
+Ejemplo:
+
+#1 Edgar
+$45,000 MXN
+
+152 trabajos
+
+96% éxito
+
+#2 Juan
+$38,000 MXN
+
+134 trabajos
+
+92% éxito
+
+⸻
+
+Ranking mensual
+
+Filtrar por:
+
+* Día
+* Semana
+* Mes
+* Año
+* Histórico
+
+⸻
+
+MÓDULO 8: SISTEMA DE PUNTOS
+
+Acciones:
+
+Trabajo completado:
++10 puntos
+
+Trabajo exitoso:
++20 puntos
+
+Trabajo premium:
++50 puntos
+
+Cliente recurrente:
++15 puntos
+
+⸻
+
+MÓDULO 9: NIVELES
+
+Nivel 1:
+0-100 puntos
+
+Nivel 2:
+101-500 puntos
+
+Nivel 3:
+501-1000 puntos
+
+Nivel 4:
+1001-3000 puntos
+
+Nivel 5:
+3000+
+
+Mostrar insignias visuales.
+
+⸻
+
+MÓDULO 10: DASHBOARD DEL TÉCNICO
+
+Indicadores:
+
+* Trabajos pendientes.
+* Trabajos completados.
+* Ganancias del día.
+* Ganancias de la semana.
+* Ganancias del mes.
+* Posición en ranking.
+* Porcentaje de éxito.
+
+Gráficas:
+
+* Ingresos por mes.
+* Trabajos por marca.
+* Trabajos por tipo de bloqueo.
+
+⸻
+
+MÓDULO 11: DASHBOARD ADMINISTRADOR
+
+Funciones:
+
+Gestionar:
+
+* Técnicos.
+* Modelos.
+* Marcas.
+* Tipos de bloqueo.
+* Herramientas.
+* Procedimientos.
+
+Puede:
+
+* Crear.
+* Editar.
+* Eliminar.
+
+⸻
+
+MÓDULO 12: BASE DE CONOCIMIENTO
+
+Estructura:
+
+Marca
+→ Modelo
+→ Tipo de bloqueo
+→ Herramientas
+→ Procedimiento
+
+Ejemplo:
+
+Apple
+→ iPhone 13
+→ MDM
+
+Herramientas:
+
+* iRemoval Pro
+
+Procedimiento:
+
+* Paso 1…
+* Paso 2…
+* Paso 3…
+
+⸻
+
+MÓDULO 13: BÚSQUEDA RÁPIDA
+
+Buscador global.
+
+Permite buscar:
+
+* IMEI.
+* Cliente.
+* Técnico.
+* Modelo.
+* Tipo de bloqueo.
+
+Resultados instantáneos.
+
+⸻
+
+MÓDULO 14: NOTIFICACIONES
+
+Notificar:
+
+* Trabajo asignado.
+* Trabajo finalizado.
+* Nuevo récord de ganancias.
+* Cambio de posición en ranking.
+
+⸻
+
+ESTRUCTURA FIREBASE
+
+Colecciones:
+
+users
+
+jobs
+
+clients
+
+brands
+
+models
+
+lock_types
+
+tools
+
+procedures
+
+rankings
+
+earnings
+
+notifications
+
+badges
+
+levels
+
+statistics
+
+⸻
+
+OBJETIVO FINAL
+
+Crear una plataforma tipo CRM para técnicos de desbloqueo con:
+
+* Gestión completa de trabajos.
+* Asistente inteligente de procedimientos.
+* Control de ganancias.
+* Ranking global en tiempo real.
+* Estadísticas avanzadas.
+* Sistema de niveles e insignias.
+* Administración centralizada.
+* Firebase Firestore como base de datos principal.
+* Actualizaciones en tiempo real.
+* Diseño moderno responsive para móvil y escritorio.
