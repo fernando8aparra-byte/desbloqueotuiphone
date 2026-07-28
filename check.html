@@ -33,11 +33,42 @@
   </div>
 
   <div id="loggedOutView">
-    <p class="field-label">Iniciar sesión</p>
-    <input type="email" id="loginEmail" class="name-input" placeholder="Correo electrónico">
-    <input type="password" id="loginPassword" class="name-input" placeholder="Contraseña">
-    <button class="submit-btn" id="loginBtn">Iniciar sesión</button>
-    <p class="hint err" id="loginError"></p>
+
+    <div id="loginForm">
+      <p class="field-label">Iniciar sesión</p>
+      <input type="email" id="loginEmail" class="name-input" placeholder="Correo electrónico">
+      <input type="password" id="loginPassword" class="name-input" placeholder="Contraseña">
+      <button class="submit-btn" id="loginBtn">Iniciar sesión</button>
+      <p class="hint err" id="loginError"></p>
+      <div class="auth-links">
+        <button class="link-btn" id="showForgotBtn">¿Olvidaste tu contraseña?</button>
+        <button class="link-btn" id="showRegisterBtn">Crear cuenta de técnico</button>
+      </div>
+    </div>
+
+    <div id="registerForm" style="display:none;">
+      <p class="field-label">Crear cuenta de técnico</p>
+      <input type="text" id="registerName" class="name-input" placeholder="Nombre completo">
+      <input type="email" id="registerEmail" class="name-input" placeholder="Correo electrónico">
+      <input type="password" id="registerPassword" class="name-input" placeholder="Contraseña (mín. 6 caracteres)">
+      <input type="password" id="registerPasswordConfirm" class="name-input" placeholder="Confirmar contraseña">
+      <button class="submit-btn" id="registerBtn">Crear cuenta</button>
+      <p class="hint err" id="registerError"></p>
+      <div class="auth-links">
+        <button class="link-btn" id="showLoginFromRegisterBtn">¿Ya tienes cuenta? Inicia sesión</button>
+      </div>
+    </div>
+
+    <div id="forgotForm" style="display:none;">
+      <p class="field-label">Recuperar contraseña</p>
+      <input type="email" id="forgotEmail" class="name-input" placeholder="Correo electrónico">
+      <button class="submit-btn" id="forgotBtn">Enviar enlace</button>
+      <p class="hint" id="forgotMsg"></p>
+      <div class="auth-links">
+        <button class="link-btn" id="showLoginFromForgotBtn">Volver a iniciar sesión</button>
+      </div>
+    </div>
+
   </div>
 
   <div id="loggedInView" style="display:none;">
@@ -45,7 +76,7 @@
       <div class="avatar" id="avatarInitials"></div>
       <div class="profile-info">
         <span class="profile-email" id="profileEmail"></span>
-        <span class="profile-role">Técnico</span>
+        <span class="profile-role" id="profileRole">Técnico</span>
       </div>
     </div>
     <button class="submit-btn secondary-btn" id="logoutBtn">Cerrar sesión</button>
