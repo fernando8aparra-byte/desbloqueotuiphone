@@ -99,7 +99,7 @@
     <div>
       <p class="brand-eyebrow">Panel técnico</p>
       <h1>Verificación de compatibilidad</h1>
-      <p class="sub">Elige el equipo, el tipo de bloqueo y registra al cliente. Ahora incluye CRM técnico, asistente, ganancias y ranking.</p>
+      <p class="sub">Elige iPhone o Android, modelo, bloqueo, pantalla e iOS para saber si el desbloqueo aplica y qué herramienta usar.</p>
     </div>
     <div class="range-tag">iPhone 6s &rarr; 17 Pro Max</div>
   </header>
@@ -144,6 +144,19 @@
 
         <div class="field-label">Paso 3 · Tipo de bloqueo</div>
         <div class="lock-grid" id="lockGrid"></div>
+
+        <div class="field-label">Paso 4 · Estado del equipo</div>
+        <select class="name-input" id="screenState">
+          <option value="">Selecciona pantalla / estado</option>
+          <option value="hello">Pantalla Hello / activación</option>
+          <option value="pin">Pantalla de PIN</option>
+          <option value="unavailable">iPhone no disponible</option>
+          <option value="other">Otro estado</option>
+        </select>
+        <input type="text" class="name-input" id="iosVersion" placeholder="Versión de iOS, ej. 26.1">
+
+        <div class="compat-card" id="compatCard">Completa modelo, bloqueo, pantalla e iOS para ver compatibilidad.</div>
+        <button class="submit-btn secondary-btn" id="checkBtn" type="button" disabled>Ver compatibilidad y descarga</button>
 
         <div class="assistant-card" id="assistantCard">
           <p class="field-label">Asistente técnico</p>
@@ -287,10 +300,10 @@ const series = [
 // lista plana, útil para la búsqueda y para el envío del registro
 const devices = series.flatMap(s => s.models.map(m => ({...m, group:s.key})));
 const lockOptions = [
-  {key:'icloud', label:'iCloud'}, {key:'mdm', label:'MDM'}, {key:'fmi', label:'FMI'},
-  {key:'frp', label:'FRP'}, {key:'google', label:'Cuenta Google'}, {key:'operador', label:'Operador'},
-  {key:'pin', label:'Código/PIN'}, {key:'patron', label:'Patrón'}, {key:'samsung', label:'Cuenta Samsung'},
-  {key:'xiaomi', label:'Cuenta Xiaomi'}, {key:'otro', label:'Otro'}
+  {key:'icloud', label:'Bloqueo de iCloud'},
+  {key:'pin', label:'Bloqueo de pantalla / PIN'},
+  {key:'mdm', label:'Bloqueo MDM'},
+  {key:'compania', label:'Bloqueo de compañía telefónica'}
 ];
 const lockLabels = Object.fromEntries(lockOptions.map(lock => [lock.key, lock.label]));
 const knowledgeBase = {
@@ -321,6 +334,10 @@ const deviceSerialInput = document.getElementById('deviceSerial');
 const deviceImeiInput = document.getElementById('deviceImei');
 const lockGrid = document.getElementById('lockGrid');
 const assistantContent = document.getElementById('assistantContent');
+const screenStateInput = document.getElementById('screenState');
+const iosVersionInput = document.getElementById('iosVersion');
+const compatCard = document.getElementById('compatCard');
+const checkBtn = document.getElementById('checkBtn');
 const jobStatusInput = document.getElementById('jobStatus');
 const jobResultInput = document.getElementById('jobResult');
 const jobPriceInput = document.getElementById('jobPrice');
@@ -450,8 +467,79 @@ function renderLockOptions(){
 }
 
 searchInput.addEventListener('input', renderPicker);
-[clientNameInput, clientPhoneInput, clientWhatsappInput, deviceBrandInput, jobStatusInput, jobResultInput, jobPriceInput, timeSpentInput].forEach(el=>el.addEventListener('input', validateForm));
+[clientNameInput, clientPhoneInput, clientWhatsappInput, deviceBrandInput, jobStatusInput, jobResultInput, jobPriceInput, timeSpentInput, screenStateInput, iosVersionInput].forEach(el=>el.addEventListener('input', ()=>{ validateForm(); renderAssistant(); }));
 deviceBrandInput.addEventListener('input', renderAssistant);
+
+
+function getTier(device){
+  if(!device) return 0;
+  const name = device.name.toLowerCase();
+  if(name.includes('iphone 6s') || name.includes('iphone 7') || name.includes('iphone 8') || name === 'iphone x' || name.includes('se')) return 1;
+  if(name.includes('iphone xr') || name.includes('iphone xs') || name.includes('iphone 11')) return 2;
+  if(/iphone (12|13|14|15|16|17)/.test(name)) return 3;
+  return 0;
+}
+
+function getCompatibility(){
+  if(!selectedDevice || !selectedLock) return null;
+  const tier = getTier(selectedDevice);
+  const screen = screenStateInput.value;
+  const ios = iosVersionInput.value.trim();
+  const base = {tier, canUnlock:true, price:'$5 USD', signal:'Por validar', tool:'Herramienta pendiente de link', notes:[], needs:['Validar autorización del cliente.']};
+  if(tier === 1){
+    base.group = 'iPhone 6s al iPhone X';
+    base.signal = 'Puede quedar con señal si el software lo valida';
+    base.notes.push('Siempre se puede desbloquear en este rango. Si queda con señal, pide más dinero al cliente.');
+  }else if(tier === 2){
+    base.group = 'iPhone XS al iPhone 11 Pro Max';
+    base.tool = 'Microcontrolador RP2450 + herramienta';
+    base.needs.push('Microcontrolador RP2450.');
+    if(screen === 'pin' || screen === 'unavailable'){
+      base.signal = 'Puede quedar con señal';
+      base.notes.push('Compatible en cualquier versión de iOS cuando está en PIN o iPhone no disponible.');
+    }else if(screen === 'hello'){
+      base.signal = 'Bypass sin señal';
+      base.notes.push('En pantalla Hello se puede desbloquear, pero queda sin señal.');
+    }else{
+      base.canUnlock = false;
+      base.signal = 'Falta confirmar pantalla';
+      base.notes.push('Selecciona si está en Hello, PIN o iPhone no disponible para confirmar.');
+    }
+  }else if(tier === 3){
+    base.group = 'iPhone 12 al iPhone 17 Pro Max';
+    base.signal = 'Bypass sin señal';
+    if(screen === 'hello' && ios === '26.1'){
+      base.notes.push('Compatible: debe estar en pantalla Hello y en iOS 26.1. Solo bypass sin señal.');
+    }else{
+      base.canUnlock = false;
+      base.notes.push('Para iPhone 12 a 17 Pro Max debe estar en Hello y iOS 26.1.');
+    }
+  }else{
+    return {tier:0, canUnlock:false, group:'No cubierto', price:'—', signal:'No disponible', tool:'—', notes:['Este modelo no está dentro de las reglas cargadas.'], needs:[]};
+  }
+  return base;
+}
+
+function renderCompatibility(){
+  const data = getCompatibility();
+  if(!data){
+    compatCard.className = 'compat-card';
+    compatCard.textContent = 'Completa modelo, bloqueo, pantalla e iOS para ver compatibilidad.';
+    checkBtn.disabled = true;
+    return;
+  }
+  compatCard.className = `compat-card ${data.canUnlock ? 'ok' : 'no'}`;
+  compatCard.innerHTML = `<strong>${data.canUnlock ? 'Sí se puede' : 'No confirmado'}</strong><span>${data.group} · ${data.signal} · Precio base ${data.price}</span><small>${data.notes.join(' ')}</small>`;
+  checkBtn.disabled = false;
+}
+
+function goToCheck(){
+  const data = getCompatibility();
+  if(!data) return;
+  const params = new URLSearchParams({model:selectedDevice.name, group:data.group, tier:String(data.tier), lock:selectedLock, screen:screenStateInput.value, ios:iosVersionInput.value.trim(), can:data.canUnlock?'1':'0'});
+  window.location.href = `check.html?${params.toString()}`;
+}
+checkBtn.addEventListener('click', goToCheck);
 
 function getAssistantData(){
   if(!selectedDevice || !selectedLock) return knowledgeBase.default;
@@ -461,10 +549,12 @@ function getAssistantData(){
 
 function renderAssistant(){
   if(!selectedDevice || !selectedLock){
+    renderCompatibility();
     assistantContent.className = 'assistant-empty';
     assistantContent.textContent = 'Selecciona marca, modelo y bloqueo para ver herramientas, procedimiento, tiempo y dificultad.';
     return;
   }
+  renderCompatibility();
   const data = getAssistantData();
   assistantContent.className = '';
   assistantContent.innerHTML = `
@@ -535,6 +625,7 @@ function validateForm(){
   if(!clientWhatsappInput.value.trim()) missing.push('WhatsApp');
   if(!deviceBrandInput.value.trim()) missing.push('marca');
 
+  renderCompatibility();
   if(missing.length===0){
     submitBtn.disabled = false;
     hintText.textContent = 'Listo para registrar trabajo, herramientas y ganancias.';

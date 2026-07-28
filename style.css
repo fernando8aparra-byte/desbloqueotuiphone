@@ -351,3 +351,12 @@ select.name-input{appearance:none;}
 .admin-actions .link-btn{width:100%;padding:10px;}
 @media (max-width:880px){.crm-grid{grid-template-columns:1fr;}.kpi-grid{grid-template-columns:1fr 1fr;}}
 @media (max-width:520px){.assistant-meta,.kpi-grid{grid-template-columns:1fr;}}
+
+/* ---------- Compatibility result widgets ---------- */
+.compat-card{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:13px 14px;margin:0 0 12px;color:var(--muted);font-size:13px;line-height:1.45;}
+.compat-card strong{display:block;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:16px;margin-bottom:3px;}
+.compat-card span,.compat-card small{display:block;}
+.compat-card.ok{border-color:rgba(111,207,124,.65);background:rgba(111,207,124,.09);}
+.compat-card.ok strong{color:var(--green);}
+.compat-card.no{border-color:rgba(226,87,76,.65);background:rgba(226,87,76,.09);}
+.compat-card.no strong{color:var(--red);}
