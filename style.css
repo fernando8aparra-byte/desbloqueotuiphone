@@ -226,6 +226,10 @@ tbody tr:hover td{background:var(--surface-2);}
 .profile-email{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .profile-role{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);}
 
+.auth-links{display:flex;flex-direction:column;gap:6px;margin-top:6px;align-items:flex-start;}
+.auth-links .link-btn{background:none;border:none;color:var(--cyan);font-size:12px;cursor:pointer;padding:0;font-family:'Inter',sans-serif;text-align:left;}
+.auth-links .link-btn:hover{text-decoration:underline;}
+
 .firebase-notice{
   background:rgba(226,163,59,.08);border:1px solid var(--copper-dim);border-radius:8px;
   padding:12px 14px;font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:16px;
