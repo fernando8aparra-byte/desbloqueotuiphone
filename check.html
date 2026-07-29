@@ -157,6 +157,20 @@ a{ color:inherit; }
 .dl-btn.placeholder{ background:var(--surface-3); color:var(--text-muted); border:1px dashed var(--border); }
 .dl-note{ font-size:11.5px; color:var(--text-faint); }
 
+
+.unlock-options{ margin-top:22px; }
+.unlock-options h3{ font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600; margin-bottom:6px; }
+.unlock-options-intro{ font-size:12.5px; color:var(--text-muted); line-height:1.5; margin-bottom:14px; }
+.unlock-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:12px; }
+.unlock-card{ background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:14px; display:flex; flex-direction:column; gap:10px; }
+.unlock-card.unavailable{ opacity:.62; }
+.unlock-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+.unlock-program{ font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:700; }
+.unlock-platform{ font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-faint); border:1px solid var(--border); border-radius:999px; padding:3px 7px; white-space:nowrap; }
+.unlock-price{ font-family:'JetBrains Mono',monospace; font-size:18px; color:var(--accent); font-weight:600; }
+.unlock-meta{ font-size:11.5px; color:var(--text-muted); line-height:1.45; }
+.unlock-signal{ font-size:11.5px; color:var(--ok); }
+
 /* iOS checker */
 .ios-check{ margin-top:22px; padding:18px; background:var(--surface-2); border:1px solid var(--border); border-radius:9px; max-width:420px; }
 .ios-check .label{ font-size:12px; color:var(--text-muted); margin-bottom:10px; font-weight:500; }
@@ -466,7 +480,7 @@ function renderResult(){
 }
 
 /* ---------------- CARD BUILDER ---------------- */
-function card({ pillClass, pillText, title, desc, warnHtml, reqHtml, showDownload, downloadPlaceholder }){
+function card({ pillClass, pillText, title, desc, warnHtml, reqHtml, showDownload, downloadPlaceholder, unlockOptions }){
   const el = document.createElement('div');
   el.className = 'result-card';
   el.innerHTML = `
@@ -476,6 +490,9 @@ function card({ pillClass, pillText, title, desc, warnHtml, reqHtml, showDownloa
     ${warnHtml || ''}
     ${reqHtml || ''}
   `;
+  if(unlockOptions){
+    el.appendChild(buildUnlockOptions(unlockOptions));
+  }
   if(showDownload){
     const actions = document.createElement('div');
     actions.className = 'result-actions';
@@ -489,6 +506,89 @@ function card({ pillClass, pillText, title, desc, warnHtml, reqHtml, showDownloa
     el.appendChild(actions);
   }
   return el;
+}
+
+function normalizeDeviceName(name){
+  return (name || '')
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/iphone\s+/g, 'iphone ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+const A12_A13_UNLOCK_OPTIONS = {
+  'iphone xr': {
+    iBerry:{ price:'13.5USD', time:'1-10 minutos', signal:'Full Signal iOS17-27' },
+    iHello:{ price:'18.5USD', time:'Minutos', signal:'Passcode Bypass (MAC-Windows)' },
+    aldaz:{ price:'8.5USD', time:'Minutos', signal:'Activator Premium Passcode A12/A13' }
+  },
+  'iphone xs': {
+    iBerry:{ price:'15USD', time:'1-10 minutos', signal:'Full Signal iOS17-27' },
+    iHello:{ price:'18.5USD', time:'Minutos', signal:'Passcode Bypass (MAC-Windows)' },
+    aldaz:{ price:'9.5USD', time:'Minutos', signal:'Activator Premium Passcode A12/A13' }
+  },
+  'iphone xs max': {
+    iBerry:{ price:'13.5USD', time:'1-10 minutos', signal:'Full Signal iOS17-27' },
+    iHello:{ price:'18.07USD', time:'Minutos', signal:'Passcode Bypass (MAC-Windows)' },
+    aldaz:{ price:'10.5USD', time:'Minutos', signal:'Activator Premium Passcode A12/A13' }
+  },
+  'iphone 11': {
+    iBerry:{ price:'14.5USD', time:'1-10 minutos', signal:'Full Signal iOS17-27' },
+    iHello:{ price:'23.5USD', time:'Minutos', signal:'Passcode Bypass (MAC-Windows)' },
+    aldaz:{ price:'9.5USD', time:'Minutos', signal:'Activator Premium Passcode A12/A13' }
+  },
+  'iphone 11 pro': {
+    iBerry:{ price:'15USD', time:'1-10 minutos', signal:'Full Signal iOS17-27' },
+    iHello:{ price:'23.5USD', time:'Minutos', signal:'Passcode Bypass (MAC-Windows)' },
+    aldaz:{ price:'11.5USD', time:'Minutos', signal:'Activator Premium Passcode A12/A13' }
+  },
+  'iphone 11 pro max': {
+    iBerry:{ price:'15.5USD', time:'1-10 minutos', signal:'Full Signal iOS17-27' },
+    iHello:{ price:'23.5USD', time:'Minutos', signal:'Passcode Bypass (MAC-Windows)' },
+    aldaz:{ price:'13.49USD', time:'Minutos', signal:'Activator Premium Passcode A12/A13' }
+  },
+  'iphone se (2.a gen)': {
+    iBerry:{ price:'13.5USD', time:'1-10 minutos', signal:'Full Signal iOS17-27' },
+    iHello:{ price:'18.5USD', time:'Minutos', signal:'Passcode Bypass (MAC-Windows)' },
+    aldaz:{ price:'10.5USD', time:'Minutos', signal:'Activator Premium Passcode A12/A13' }
+  }
+};
+
+function getA12A13UnlockOptions(deviceName){
+  return A12_A13_UNLOCK_OPTIONS[normalizeDeviceName(deviceName)] || null;
+}
+
+function buildUnlockOptions(options){
+  const section = document.createElement('div');
+  section.className = 'unlock-options';
+  const programs = [
+    { key:'iBerry', name:'iBerry', platform:'Windows' },
+    { key:'iHello', name:'iHello HFZ', platform:'Windows / Mac' },
+    { key:'aldaz', name:'Aldaz R Activator', platform:'Mac' }
+  ];
+  section.innerHTML = `
+    <h3>Opciones de desbloqueo</h3>
+    <div class="unlock-options-intro">Costos disponibles para ${order.device}. Selecciona el programa según el equipo y el sistema donde harás el proceso.</div>
+    <div class="unlock-grid"></div>
+  `;
+  const grid = section.querySelector('.unlock-grid');
+  programs.forEach(program=>{
+    const data = options[program.key];
+    const card = document.createElement('div');
+    card.className = 'unlock-card' + (data ? '' : ' unavailable');
+    card.innerHTML = `
+      <div class="unlock-head">
+        <div class="unlock-program">${program.name}</div>
+        <div class="unlock-platform">${program.platform}</div>
+      </div>
+      <div class="unlock-price">${data ? data.price : 'No disponible'}</div>
+      <div class="unlock-meta">${data ? data.time : 'Sin precio para este modelo'}</div>
+      <div class="unlock-signal">${data ? data.signal : ''}</div>
+    `;
+    grid.appendChild(card);
+  });
+  return section;
 }
 
 /* ---------------- ICLOUD ---------------- */
@@ -509,7 +609,8 @@ function buildIcloudResult(tier){
       desc:'Este modelo se libera de iCloud sin importar la versión de iOS instalada.',
       warnHtml:`<div class="callout callout-warn">${ICONS.warn}<div>Puede quedar <b>sin señal solo si el equipo está pidiendo el iCloud</b> activamente. Si no lo está pidiendo, normalmente conserva la señal.</div></div>`,
       reqHtml:`<div class="callout callout-req">${ICONS.chip}<div>Requiere <b>placa RP2350</b> para hacer el proceso.</div></div>`,
-      showDownload:true
+      showDownload:false,
+      unlockOptions:getA12A13UnlockOptions(order.device)
     });
   }
   // tier 3
@@ -655,7 +756,9 @@ function buildPinResult(tier){
       title:'Se puede desbloquear',
       desc:'Aplica para XS, XS Max, XR al 11 Pro Max, y en general cualquier modelo con procesador A12/A13.',
       warnHtml:`<div class="callout callout-warn">${ICONS.warn}<div>Si el equipo <b>ya tiene señal</b> antes del proceso, la conserva después de desbloquearlo.</div></div>`,
-      showDownload:false
+      reqHtml:`<div class="callout callout-req">${ICONS.chip}<div>Requiere <b>placa RP2350</b> para hacer el proceso.</div></div>`,
+      showDownload:false,
+      unlockOptions:getA12A13UnlockOptions(order.device)
     });
     el.appendChild(buildUnlockOptions(order.device));
     return el;
