@@ -3,74 +3,618 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Resultado — Compatibilidad de desbloqueo</title>
-<link rel="stylesheet" href="style.css">
+<title>F3RN4N · Check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  .result-wrap{max-width:760px;margin:0 auto;padding:32px 20px;}
-  .result-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:26px;}
-  .result-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap;margin-bottom:18px;}
-  .result-title{font-family:'Space Grotesk',sans-serif;font-size:24px;margin:0 0 6px;}
-  .result-sub{color:var(--muted);margin:0;font-size:14px;}
-  .verdict{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;border-radius:20px;padding:8px 14px;border:1px solid var(--border);}
-  .verdict.yes{color:var(--green);border-color:var(--green);}
-  .verdict.no{color:var(--red);border-color:var(--red);}
-  .info-block{background:var(--surface-2);border-left:3px solid var(--copper);border-radius:0 10px 10px 0;padding:14px 16px;margin:12px 0;line-height:1.55;color:var(--text);}
-  .info-block.good{border-left-color:var(--green);}.info-block.bad{border-left-color:var(--red);}
-  .meta-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:18px 0;}
-  .meta-item{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:12px;}
-  .meta-item .label{font-family:'JetBrains Mono',monospace;color:var(--muted);font-size:11px;text-transform:uppercase;margin-bottom:5px;}
-  .meta-item .value{font-weight:700;}
-  .download-btn{display:block;text-align:center;background:var(--copper);color:#181206;text-decoration:none;border-radius:10px;padding:14px;font-weight:800;margin:12px 0;}
-  .tool-result-list{display:grid;gap:8px;margin:14px 0;}
-  .tool-result-list div{background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:13px;}
-  .tool-result-list .ok{color:var(--green);font-weight:800;margin-right:8px;}
-  .tool-result-list .missing{color:var(--muted);font-weight:800;margin-right:8px;}
-  .back-btn{display:block;text-align:center;border:1px solid var(--border);color:var(--text);text-decoration:none;border-radius:10px;padding:12px;font-weight:700;}
+:root{
+  --bg:#10141B;
+  --surface:#171D27;
+  --surface-2:#1F2733;
+  --surface-3:#262F3D;
+  --border:#2A3341;
+  --text:#EDF0F4;
+  --text-muted:#8891A0;
+  --text-faint:#5B6474;
+  --ios:#4FA8FF;
+  --ios-soft:#4FA8FF1A;
+  --android:#7CDB6A;
+  --android-soft:#7CDB6A1A;
+  --amber:#FF9C3D;
+  --amber-soft:#FF9C3D1A;
+  --danger:#FF5D5D;
+  --danger-soft:#FF5D5D1A;
+  --ok:#4FD17E;
+  --ok-soft:#4FD17E1A;
+  --manual:#8891A0;
+  --manual-soft:#8891A01A;
+  --radius:10px;
+  --accent:var(--amber);
+  --accent-soft:var(--amber-soft);
+  font-family:'Inter',sans-serif;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{
+  background:
+    radial-gradient(circle at 15% 0%, #1a2130 0%, transparent 45%),
+    radial-gradient(circle at 85% 100%, #161c27 0%, transparent 40%),
+    var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+body.os-apple{ --accent:var(--ios); --accent-soft:var(--ios-soft); }
+body.os-android{ --accent:var(--android); --accent-soft:var(--android-soft); }
+::selection{ background:var(--accent-soft); color:var(--text); }
+button{ font-family:inherit; cursor:pointer; }
+input{ font-family:inherit; }
+a{ color:inherit; }
+
+/* ---------- NAV (compartido) ---------- */
+.topnav{ display:flex; align-items:center; justify-content:space-between; padding:18px 32px; border-bottom:1px solid var(--border); background:#10141Bcc; backdrop-filter:blur(10px); position:sticky; top:0; z-index:50; }
+.brand{ display:flex; align-items:center; gap:10px; }
+.brand-mark{ width:30px; height:30px; border-radius:8px; background:linear-gradient(135deg, var(--amber), #d97a1f); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.brand-mark svg{ width:16px; height:16px; }
+.brand-text{ display:flex; flex-direction:column; line-height:1.15; }
+.brand-text b{ font-family:'Space Grotesk',sans-serif; font-size:15px; letter-spacing:.2px; }
+.brand-text span{ font-size:11px; color:var(--text-muted); }
+.hamburger{ width:40px; height:40px; border-radius:9px; background:var(--surface); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:border-color .15s; position:relative; }
+.hamburger:hover{ border-color:var(--text-faint); }
+.hamburger svg{ width:18px; height:18px; }
+.hamburger .dot{ position:absolute; top:-3px; right:-3px; width:9px; height:9px; border-radius:50%; background:var(--android); border:2px solid var(--bg); display:none; }
+.hamburger.logged .dot{ display:block; }
+
+/* ---------- DRAWER (compartido) ---------- */
+.overlay{ position:fixed; inset:0; background:#080a0ecc; backdrop-filter:blur(2px); opacity:0; pointer-events:none; transition:opacity .2s; z-index:90; }
+.overlay.show{ opacity:1; pointer-events:auto; }
+.drawer{ position:fixed; top:0; right:0; height:100%; width:360px; max-width:92vw; background:var(--surface); border-left:1px solid var(--border); transform:translateX(100%); transition:transform .25s cubic-bezier(.4,0,.2,1); z-index:95; display:flex; flex-direction:column; padding:22px 22px 26px; overflow-y:auto; }
+.drawer.show{ transform:translateX(0); }
+.drawer-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:22px; }
+.drawer-head h3{ font-family:'Space Grotesk',sans-serif; font-size:16px; }
+.drawer-close{ width:30px; height:30px; border-radius:7px; background:var(--surface-2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; color:var(--text-muted); }
+.drawer-close:hover{ color:var(--text); }
+.drawer-close svg{ width:14px; height:14px; }
+.account-card{ display:flex; align-items:center; gap:12px; background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius); padding:16px; margin-bottom:18px; }
+.avatar{ width:42px; height:42px; border-radius:50%; background:var(--surface-3); display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:15px; color:var(--accent); flex-shrink:0; overflow:hidden; }
+.avatar img{ width:100%; height:100%; object-fit:cover; }
+.account-info{ overflow:hidden; }
+.account-info b{ display:block; font-size:13.5px; }
+.account-info span{ display:block; font-size:11.5px; color:var(--text-muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.auth-tabs{ display:flex; gap:4px; background:var(--surface-2); border:1px solid var(--border); border-radius:999px; padding:4px; margin-bottom:20px; }
+.auth-tabs button{ flex:1; background:transparent; border:none; color:var(--text-muted); font-size:12.5px; font-weight:600; padding:8px; border-radius:999px; transition:all .15s; }
+.auth-tabs button.active{ background:var(--surface-3); color:var(--text); }
+.auth-form{ display:none; flex-direction:column; gap:14px; }
+.auth-form.visible{ display:flex; }
+.google-btn{ display:flex; align-items:center; justify-content:center; gap:10px; background:var(--text); color:#1a1a1a; border-radius:8px; padding:11px; font-size:13.5px; font-weight:600; border:1px solid var(--border); width:100%; }
+.google-btn:hover{ filter:brightness(.96); }
+.google-btn svg{ width:17px; height:17px; }
+.auth-divider{ display:flex; align-items:center; gap:10px; color:var(--text-faint); font-size:11.5px; margin:2px 0; }
+.auth-divider::before, .auth-divider::after{ content:''; flex:1; height:1px; background:var(--border); }
+.auth-error{ font-size:12.5px; color:var(--danger); display:none; }
+.auth-error.show{ display:block; }
+.logout-btn{ width:100%; }
+.guest-note{ margin-top:auto; padding-top:18px; border-top:1px solid var(--border); font-size:11.5px; color:var(--text-faint); line-height:1.5; }
+.field label{ display:block; font-size:12.5px; color:var(--text-muted); margin-bottom:7px; font-weight:500; }
+.field input{ width:100%; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:8px; padding:11px 13px; font-size:14px; outline:none; transition:border-color .12s; }
+.field input:focus{ border-color:var(--accent); }
+.field input::placeholder{ color:var(--text-faint); }
+.btn{ border-radius:8px; padding:11px 22px; font-size:13.5px; font-weight:600; border:1px solid transparent; display:inline-flex; align-items:center; gap:8px; transition:all .12s; }
+.btn-primary{ background:var(--accent); color:#0d0f13; }
+.btn-primary:hover{ filter:brightness(1.08); }
+.btn-ghost{ background:transparent; border-color:var(--border); color:var(--text-muted); }
+.btn-ghost:hover{ border-color:var(--text-faint); color:var(--text); }
+.btn-text{ background:transparent; color:var(--text-muted); font-size:13px; text-decoration:underline; text-underline-offset:3px; padding:6px; }
+.btn-text:hover{ color:var(--text); }
+
+/* Toast */
+.toast{ position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--surface-3); border:1px solid var(--accent); color:var(--text); padding:14px 22px; border-radius:10px; font-size:13.5px; font-weight:500; display:flex; align-items:center; gap:10px; opacity:0; pointer-events:none; transition:all .25s; z-index:100; }
+.toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* ---------- CHECK LAYOUT ---------- */
+.wrap{ max-width:900px; margin:0 auto; padding:44px 32px 100px; }
+@media (max-width:600px){ .wrap{ padding:28px 18px 80px; } }
+.page-head h1{ font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:600; }
+.page-head p{ color:var(--text-muted); font-size:14px; margin-top:5px; }
+
+/* Summary strip */
+.order-strip{
+  margin-top:26px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:18px 22px; display:flex; flex-wrap:wrap; gap:22px; align-items:center; justify-content:space-between;
+}
+.order-strip-item{ display:flex; flex-direction:column; gap:4px; }
+.order-strip-item .k{ font-size:10.5px; text-transform:uppercase; letter-spacing:.07em; color:var(--text-faint); }
+.order-strip-item .v{ font-size:14px; font-weight:600; font-family:'Space Grotesk',sans-serif; }
+.order-strip-item .v.mono{ font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:500; }
+.order-actions{ display:flex; gap:8px; }
+
+/* Result card */
+.result-card{
+  margin-top:22px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:26px 26px 28px;
+}
+.status-pill{ display:inline-flex; align-items:center; gap:7px; padding:5px 13px; border-radius:999px; font-size:12px; font-weight:700; letter-spacing:.02em; margin-bottom:16px; }
+.status-pill .dot{ width:7px; height:7px; border-radius:50%; }
+.status-ok{ background:var(--ok-soft); color:var(--ok); }
+.status-ok .dot{ background:var(--ok); }
+.status-warn{ background:var(--amber-soft); color:var(--amber); }
+.status-warn .dot{ background:var(--amber); }
+.status-bad{ background:var(--danger-soft); color:var(--danger); }
+.status-bad .dot{ background:var(--danger); }
+.status-manual{ background:var(--manual-soft); color:var(--manual); }
+.status-manual .dot{ background:var(--manual); }
+
+.result-title{ font-family:'Space Grotesk',sans-serif; font-size:19px; font-weight:600; margin-bottom:8px; }
+.result-desc{ font-size:14px; color:var(--text-muted); line-height:1.6; max-width:560px; }
+
+.callout{ display:flex; gap:12px; padding:14px 16px; border-radius:9px; margin-top:18px; font-size:13px; line-height:1.55; }
+.callout svg{ width:18px; height:18px; flex-shrink:0; margin-top:1px; }
+.callout-warn{ background:var(--amber-soft); border:1px solid #FF9C3D33; color:#ffd6ab; }
+.callout-req{ background:var(--surface-2); border:1px solid var(--border); }
+.callout-req b{ color:var(--text); }
+
+.result-actions{ display:flex; flex-wrap:wrap; gap:10px; margin-top:22px; align-items:center; }
+.dl-btn{ background:var(--accent); color:#0d0f13; }
+.dl-btn.placeholder{ background:var(--surface-3); color:var(--text-muted); border:1px dashed var(--border); }
+.dl-note{ font-size:11.5px; color:var(--text-faint); }
+
+/* iOS checker */
+.ios-check{ margin-top:22px; padding:18px; background:var(--surface-2); border:1px solid var(--border); border-radius:9px; max-width:420px; }
+.ios-check .label{ font-size:12px; color:var(--text-muted); margin-bottom:10px; font-weight:500; }
+.ios-check-row{ display:flex; gap:8px; }
+.ios-check-row input{ flex:1; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:8px; padding:10px 12px; font-size:13.5px; font-family:'JetBrains Mono',monospace; outline:none; }
+.ios-check-row input:focus{ border-color:var(--accent); }
+.ios-result{ margin-top:12px; font-size:13px; display:none; align-items:center; gap:8px; }
+.ios-result.show{ display:flex; }
+.ios-result.ok{ color:var(--ok); }
+.ios-result.bad{ color:var(--danger); }
+
+/* Carrier chips */
+.carrier-grid{ display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
+.carrier-chip{ background:var(--surface-2); border:1px solid var(--border); color:var(--text); padding:10px 18px; border-radius:8px; font-size:13.5px; font-weight:600; transition:all .12s; }
+.carrier-chip:hover{ border-color:var(--text-faint); }
+.carrier-chip.selected{ background:var(--accent); border-color:var(--accent); color:#0d0f13; }
+.carrier-note{ display:none; margin-top:16px; }
+.carrier-note.show{ display:block; }
+
+/* Empty state */
+.empty-card{ margin-top:26px; background:var(--surface); border:1px dashed var(--border); border-radius:var(--radius); padding:44px 28px; text-align:center; }
+.empty-card svg{ width:34px; height:34px; color:var(--text-faint); margin-bottom:14px; }
+.empty-card h3{ font-family:'Space Grotesk',sans-serif; font-size:16px; margin-bottom:6px; }
+.empty-card p{ font-size:13.5px; color:var(--text-muted); margin-bottom:20px; }
 </style>
 </head>
 <body>
-<div class="topbar"><div class="topbar-inner"><div class="brand"><span class="brand-name">Guía de Desbloqueos Apple<small>Resultado interno</small></span></div></div></div>
-<main class="result-wrap">
-  <div class="result-card" id="resultCard">Cargando resultado...</div>
-</main>
+
+<nav class="topnav">
+  <div class="brand">
+    <div class="brand-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#0d0f13" stroke-width="2" stroke-linecap="round"><path d="M6 10V7a6 6 0 0112 0v3"/><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M12 14v3"/></svg>
+    </div>
+    <div class="brand-text"><b>F3RN4N</b><span>Panel de registro y liberación</span></div>
+  </div>
+  <button class="hamburger" id="hamburgerBtn" onclick="openDrawer()" aria-label="Abrir menú de sesión">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="color:var(--text)"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    <span class="dot" id="hamburgerDot"></span>
+  </button>
+</nav>
+
+<div class="overlay" id="overlay" onclick="closeDrawer()"></div>
+
+<aside class="drawer" id="drawer">
+  <div class="drawer-head">
+    <h3>Mi cuenta</h3>
+    <button class="drawer-close" onclick="closeDrawer()" aria-label="Cerrar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+
+  <div id="view-logged" style="display:none;">
+    <div class="account-card">
+      <div class="avatar" id="avatar">–</div>
+      <div class="account-info">
+        <b id="account-name">—</b>
+        <span id="account-email">—</span>
+      </div>
+    </div>
+    <button class="btn btn-ghost logout-btn" onclick="doLogout()">Cerrar sesión</button>
+  </div>
+
+  <div id="view-guest">
+    <div class="auth-tabs">
+      <button id="tab-login" class="active" onclick="switchAuthTab('login')">Iniciar sesión</button>
+      <button id="tab-register" onclick="switchAuthTab('register')">Registrarse</button>
+    </div>
+
+    <button class="google-btn" onclick="doGoogleAuth()">
+      <svg viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 01-1.8 2.72v2.26h2.9c1.7-1.57 2.7-3.88 2.7-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.26c-.8.54-1.84.86-3.06.86-2.35 0-4.34-1.59-5.05-3.72H.98v2.33A9 9 0 009 18z"/><path fill="#FBBC05" d="M3.95 10.7A5.4 5.4 0 013.68 9c0-.59.1-1.17.27-1.7V4.97H.98A9 9 0 000 9c0 1.45.35 2.83.98 4.03l2.97-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.9 11.43 0 9 0A9 9 0 00.98 4.97l2.97 2.33C4.66 5.17 6.65 3.58 9 3.58z"/></svg>
+      Continuar con Google
+    </button>
+
+    <div class="auth-divider">o con tu correo</div>
+
+    <form class="auth-form visible" id="form-login" onsubmit="doEmailLogin(event)">
+      <div class="field">
+        <label for="login-email">Correo</label>
+        <input id="login-email" type="email" placeholder="tu@correo.com" required>
+      </div>
+      <div class="field">
+        <label for="login-pass">Contraseña</label>
+        <input id="login-pass" type="password" placeholder="••••••••" required>
+      </div>
+      <div class="auth-error" id="login-error"></div>
+      <button type="submit" class="btn btn-primary" style="justify-content:center;">Entrar</button>
+    </form>
+
+    <form class="auth-form" id="form-register" onsubmit="doEmailRegister(event)">
+      <div class="field">
+        <label for="reg-name">Nombre</label>
+        <input id="reg-name" type="text" placeholder="Tu nombre" required>
+      </div>
+      <div class="field">
+        <label for="reg-email">Correo</label>
+        <input id="reg-email" type="email" placeholder="tu@correo.com" required>
+      </div>
+      <div class="field">
+        <label for="reg-pass">Contraseña</label>
+        <input id="reg-pass" type="password" placeholder="Mínimo 6 caracteres" required>
+      </div>
+      <div class="auth-error" id="register-error"></div>
+      <button type="submit" class="btn btn-primary" style="justify-content:center;">Crear cuenta</button>
+    </form>
+  </div>
+
+  <div class="guest-note">No necesitas iniciar sesión para registrar clientes ni generar un Check. La cuenta es solo para acceder al Dashboard y tu historial.</div>
+</aside>
+
+<div class="wrap">
+  <div class="page-head">
+    <h1>Check de compatibilidad</h1>
+    <p>Esto es lo que puedes hacer con el equipo, según el dispositivo y el bloqueo que registraste en Index.</p>
+  </div>
+
+  <!-- ORDER STRIP -->
+  <div class="order-strip" id="order-strip" style="display:none;">
+    <div class="order-strip-item">
+      <span class="k">Dispositivo</span>
+      <span class="v" id="strip-device">—</span>
+    </div>
+    <div class="order-strip-item">
+      <span class="k">Bloqueo</span>
+      <span class="v" id="strip-lock">—</span>
+    </div>
+    <div class="order-strip-item">
+      <span class="k">Cliente</span>
+      <span class="v mono" id="strip-client">—</span>
+    </div>
+    <div class="order-actions">
+      <button class="btn btn-ghost" onclick="window.location.href='index.html'">Editar en Index</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-zone"></div>
+
+  <!-- EMPTY STATE -->
+  <div class="empty-card" id="empty-state" style="display:none;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>
+    <h3>Todavía no hay una orden</h3>
+    <p>Registra un equipo en Index para ver aquí qué se puede hacer con él.</p>
+    <button class="btn btn-primary" onclick="window.location.href='index.html'">Ir a Index</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script>
-const LINKS = {
-  1: '#', // iPhone 6s al X: reemplaza # por tu link de descarga
-  2: '#', // iPhone XS al 11 Pro Max: reemplaza # por tu link de descarga
-  3: '#', // iPhone 12 al 17 Pro Max: reemplaza # por tu link de descarga
-  4: '#'  // Android: reemplaza # por tu link de descarga
+/* ---------------- FIREBASE (compartido con Index) ---------------- */
+const firebaseConfig = {
+  apiKey: "AIzaSyDUE6QZa8ClQLNPXSuv0QFa2myLIAT2Y9s",
+  authDomain: "mensaje-76bbc.firebaseapp.com",
+  databaseURL: "https://mensaje-76bbc-default-rtdb.firebaseio.com",
+  projectId: "mensaje-76bbc",
+  storageBucket: "mensaje-76bbc.firebasestorage.app",
+  messagingSenderId: "257129078581",
+  appId: "1:257129078581:web:48c923addfa3d28526f67c",
+  measurementId: "G-7F10K2Z3VJ"
 };
-const lockLabels = {icloud:'Bloqueo de iCloud', pin:'Bloqueo de pantalla / PIN', mdm:'Bloqueo MDM', compania:'Bloqueo de compañía telefónica'};
-const screenLabels = {hello:'Hello / activación', pin:'PIN', unavailable:'iPhone no disponible', other:'Otro'};
-const resultCard = document.getElementById('resultCard');
-function empty(){resultCard.innerHTML = '<h1 class="result-title">Sin datos</h1><p class="result-sub">Vuelve a index.html y completa la consulta.</p><a class="back-btn" href="index.html">Volver</a>';}
-function downloadLink(tier){
-  const link = LINKS[tier];
-  if(link && link !== '#') return `<a class="download-btn" href="${link}" target="_blank" rel="noopener">Descargar herramienta</a>`;
-  return `<a class="download-btn" href="#" onclick="event.preventDefault();alert('Edita el bloque LINKS en check.html y reemplaza # por tu link real.');">Descargar herramienta</a>`;
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+
+function switchAuthTab(tab){
+  document.getElementById('tab-login').classList.toggle('active', tab==='login');
+  document.getElementById('tab-register').classList.toggle('active', tab==='register');
+  document.getElementById('form-login').classList.toggle('visible', tab==='login');
+  document.getElementById('form-register').classList.toggle('visible', tab==='register');
+  hideAuthErrors();
 }
-function details(tier, can, screen, ios){
-  if(tier === 1) return ['Siempre se puede desbloquear. Precio base $5 USD.', 'Puede quedar con señal, pero debe validarse con el software. Si queda con señal, pide más dinero.'];
+function hideAuthErrors(){
+  document.getElementById('login-error').classList.remove('show');
+  document.getElementById('register-error').classList.remove('show');
+}
+function showAuthError(id, message){
+  const el = document.getElementById(id);
+  el.textContent = friendlyAuthError(message);
+  el.classList.add('show');
+}
+function friendlyAuthError(code){
+  const map = {
+    'auth/invalid-email':'Correo inválido.',
+    'auth/user-not-found':'No existe una cuenta con ese correo.',
+    'auth/wrong-password':'Contraseña incorrecta.',
+    'auth/invalid-credential':'Correo o contraseña incorrectos.',
+    'auth/email-already-in-use':'Ya existe una cuenta con ese correo.',
+    'auth/weak-password':'La contraseña debe tener al menos 6 caracteres.',
+    'auth/popup-closed-by-user':'Se cerró la ventana de Google antes de terminar.',
+  };
+  return map[code] || 'Ocurrió un error. Intenta de nuevo.';
+}
+function doGoogleAuth(){
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider).then(()=>{ closeDrawer(); showToast('Sesión iniciada ✔'); }).catch(err=> showAuthError('login-error', err.code));
+}
+function doEmailLogin(e){
+  e.preventDefault(); hideAuthErrors();
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  auth.signInWithEmailAndPassword(email, pass).then(()=>{ closeDrawer(); showToast('Sesión iniciada ✔'); }).catch(err=> showAuthError('login-error', err.code));
+}
+function doEmailRegister(e){
+  e.preventDefault(); hideAuthErrors();
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pass = document.getElementById('reg-pass').value;
+  auth.createUserWithEmailAndPassword(email, pass).then(cred => cred.user.updateProfile({ displayName: name })).then(()=>{ closeDrawer(); showToast('Cuenta creada ✔'); }).catch(err=> showAuthError('register-error', err.code));
+}
+function doLogout(){ auth.signOut().then(()=> showToast('Sesión cerrada')); }
+auth.onAuthStateChanged(user=>{
+  const loggedView = document.getElementById('view-logged');
+  const guestView = document.getElementById('view-guest');
+  const hamburger = document.getElementById('hamburgerBtn');
+  if(user){
+    loggedView.style.display = 'block'; guestView.style.display = 'none'; hamburger.classList.add('logged');
+    const name = user.displayName || (user.email ? user.email.split('@')[0] : 'Usuario');
+    document.getElementById('account-name').textContent = name;
+    document.getElementById('account-email').textContent = user.email || '';
+    const avatar = document.getElementById('avatar');
+    avatar.innerHTML = user.photoURL ? `<img src="${user.photoURL}" alt="">` : '';
+    if(!user.photoURL) avatar.textContent = name.charAt(0).toUpperCase();
+  } else {
+    loggedView.style.display = 'none'; guestView.style.display = 'block'; hamburger.classList.remove('logged');
+  }
+});
+function openDrawer(){ document.getElementById('drawer').classList.add('show'); document.getElementById('overlay').classList.add('show'); }
+function closeDrawer(){ document.getElementById('drawer').classList.remove('show'); document.getElementById('overlay').classList.remove('show'); }
+function showToast(msg){ const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(()=> t.classList.remove('show'), 2600); }
+
+/* ---------------- ICONS ---------------- */
+const ICONS = {
+  warn: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2L12 3z"/><path d="M12 10v4"/><circle cx="12" cy="17" r="0.6" fill="currentColor"/></svg>`,
+  chip: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3"/></svg>`,
+};
+
+/* ---------------- DEVICE TIER RULES ---------------- */
+const TIER1 = ['iPhone 6s','iPhone 6s Plus','iPhone 7','iPhone 7 Plus','iPhone 8','iPhone 8 Plus','iPhone X','iPhone SE (1.ª gen)'];
+const TIER2 = ['iPhone XR','iPhone XS','iPhone XS Max','iPhone 11','iPhone 11 Pro','iPhone 11 Pro Max','iPhone SE (2.ª gen)'];
+// Todo lo demás (12 en adelante, incluida SE 3.ª gen) cae en tier 3.
+
+function getAppleTier(deviceName){
+  if(!deviceName) return null;
+  if(TIER1.includes(deviceName)) return 1;
+  if(TIER2.includes(deviceName)) return 2;
+  return 3;
+}
+
+function parseIOS(str){
+  const m = (str||'').match(/(\d+)(?:\.(\d+))?/);
+  if(!m) return null;
+  return parseFloat(m[1] + '.' + (m[2] || '0'));
+}
+
+/* ---------------- LOAD ORDER ---------------- */
+let order = null;
+try{ order = JSON.parse(localStorage.getItem('f3rn4n_pending_check')); }catch(e){}
+
+function init(){
+  if(!order || !order.lockKey){
+    document.getElementById('empty-state').style.display = 'block';
+    return;
+  }
+  document.body.className = order.os === 'apple' ? 'os-apple' : 'os-android';
+  document.getElementById('order-strip').style.display = 'flex';
+  document.getElementById('strip-device').textContent = order.device || '—';
+  document.getElementById('strip-lock').textContent = order.lockLabel || '—';
+  document.getElementById('strip-client').textContent = (order.client && order.client.name) ? order.client.name : 'Sin datos';
+
+  renderResult();
+}
+
+function renderResult(){
+  const zone = document.getElementById('result-zone');
+  zone.innerHTML = '';
+
+  if(order.os === 'apple'){
+    const tier = getAppleTier(order.device);
+    if(order.lockKey === 'icloud') return zone.appendChild(buildIcloudResult(tier));
+    if(order.lockKey === 'pin') return zone.appendChild(buildPinResult(tier));
+    if(order.lockKey === 'mdm') return zone.appendChild(buildMdmResult());
+    if(order.lockKey === 'carrier') return zone.appendChild(buildCarrierResult());
+  } else {
+    // Android: solo MDM y compañía tienen reglas definidas por ahora.
+    if(order.lockKey === 'mdm') return zone.appendChild(buildMdmResult());
+    if(order.lockKey === 'carrier') return zone.appendChild(buildCarrierResult());
+    return zone.appendChild(buildPendingRulesResult());
+  }
+}
+
+/* ---------------- CARD BUILDER ---------------- */
+function card({ pillClass, pillText, title, desc, warnHtml, reqHtml, showDownload, downloadPlaceholder }){
+  const el = document.createElement('div');
+  el.className = 'result-card';
+  el.innerHTML = `
+    <span class="status-pill ${pillClass}"><span class="dot"></span>${pillText}</span>
+    <div class="result-title">${title}</div>
+    <div class="result-desc">${desc}</div>
+    ${warnHtml || ''}
+    ${reqHtml || ''}
+  `;
+  if(showDownload){
+    const actions = document.createElement('div');
+    actions.className = 'result-actions';
+    actions.innerHTML = `
+      <a class="btn dl-btn placeholder" href="#" id="download-link">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+        Descargar software
+      </a>
+      <span class="dl-note">${downloadPlaceholder || 'Enlace pendiente de configurar'}</span>
+    `;
+    el.appendChild(actions);
+  }
+  return el;
+}
+
+/* ---------------- ICLOUD ---------------- */
+function buildIcloudResult(tier){
+  if(tier === 1){
+    return card({
+      pillClass:'status-ok', pillText:'Compatible',
+      title:'Se puede desbloquear',
+      desc:'Este modelo se libera de iCloud sin importar la versión de iOS instalada.',
+      warnHtml:`<div class="callout callout-warn">${ICONS.warn}<div>Este equipo <b>suele quedar sin señal</b> después del proceso. Avísale al cliente antes de continuar.</div></div>`,
+      showDownload:true
+    });
+  }
   if(tier === 2){
-    const signal = screen === 'hello' ? 'En Hello queda sin señal.' : 'En PIN o iPhone no disponible puede quedar con señal.';
-    return ['Compatible en cualquier versión de iOS para XS al 11 Pro Max. Requiere microcontrolador RP2450.', signal];
+    return card({
+      pillClass:'status-ok', pillText:'Compatible',
+      title:'Se puede desbloquear',
+      desc:'Este modelo se libera de iCloud sin importar la versión de iOS instalada.',
+      warnHtml:`<div class="callout callout-warn">${ICONS.warn}<div>Puede quedar <b>sin señal solo si el equipo está pidiendo el iCloud</b> activamente. Si no lo está pidiendo, normalmente conserva la señal.</div></div>`,
+      reqHtml:`<div class="callout callout-req">${ICONS.chip}<div>Requiere <b>placa RP2350</b> para hacer el proceso.</div></div>`,
+      showDownload:true
+    });
   }
-  if(tier === 3){
-    return can ? ['Compatible si está en Hello y iOS 26.1.', 'Solo bypass sin señal. Precio base $5 USD.'] : ['No confirmado con los datos ingresados.', 'Para 12 a 17 Pro Max debe estar en Hello y iOS 26.1; solo bypass sin señal.'];
-  }
-  if(tier === 4) return ['Android requiere revisión por marca, parche de seguridad y tipo de bloqueo.', 'Se recomienda diagnosticar con herramienta FRP/ADB antes de confirmar señal o liberación de compañía.'];
-  return ['Modelo fuera de las reglas cargadas.', 'Agrega una regla nueva si tu procedimiento lo permite.'];
+  // tier 3
+  const el = card({
+    pillClass:'status-warn', pillText:'Depende de la versión de iOS',
+    title:'Solo compatible en iOS 26.0 – 26.1',
+    desc:'Este modelo (iPhone 12 al 17 Pro Max) solo se puede desbloquear de iCloud si el equipo tiene instalada una versión de iOS entre 26.0 y 26.1. Verifica la versión antes de continuar.',
+    showDownload:true,
+    downloadPlaceholder:'El enlace solo aplica si la versión es compatible'
+  });
+  const checker = document.createElement('div');
+  checker.className = 'ios-check';
+  checker.innerHTML = `
+    <div class="label">Versión de iOS instalada en el equipo</div>
+    <div class="ios-check-row">
+      <input type="text" id="ios-version-input" placeholder="Ej. 26.0.1">
+      <button class="btn btn-primary" onclick="checkIosVersion()">Verificar</button>
+    </div>
+    <div class="ios-result" id="ios-result"></div>
+  `;
+  el.insertBefore(checker, el.querySelector('.result-actions'));
+  return el;
 }
-(function init(){
-  const p = new URLSearchParams(location.search);
-  const model = p.get('model'), group = p.get('group'), tier = Number(p.get('tier')), lock = p.get('lock'), screen = p.get('screen'), ios = p.get('ios') || 'No indicado', can = p.get('can') === '1';
-  const tools = (p.get('tools') || '').split('|').filter(Boolean);
-  const installed = (p.get('installed') || '').split('|').filter(Boolean);
-  if(!model || !group || !tier || !lock){ empty(); return; }
-  const lines = details(tier, can, screen, ios);
-  const toolHtml = tools.length ? `<div class="tool-result-list">${tools.map(tool => `<div><span class="${installed.includes(tool) ? 'ok' : 'missing'}">${installed.includes(tool) ? '✓' : '—'}</span>${tool}</div>`).join('')}</div>` : '';
-  resultCard.innerHTML = `<div class="result-top"><div><h1 class="result-title">${model}</h1><p class="result-sub">${group} · ${lockLabels[lock] || lock}</p></div><span class="verdict ${can ? 'yes' : 'no'}">${can ? 'Sí se puede' : 'No confirmado'}</span></div><div class="info-block ${can ? 'good' : 'bad'}"><strong>Resultado:</strong> ${lines[0]}<br>${lines[1]}</div><div class="meta-grid"><div class="meta-item"><div class="label">Pantalla</div><div class="value">${screenLabels[screen] || 'No indicada'}</div></div><div class="meta-item"><div class="label">iOS/versión</div><div class="value">${ios}</div></div><div class="meta-item"><div class="label">Precio base</div><div class="value">$5 USD</div></div><div class="meta-item"><div class="label">Herramienta extra</div><div class="value">${tier === 2 ? 'RP2450' : 'Software'}</div></div></div>${toolHtml}${downloadLink(tier)}<a class="back-btn" href="index.html">← Nueva consulta</a>`;
-})();
+
+function checkIosVersion(){
+  const raw = document.getElementById('ios-version-input').value;
+  const v = parseIOS(raw);
+  const resultEl = document.getElementById('ios-result');
+  resultEl.classList.add('show');
+  if(v === null){
+    resultEl.className = 'ios-result show bad';
+    resultEl.textContent = 'Escribe una versión válida, ej. 26.0';
+    return;
+  }
+  if(v >= 26.0 && v <= 26.1){
+    resultEl.className = 'ios-result show ok';
+    resultEl.textContent = `iOS ${raw} es compatible — puedes continuar con el desbloqueo.`;
+  } else {
+    resultEl.className = 'ios-result show bad';
+    resultEl.textContent = `iOS ${raw} no es compatible. Se requiere una versión entre 26.0 y 26.1.`;
+  }
+}
+
+/* ---------------- PIN ---------------- */
+function buildPinResult(tier){
+  if(tier === 1){
+    return card({
+      pillClass:'status-ok', pillText:'Compatible',
+      title:'Se puede desbloquear',
+      desc:'Este modelo se libera del bloqueo de PIN sin importar la versión de iOS instalada.',
+      warnHtml:`<div class="callout callout-warn">${ICONS.warn}<div>El resultado de señal <b>no está garantizado</b>: el equipo puede quedar con o sin señal después del proceso.</div></div>`,
+      showDownload:true
+    });
+  }
+  if(tier === 2){
+    return card({
+      pillClass:'status-ok', pillText:'Compatible',
+      title:'Se puede desbloquear',
+      desc:'Aplica para XS, XS Max, XR al 11 Pro Max, y en general cualquier modelo con procesador A12/A13.',
+      warnHtml:`<div class="callout callout-warn">${ICONS.warn}<div>Si el equipo <b>ya tiene señal</b> antes del proceso, la conserva después de desbloquearlo.</div></div>`,
+      reqHtml:`<div class="callout callout-req">${ICONS.chip}<div>Requiere <b>placa RP2350</b> para hacer el proceso.</div></div>`,
+      showDownload:true
+    });
+  }
+  return card({
+    pillClass:'status-bad', pillText:'No disponible',
+    title:'Por el momento no se puede desbloquear',
+    desc:'Los modelos iPhone 12 al 17 Pro Max no tienen, por ahora, un método disponible para liberar el bloqueo de PIN.',
+    showDownload:false
+  });
+}
+
+/* ---------------- MDM ---------------- */
+function buildMdmResult(){
+  return card({
+    pillClass:'status-ok', pillText:'Compatible',
+    title:'Se puede desbloquear',
+    desc:'El bloqueo MDM se libera en todos los modelos, sin importar la versión de sistema operativo instalada.',
+    showDownload:true
+  });
+}
+
+/* ---------------- CARRIER ---------------- */
+function buildCarrierResult(){
+  const el = document.createElement('div');
+  el.className = 'result-card';
+  el.innerHTML = `
+    <span class="status-pill status-manual"><span class="dot"></span>Requiere revisión</span>
+    <div class="result-title">Selecciona la compañía del equipo</div>
+    <div class="result-desc">Estas son las compañías que manejamos por ahora. Todas requieren revisión de IMEI antes de continuar.</div>
+    <div class="carrier-grid" id="carrier-grid"></div>
+    <div class="callout callout-req carrier-note" id="carrier-note">
+      ${ICONS.chip}<div><b id="carrier-selected-name"></b> requiere <b>revisión de IMEI</b>. Por ahora este paso se hace de forma manual — lo automatizamos más adelante.</div>
+    </div>
+  `;
+  const grid = el.querySelector('#carrier-grid');
+  ['Telcel','Movistar','AT&T','T-Mobile'].forEach(name=>{
+    const b = document.createElement('button');
+    b.className = 'carrier-chip';
+    b.textContent = name;
+    b.onclick = ()=>{
+      [...grid.children].forEach(c=>c.classList.remove('selected'));
+      b.classList.add('selected');
+      el.querySelector('#carrier-selected-name').textContent = name;
+      el.querySelector('#carrier-note').classList.add('show');
+    };
+    grid.appendChild(b);
+  });
+  return el;
+}
+
+/* ---------------- FALLBACK (Android sin reglas aún) ---------------- */
+function buildPendingRulesResult(){
+  return card({
+    pillClass:'status-manual', pillText:'Reglas pendientes',
+    title:'Aún no configuramos este flujo para Android',
+    desc:'Las reglas de compatibilidad para este tipo de bloqueo en Android todavía no están definidas. Por ahora, revisa el equipo manualmente.',
+    showDownload:false
+  });
+}
+
+init();
 </script>
 </body>
 </html>
