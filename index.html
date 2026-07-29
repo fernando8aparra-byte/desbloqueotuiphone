@@ -284,6 +284,8 @@ input, textarea{ font-family:inherit; }
 .auth-hint a{ color:var(--accent); text-decoration:none; font-weight:600; cursor:pointer; }
 
 .logout-btn{ width:100%; }
+.logout-btn:hover, .logout-btn:focus-visible{ background:var(--danger-soft); border-color:var(--danger); color:var(--danger); transform:translateY(-1px); box-shadow:0 8px 20px var(--danger-soft); }
+.drawer-programs-btn{ width:100%; justify-content:center; margin-top:10px; text-decoration:none; }
 
 .guest-note{
   margin-top:auto; padding-top:18px; border-top:1px solid var(--border);
@@ -336,6 +338,7 @@ input, textarea{ font-family:inherit; }
       </div>
     </div>
     <button class="btn btn-ghost logout-btn" onclick="doLogout()">Cerrar sesión</button>
+    <a class="btn btn-ghost drawer-programs-btn" href="check.html">Programas</a>
   </div>
 
   <!-- LOGGED OUT -->
