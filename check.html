@@ -491,14 +491,21 @@ const RP2350_BOARDS = [
   { name:'Waveshare RP2350 USB-A Board', note:'Placa recomendada' },
   { name:'Raspberry Pi Pico 2 RP2350', note:'Alternativa compatible' },
 ];
+const RP2350_USB_TOOL_URL = 'https://mega.nz/file/BDcWxKiB#NcJVBRUfRDfrNMb5e3QKtVgaTnAVOnnBBfkVbx8l6W8';
 function openBoardOptionsModal(){
-  const body = RP2350_BOARDS.map(b => `
+  const boardsHtml = RP2350_BOARDS.map(b => `
     <div class="board-option">
       <div><b>${b.name}</b><span>${b.note}</span></div>
       <button class="btn board-search-btn" onclick="searchBoard('${b.name.replace(/'/g,"\\'")}')">Buscar</button>
     </div>
   `).join('');
-  openModal('Placas compatibles con RP2350', 'Te lleva a buscar el nombre exacto en Google.', body);
+  const usbHtml = `
+    <div class="program-action">
+      <div><b>Herramienta USB para programar la placa</b><span>Software para flashear el RP2350</span></div>
+      <a class="btn dl-btn" href="${RP2350_USB_TOOL_URL}" target="_blank" rel="noopener">Descargar</a>
+    </div>
+  `;
+  openModal('Placas compatibles con RP2350', 'Busca la placa exacta en Google, o descarga la herramienta para programarla.', boardsHtml + usbHtml);
 }
 function searchBoard(name){
   window.open('https://www.google.com/search?q=' + encodeURIComponent(name), '_blank');
@@ -660,6 +667,7 @@ const UNLOCK_PROGRAMS = {
     color: 'var(--ios)',
     platform: 'Windows',
     time: '1–10 min',
+    downloadUrl: 'https://mega.nz/folder/j6ZSSJyB#nQnIMWLhUi_cT9NFfNIXeQ',
     prices: {
       'iPhone XR': 13.5,
       'iPhone XS Max': 13.5,
@@ -675,6 +683,7 @@ const UNLOCK_PROGRAMS = {
     color: '#B27CFF',
     platform: 'Windows',
     time: 'Minutos',
+    downloadUrl: 'https://mega.nz/folder/JBEQSBaK#P-MMA1LGZergdz2-3vec6A',
     prices: {
       'iPhone XS': [{label:'Sin señal', price:16.5},{label:'Passcode Bypass', price:18.5}],
       'iPhone XR': [{label:'Sin señal', price:16.5},{label:'Passcode Bypass', price:18.5}],
@@ -691,6 +700,7 @@ const UNLOCK_PROGRAMS = {
     color: 'var(--android)',
     platform: 'Mac',
     time: 'Minutos',
+    downloadUrl: 'https://www.mediafire.com/file/0bmxhbyv6k2bg2e/AldazRActivator_Bypass_Passcode_%2526_Hello_A12_macOS.pkg/file',
     prices: {
       'iPhone XS': 9.5,
       'iPhone XR': 8.5,
@@ -740,10 +750,13 @@ function buildUnlockOptions(deviceName){
 
 /* ---------------- MODAL: ACCIONES DE UN PROGRAMA ---------------- */
 function openProgramActionModal(program, deviceName){
+  const downloadHtml = program.downloadUrl
+    ? `<a class="btn dl-btn" href="${program.downloadUrl}" target="_blank" rel="noopener">Descargar</a>`
+    : `<a class="btn dl-btn placeholder" href="#" onclick="return false;">Descargar</a>`;
   const body = `
     <div class="program-action">
       <div><b>Descarga el programa aquí</b><span>${program.name} · ${program.platform}</span></div>
-      <a class="btn dl-btn placeholder" href="#" onclick="return false;">Descargar</a>
+      ${downloadHtml}
     </div>
     <div class="program-action">
       <div><b>Registra tu ECID</b><span>Aún no disponible</span></div>
