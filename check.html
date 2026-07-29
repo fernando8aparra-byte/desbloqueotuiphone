@@ -207,6 +207,25 @@ a{ color:inherit; }
 .price-line b{ font-family:'JetBrains Mono',monospace; color:var(--ok); font-size:13px; }
 .price-na{ font-size:12px; color:var(--text-faint); font-style:italic; }
 
+
+.modal-overlay{ position:fixed; inset:0; background:#080a0ed9; backdrop-filter:blur(4px); opacity:0; pointer-events:none; transition:opacity .2s; z-index:110; display:flex; align-items:center; justify-content:center; padding:22px; }
+.modal-overlay.show{ opacity:1; pointer-events:auto; }
+.option-modal{ width:min(620px, 100%); background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:22px; box-shadow:0 22px 70px #0008; }
+.option-modal-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:14px; margin-bottom:16px; }
+.option-modal-title{ font-family:'Space Grotesk',sans-serif; font-size:18px; font-weight:700; }
+.option-modal-sub{ font-size:12.5px; color:var(--text-muted); line-height:1.5; margin-top:4px; }
+.option-modal-close{ width:32px; height:32px; border-radius:8px; border:1px solid var(--border); background:var(--surface-2); color:var(--text-muted); font-size:20px; line-height:1; }
+.option-modal-close:hover{ color:var(--text); border-color:var(--text-faint); }
+.modal-options-grid{ display:grid; gap:10px; }
+.modal-option-card{ background:var(--surface-2); border:1px solid var(--border); border-radius:10px; padding:14px; display:flex; justify-content:space-between; gap:14px; align-items:center; }
+.modal-option-card.disabled{ opacity:.58; }
+.modal-option-name{ font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:700; }
+.modal-option-note{ font-size:11.5px; color:var(--text-muted); margin-top:3px; }
+.option-small-btn{ white-space:nowrap; padding:9px 13px; }
+.callout-req .btn{ margin-top:10px; }
+.program-card{ cursor:pointer; transition:border-color .12s, transform .12s; }
+.program-card:hover{ border-color:var(--accent); transform:translateY(-1px); }
+
 /* Empty state */
 .empty-card{ margin-top:26px; background:var(--surface); border:1px dashed var(--border); border-radius:var(--radius); padding:44px 28px; text-align:center; }
 .empty-card svg{ width:34px; height:34px; color:var(--text-faint); margin-bottom:14px; }
@@ -335,6 +354,18 @@ a{ color:inherit; }
 </div>
 
 <div class="toast" id="toast"></div>
+<div class="modal-overlay" id="options-modal" onclick="closeOptionsModal(event)">
+  <div class="option-modal" role="dialog" aria-modal="true" aria-labelledby="options-modal-title">
+    <div class="option-modal-head">
+      <div>
+        <div class="option-modal-title" id="options-modal-title">Opciones</div>
+        <div class="option-modal-sub" id="options-modal-sub"></div>
+      </div>
+      <button class="option-modal-close" onclick="hideOptionsModal()" aria-label="Cerrar">×</button>
+    </div>
+    <div class="modal-options-grid" id="options-modal-list"></div>
+  </div>
+</div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -443,6 +474,58 @@ function parseIOS(str){
   return parseFloat(m[1] + '.' + (m[2] || '0'));
 }
 
+
+/* ---------------- MODALES DE OPCIONES ---------------- */
+const RP2350_OPTIONS = [
+  { name:'Waveshare RP2359 USB-A Board', query:'Waveshare RP2359 USB-A Board', configured:true },
+  { name:'Raspberry Pi Pico 2 RP2350', query:'Raspberry Pi Pico 2 RP2350', configured:true },
+  { name:'Opción RP2350 3', note:'Pendiente de configurar', configured:false },
+  { name:'Opción RP2350 4', note:'Pendiente de configurar', configured:false }
+];
+
+function googleSearch(query){
+  window.location.href = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+}
+
+function showModal(title, subtitle, options){
+  document.getElementById('options-modal-title').textContent = title;
+  document.getElementById('options-modal-sub').textContent = subtitle || '';
+  const list = document.getElementById('options-modal-list');
+  list.innerHTML = '';
+  options.forEach(option=>{
+    const item = document.createElement('div');
+    item.className = 'modal-option-card' + (option.disabled ? ' disabled' : '');
+    item.innerHTML = `
+      <div>
+        <div class="modal-option-name">${option.name}</div>
+        <div class="modal-option-note">${option.note || ''}</div>
+      </div>
+      ${option.button || ''}
+    `;
+    list.appendChild(item);
+  });
+  document.getElementById('options-modal').classList.add('show');
+}
+
+function hideOptionsModal(){ document.getElementById('options-modal').classList.remove('show'); }
+function closeOptionsModal(event){ if(event.target.id === 'options-modal') hideOptionsModal(); }
+
+function showRp2350Options(){
+  showModal('Opciones de placa RP2350', 'Busca una placa compatible sin salir de este navegador.', RP2350_OPTIONS.map(option=>({
+    name: option.name,
+    note: option.note || 'Placa recomendada para el proceso.',
+    disabled: !option.configured,
+    button: option.configured ? `<button class="btn btn-primary option-small-btn" onclick="googleSearch('${option.query}')">Buscar</button>` : `<button class="btn btn-ghost option-small-btn" disabled>Por configurar</button>`
+  })));
+}
+
+function showProgramOptions(programName){
+  showModal(programName, 'Opciones disponibles para este programa de desbloqueo.', [
+    { name:'Descarga el programa aquí', note:'Abre una búsqueda para localizar la descarga del programa.', button:`<button class="btn btn-primary option-small-btn" onclick="googleSearch('${programName} descargar')">Descargar</button>` },
+    { name:'Registra tu ECID', note:'Este botón queda pendiente de programación.', button:'<button class="btn btn-ghost option-small-btn" disabled>Registrar</button>' }
+  ]);
+}
+
 /* ---------------- LOAD ORDER ---------------- */
 let order = null;
 try{ order = JSON.parse(localStorage.getItem('f3rn4n_pending_check')); }catch(e){}
@@ -491,7 +574,7 @@ function card({ pillClass, pillText, title, desc, warnHtml, reqHtml, showDownloa
     ${reqHtml || ''}
   `;
   if(unlockOptions){
-    el.appendChild(buildUnlockOptions(unlockOptions));
+    el.appendChild(buildA12A13UnlockOptions(unlockOptions));
   }
   if(showDownload){
     const actions = document.createElement('div');
@@ -559,7 +642,7 @@ function getA12A13UnlockOptions(deviceName){
   return A12_A13_UNLOCK_OPTIONS[normalizeDeviceName(deviceName)] || null;
 }
 
-function buildUnlockOptions(options){
+function buildA12A13UnlockOptions(options){
   const section = document.createElement('div');
   section.className = 'unlock-options';
   const programs = [
@@ -585,6 +668,7 @@ function buildUnlockOptions(options){
       <div class="unlock-price">${data ? data.price : 'No disponible'}</div>
       <div class="unlock-meta">${data ? data.time : 'Sin precio para este modelo'}</div>
       <div class="unlock-signal">${data ? data.signal : ''}</div>
+      ${data ? `<button class="btn btn-ghost" onclick="showProgramOptions(${JSON.stringify(program.name)})">Ver opciones</button>` : ''}
     `;
     grid.appendChild(card);
   });
@@ -608,7 +692,7 @@ function buildIcloudResult(tier){
       title:'Se puede desbloquear',
       desc:'Este modelo se libera de iCloud sin importar la versión de iOS instalada.',
       warnHtml:`<div class="callout callout-warn">${ICONS.warn}<div>Puede quedar <b>sin señal solo si el equipo está pidiendo el iCloud</b> activamente. Si no lo está pidiendo, normalmente conserva la señal.</div></div>`,
-      reqHtml:`<div class="callout callout-req">${ICONS.chip}<div>Requiere <b>placa RP2350</b> para hacer el proceso.</div></div>`,
+      reqHtml:`<div class="callout callout-req">${ICONS.chip}<div>Requiere <b>placa RP2350</b> para hacer el proceso.<br><button class="btn btn-ghost" onclick="showRp2350Options()">Ver más opciones</button></div></div>`,
       showDownload:false,
       unlockOptions:getA12A13UnlockOptions(order.device)
     });
@@ -713,7 +797,7 @@ function formatUnlockPrice(entry){
   return `<div class="price-line"><span>Precio</span><b>$${entry} USD</b></div>`;
 }
 
-function buildUnlockOptions(deviceName){
+function buildLegacyUnlockOptions(deviceName){
   const wrap = document.createElement('div');
   wrap.className = 'unlock-options';
   wrap.innerHTML = `<div class="unlock-options-label">Opciones de desbloqueo para <b>${deviceName || 'este modelo'}</b></div>`;
@@ -756,11 +840,10 @@ function buildPinResult(tier){
       title:'Se puede desbloquear',
       desc:'Aplica para XS, XS Max, XR al 11 Pro Max, y en general cualquier modelo con procesador A12/A13.',
       warnHtml:`<div class="callout callout-warn">${ICONS.warn}<div>Si el equipo <b>ya tiene señal</b> antes del proceso, la conserva después de desbloquearlo.</div></div>`,
-      reqHtml:`<div class="callout callout-req">${ICONS.chip}<div>Requiere <b>placa RP2350</b> para hacer el proceso.</div></div>`,
+      reqHtml:`<div class="callout callout-req">${ICONS.chip}<div>Requiere <b>placa RP2350</b> para hacer el proceso.<br><button class="btn btn-ghost" onclick="showRp2350Options()">Ver más opciones</button></div></div>`,
       showDownload:false,
       unlockOptions:getA12A13UnlockOptions(order.device)
     });
-    el.appendChild(buildUnlockOptions(order.device));
     return el;
   }
   return card({
