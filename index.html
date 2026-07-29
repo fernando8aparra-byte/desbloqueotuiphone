@@ -899,11 +899,11 @@ function sendToCheck(){
     client: state.client,
     createdAt: new Date().toISOString()
   };
-  // Scaffold: guarda la orden para que la página Check la recoja cuando exista.
   try{
-    localStorage.setItem('liberacel_pending_check', JSON.stringify(payload));
+    localStorage.setItem('f3rn4n_pending_check', JSON.stringify(payload));
   }catch(e){}
-  showToast('Orden lista. Se enviará a Check ✔');
+  showToast('Orden lista. Abriendo Check…');
+  setTimeout(()=>{ window.location.href = 'check.html'; }, 700);
 }
 
 function showToast(msg){
