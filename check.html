@@ -167,6 +167,7 @@ a{ color:inherit; }
 .ios-result.show{ display:flex; }
 .ios-result.ok{ color:var(--ok); }
 .ios-result.bad{ color:var(--danger); }
+.ios-tool-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:14px; padding-top:14px; border-top:1px solid var(--border); font-size:12.5px; color:var(--text-muted); }
 
 /* Carrier chips */
 .carrier-grid{ display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
@@ -269,6 +270,10 @@ a{ color:inherit; }
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
     </button>
   </div>
+
+  <button class="btn btn-ghost" style="width:100%; justify-content:center; margin-bottom:20px;" onclick="closeDrawer(); openAllProgramsModal();">
+    Programas
+  </button>
 
   <div id="view-logged" style="display:none;">
     <div class="account-card">
@@ -501,7 +506,7 @@ function openBoardOptionsModal(){
   `).join('');
   const usbHtml = `
     <div class="program-action">
-      <div><b>Herramienta USB para programar la placa</b><span>Software para flashear el RP2350</span></div>
+      <div><b>Programar placa</b><span>Herramienta USB para flashear el RP2350</span></div>
       <a class="btn dl-btn" href="${RP2350_USB_TOOL_URL}" target="_blank" rel="noopener">Descargar</a>
     </div>
   `;
@@ -509,6 +514,23 @@ function openBoardOptionsModal(){
 }
 function searchBoard(name){
   window.open('https://www.google.com/search?q=' + encodeURIComponent(name), '_blank');
+}
+
+/* ---------------- MODAL: TODOS LOS PROGRAMAS (menú) ---------------- */
+function openAllProgramsModal(){
+  const items = [];
+  Object.values(UNLOCK_PROGRAMS).forEach(p => items.push({ name: p.name, url: p.downloadUrl }));
+  Object.values(CHECKM8_PROGRAMS).forEach(p => items.push({ name: p.name, url: p.downloadUrl }));
+  items.push({ name: '3uTools (verificación de versión de iOS)', url: 'https://www.3u.com/productsWin' });
+  items.push({ name: 'Herramienta USB para programar placa RP2350', url: RP2350_USB_TOOL_URL });
+
+  const body = items.map(it => `
+    <div class="program-action">
+      <div><b>${it.name}</b></div>
+      <a class="btn dl-btn" href="${it.url}" target="_blank" rel="noopener">Abrir</a>
+    </div>
+  `).join('');
+  openModal('Programas', 'Todos los programas y herramientas de verificación que se utilizan.', body);
 }
 
 /* ---------------- ICONS ---------------- */
@@ -600,31 +622,34 @@ function card({ pillClass, pillText, title, desc, warnHtml, reqHtml, showDownloa
 /* ---------------- ICLOUD ---------------- */
 function buildIcloudResult(tier){
   if(tier === 1){
-    return card({
+    const el = card({
       pillClass:'status-ok', pillText:'Compatible',
       title:'Se puede desbloquear',
       desc:'Este modelo se libera de iCloud sin importar la versión de iOS instalada.',
       warnHtml:`<div class="callout callout-warn">${ICONS.warn}<div>Este equipo <b>suele quedar sin señal</b> después del proceso. Avísale al cliente antes de continuar.</div></div>`,
-      showDownload:true
+      showDownload:false
     });
+    el.appendChild(buildFlatProgramOptions(CHECKM8_PROGRAMS, order.device));
+    return el;
   }
   if(tier === 2){
-    return card({
+    const el = card({
       pillClass:'status-ok', pillText:'Compatible',
       title:'Se puede desbloquear',
       desc:'Este modelo se libera de iCloud sin importar la versión de iOS instalada.',
       warnHtml:`<div class="callout callout-warn">${ICONS.warn}<div>Puede quedar <b>sin señal solo si el equipo está pidiendo el iCloud</b> activamente. Si no lo está pidiendo, normalmente conserva la señal.</div></div>`,
       reqHtml:`<div class="callout callout-req">${ICONS.chip}<div>Requiere <b>placa RP2350</b> para hacer el proceso.<br><button class="req-more-btn" onclick="openBoardOptionsModal()">Ver más opciones →</button></div></div>`,
-      showDownload:true
+      showDownload:false
     });
+    el.appendChild(buildUnlockOptions(order.device));
+    return el;
   }
-  // tier 3
+  // tier 3: iPhone 12 al 17 Pro Max
   const el = card({
     pillClass:'status-warn', pillText:'Depende de la versión de iOS',
-    title:'Solo compatible en iOS 26.0 – 26.1',
-    desc:'Este modelo (iPhone 12 al 17 Pro Max) solo se puede desbloquear de iCloud si el equipo tiene instalada una versión de iOS entre 26.0 y 26.1. Verifica la versión antes de continuar.',
-    showDownload:true,
-    downloadPlaceholder:'El enlace solo aplica si la versión es compatible'
+    title:'Solo se puede desbloquear sin señal',
+    desc:'Este modelo (iPhone 12 al 17 Pro Max) solo se puede desbloquear de iCloud sin señal, y únicamente si el equipo tiene instalada una versión de iOS entre 26.0 y 26.1. Verifica la versión antes de continuar.',
+    showDownload:false
   });
   const checker = document.createElement('div');
   checker.className = 'ios-check';
@@ -635,15 +660,22 @@ function buildIcloudResult(tier){
       <button class="btn btn-primary" onclick="checkIosVersion()">Verificar</button>
     </div>
     <div class="ios-result" id="ios-result"></div>
+    <div class="ios-tool-row">
+      <span>¿No sabes la versión? Verifícala con 3uTools</span>
+      <a class="btn btn-ghost" href="https://www.3u.com/productsWin" target="_blank" rel="noopener">Descargar aquí</a>
+    </div>
   `;
-  el.insertBefore(checker, el.querySelector('.result-actions'));
+  el.appendChild(checker);
+  el.appendChild(buildFlatProgramOptions(CHECKM8_PROGRAMS, order.device));
   return el;
 }
 
-function checkIosVersion(){
-  const raw = document.getElementById('ios-version-input').value;
+function checkIosVersion(inputId, resultId){
+  inputId = inputId || 'ios-version-input';
+  resultId = resultId || 'ios-result';
+  const raw = document.getElementById(inputId).value;
   const v = parseIOS(raw);
-  const resultEl = document.getElementById('ios-result');
+  const resultEl = document.getElementById(resultId);
   resultEl.classList.add('show');
   if(v === null){
     resultEl.className = 'ios-result show bad';
@@ -713,6 +745,37 @@ const UNLOCK_PROGRAMS = {
   }
 };
 
+/* Programas de precio fijo ($5 USD, sin importar el modelo) para 6s–X y 12–17 */
+const CHECKM8_PROGRAMS = {
+  f3arra1n: {
+    name: 'F3arRa1n',
+    tag: 'F3',
+    color: 'var(--ios)',
+    platform: 'Windows y Mac',
+    time: 'Minutos',
+    price: 5,
+    downloadUrl: 'https://f3arra1n.com/Docs/#Windows',
+  },
+  rex: {
+    name: 'REX Activator',
+    tag: 'RX',
+    color: 'var(--amber)',
+    platform: '—',
+    time: 'Minutos',
+    price: 5,
+    downloadUrl: 'https://www.mediafire.com/folder/9nrd4x17fay10/Rex_activator',
+  },
+  unlock: {
+    name: 'Unlock',
+    tag: 'Un',
+    color: 'var(--android)',
+    platform: '—',
+    time: 'Minutos',
+    price: 3,
+    downloadUrl: 'https://mega.nz/file/gns1CTYA#Qq4PigKzpZ2INjLMZAbY-7nC26i0Q-7tmTKYRoMfhzU',
+  }
+};
+
 function formatUnlockPrice(entry){
   if(entry === undefined) return `<span class="price-na">No disponible para este modelo</span>`;
   if(Array.isArray(entry)){
@@ -748,6 +811,33 @@ function buildUnlockOptions(deviceName){
   return wrap;
 }
 
+/* Programas de precio fijo, sin importar el modelo (6s–X y 12–17) */
+function buildFlatProgramOptions(programs, deviceName){
+  const wrap = document.createElement('div');
+  wrap.className = 'unlock-options';
+  wrap.innerHTML = `<div class="unlock-options-label">Opciones de desbloqueo para <b>${deviceName || 'este modelo'}</b></div>`;
+  const grid = document.createElement('div');
+  grid.className = 'program-grid';
+  Object.values(programs).forEach(p=>{
+    const c = document.createElement('div');
+    c.className = 'program-card';
+    c.innerHTML = `
+      <div class="program-head">
+        <span class="program-tag" style="background:${p.color}22; color:${p.color};">${p.tag}</span>
+        <div>
+          <b>${p.name}</b>
+          <span class="program-meta">${p.platform} · ${p.time}</span>
+        </div>
+      </div>
+      <div class="program-prices"><div class="price-line"><span>Precio</span><b>$${p.price} USD</b></div></div>
+    `;
+    c.onclick = ()=> openProgramActionModal(p, deviceName);
+    grid.appendChild(c);
+  });
+  wrap.appendChild(grid);
+  return wrap;
+}
+
 /* ---------------- MODAL: ACCIONES DE UN PROGRAMA ---------------- */
 function openProgramActionModal(program, deviceName){
   const downloadHtml = program.downloadUrl
@@ -773,13 +863,15 @@ function openProgramActionModal(program, deviceName){
 /* ---------------- PIN ---------------- */
 function buildPinResult(tier){
   if(tier === 1){
-    return card({
+    const el = card({
       pillClass:'status-ok', pillText:'Compatible',
       title:'Se puede desbloquear',
       desc:'Este modelo se libera del bloqueo de PIN sin importar la versión de iOS instalada.',
       warnHtml:`<div class="callout callout-warn">${ICONS.warn}<div>El resultado de señal <b>no está garantizado</b>: el equipo puede quedar con o sin señal después del proceso.</div></div>`,
-      showDownload:true
+      showDownload:false
     });
+    el.appendChild(buildFlatProgramOptions(CHECKM8_PROGRAMS, order.device));
+    return el;
   }
   if(tier === 2){
     const el = card({
@@ -787,11 +879,13 @@ function buildPinResult(tier){
       title:'Se puede desbloquear',
       desc:'Aplica para XS, XS Max, XR al 11 Pro Max, y en general cualquier modelo con procesador A12/A13.',
       warnHtml:`<div class="callout callout-warn">${ICONS.warn}<div>Si el equipo <b>ya tiene señal</b> antes del proceso, la conserva después de desbloquearlo.</div></div>`,
+      reqHtml:`<div class="callout callout-req">${ICONS.chip}<div>Requiere <b>placa RP2350</b> para hacer el proceso.<br><button class="req-more-btn" onclick="openBoardOptionsModal()">Ver placas y cómo programarlas →</button></div></div>`,
       showDownload:false
     });
     el.appendChild(buildUnlockOptions(order.device));
     return el;
   }
+  // tier 3: iPhone 12 al 17 Pro Max — no soportado por PIN
   return card({
     pillClass:'status-bad', pillText:'No disponible',
     title:'Por el momento no se puede desbloquear',
