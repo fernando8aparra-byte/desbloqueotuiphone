@@ -5,43 +5,43 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>F3RN4N · Registro de equipo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#10141B;
-  --surface:#171D27;
-  --surface-2:#1F2733;
-  --surface-3:#262F3D;
-  --border:#2A3341;
-  --border-soft:#20283420;
-  --text:#EDF0F4;
-  --text-muted:#8891A0;
-  --text-faint:#5B6474;
-  --ios:#4FA8FF;
-  --ios-soft:#4FA8FF1A;
-  --android:#7CDB6A;
-  --android-soft:#7CDB6A1A;
-  --amber:#FF9C3D;
-  --amber-soft:#FF9C3D1A;
-  --danger:#FF5D5D;
-  --danger-soft:#FF5D5D1A;
+  --bg:#0B0E11;
+  --surface:#1B1F24;
+  --surface-2:#22262B;
+  --surface-3:#2B3036;
+  --border:#333840;
+  --border-soft:#33384020;
+  --text:#FFFFFF;
+  --text-muted:#848E9C;
+  --text-faint:#5E6673;
+  --ios:#F5F5F7;
+  --ios-soft:#FFFFFF14;
+  --android:#3DDC84;
+  --android-soft:#3DDC8420;
+  --gold:#F0B90B;
+  --gold-soft:#F0B90B1F;
+  --danger:#F6465D;
+  --danger-soft:#F6465D1A;
+  --success:#0ECB81;
   --radius:10px;
-  --accent:var(--amber);
-  --accent-soft:var(--amber-soft);
+  --accent:var(--gold);
+  --accent-soft:var(--gold-soft);
   font-family:'Inter',sans-serif;
 }
 *{box-sizing:border-box; margin:0; padding:0;}
 body{
   background:
-    radial-gradient(circle at 15% 0%, #1a2130 0%, transparent 45%),
-    radial-gradient(circle at 85% 100%, #161c27 0%, transparent 40%),
+    radial-gradient(circle at 15% 0%, #1c1a10 0%, transparent 45%),
+    radial-gradient(circle at 85% 100%, #14171a 0%, transparent 40%),
     var(--bg);
   color:var(--text);
   min-height:100vh;
   -webkit-font-smoothing:antialiased;
 }
-body.os-apple{ --accent:var(--ios); --accent-soft:var(--ios-soft); }
-body.os-android{ --accent:var(--android); --accent-soft:var(--android-soft); }
+/* Acento único (dorado) en toda la app para una identidad consistente */
 
 ::selection{ background:var(--accent-soft); color:var(--text); }
 button{ font-family:inherit; cursor:pointer; }
@@ -52,20 +52,20 @@ input, textarea{ font-family:inherit; }
   display:flex; align-items:center; justify-content:space-between;
   padding:18px 32px;
   border-bottom:1px solid var(--border);
-  background:#10141Bcc;
+  background:#0B0E11cc;
   backdrop-filter:blur(10px);
   position:sticky; top:0; z-index:50;
 }
 .brand{ display:flex; align-items:center; gap:10px; }
 .brand-mark{
   width:30px; height:30px; border-radius:8px;
-  background:linear-gradient(135deg, var(--amber), #d97a1f);
+  background:linear-gradient(135deg, var(--gold), #C99400);
   display:flex; align-items:center; justify-content:center;
   flex-shrink:0;
 }
 .brand-mark svg{ width:16px; height:16px; }
 .brand-text{ display:flex; flex-direction:column; line-height:1.15; }
-.brand-text b{ font-family:'Space Grotesk',sans-serif; font-size:15px; letter-spacing:.2px; }
+.brand-text b{ font-family:'Inter',sans-serif; font-weight:800; font-size:15px; letter-spacing:.2px; }
 .brand-text span{ font-size:11px; color:var(--text-muted); }
 
 .nav-pages{ display:flex; gap:4px; background:var(--surface); border:1px solid var(--border); border-radius:999px; padding:4px; }
@@ -74,7 +74,7 @@ input, textarea{ font-family:inherit; }
   padding:7px 16px; border-radius:999px; position:relative;
   transition:color .15s;
 }
-.nav-pages a.active{ background:var(--surface-3); color:var(--text); }
+.nav-pages a.active{ background:var(--accent); color:#0B0E11; font-weight:700; }
 .nav-pages a.disabled{ pointer-events:none; opacity:.45; }
 .nav-pages a.disabled::after{
   content:'Próximamente'; position:absolute; bottom:-26px; left:50%; transform:translateX(-50%);
@@ -91,7 +91,7 @@ input, textarea{ font-family:inherit; }
 @media (max-width:880px){ .wrap{ grid-template-columns:1fr; gap:28px; padding:28px 18px 80px; } }
 
 .page-head{ grid-column:1/-1; margin-bottom:6px; }
-.page-head h1{ font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:600; }
+.page-head h1{ font-family:'Inter',sans-serif; font-size:26px; font-weight:800; letter-spacing:-.3px; }
 .page-head p{ color:var(--text-muted); font-size:14px; margin-top:5px; }
 
 /* ---------- STEPPER RAIL ---------- */
@@ -107,7 +107,7 @@ input, textarea{ font-family:inherit; }
 }
 .rail-step:last-child::before{ display:none; }
 .rail-num{
-  font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:13px;
+  font-family:'Inter',sans-serif; font-weight:700; font-size:13px;
   width:31px; height:31px; border-radius:50%; flex-shrink:0;
   display:flex; align-items:center; justify-content:center;
   background:var(--surface); border:1px solid var(--border); color:var(--text-muted);
@@ -130,7 +130,7 @@ input, textarea{ font-family:inherit; }
 .step-block.visible{ display:block; }
 @keyframes fadeUp{ from{ opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;} }
 
-.step-title{ font-family:'Space Grotesk',sans-serif; font-size:19px; font-weight:600; margin-bottom:4px; }
+.step-title{ font-family:'Inter',sans-serif; font-size:19px; font-weight:700; letter-spacing:-.2px; margin-bottom:4px; }
 .step-sub{ color:var(--text-muted); font-size:13.5px; margin-bottom:24px; }
 
 /* OS cards */
@@ -141,10 +141,15 @@ input, textarea{ font-family:inherit; }
   padding:26px 20px; text-align:left; color:var(--text); transition:all .15s;
   display:flex; flex-direction:column; gap:14px;
 }
-.os-card:hover{ border-color:var(--text-faint); transform:translateY(-2px); }
-.os-card.selected{ border-color:var(--accent); background:var(--accent-soft); }
-.os-icon{ width:38px; height:38px; }
-.os-card h3{ font-family:'Space Grotesk',sans-serif; font-size:16px; }
+.os-card:hover{ border-color:var(--text-faint); transform:translateY(-2px); box-shadow:0 8px 24px -12px #000000a0; }
+.os-card.selected{ border-color:var(--accent); background:var(--accent-soft); box-shadow:0 0 0 1px var(--accent) inset; }
+.os-icon{ width:34px; height:34px; color:var(--text-muted); transition:color .15s; }
+.os-card:hover .os-icon{ color:var(--text); }
+.os-card.selected .os-icon{ color:var(--accent); }
+.os-card:hover .os-icon-android{ color:var(--android); }
+.os-card:hover .os-icon-apple{ color:var(--ios); }
+.os-card.selected .os-icon-android, .os-card.selected .os-icon-apple{ color:var(--accent); }
+.os-card h3{ font-family:'Inter',sans-serif; font-size:16px; font-weight:700; }
 .os-card p{ font-size:12.5px; color:var(--text-muted); }
 
 /* Chip grids (generation / brand / lock) */
@@ -199,7 +204,7 @@ input, textarea{ font-family:inherit; }
 .summary-row{ display:flex; justify-content:space-between; align-items:center; gap:12px; padding-bottom:14px; border-bottom:1px solid var(--border); }
 .summary-row:last-child{ border-bottom:none; padding-bottom:0; }
 .summary-row .k{ font-size:11.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-faint); }
-.summary-row .v{ font-family:'JetBrains Mono',monospace; font-size:13.5px; text-align:right; }
+.summary-row .v{ font-family:'Inter',sans-serif; font-weight:600; font-size:13.5px; text-align:right; }
 .summary-row .v.empty{ color:var(--text-faint); font-family:'Inter',sans-serif; font-style:italic; }
 .tag{ display:inline-flex; align-items:center; gap:6px; background:var(--accent-soft); color:var(--accent); padding:3px 10px; border-radius:999px; font-size:11.5px; font-weight:600; font-family:'Inter',sans-serif; }
 
@@ -209,8 +214,8 @@ input, textarea{ font-family:inherit; }
   border-radius:8px; padding:11px 22px; font-size:13.5px; font-weight:600; border:1px solid transparent;
   display:inline-flex; align-items:center; gap:8px; transition:all .12s;
 }
-.btn-primary{ background:var(--accent); color:#0d0f13; }
-.btn-primary:hover{ filter:brightness(1.08); }
+.btn-primary{ background:var(--accent); color:#0B0E11; font-weight:700; }
+.btn-primary:hover{ filter:brightness(1.08); box-shadow:0 0 0 3px var(--accent-soft); }
 .btn-primary:disabled{ background:var(--surface-3); color:var(--text-faint); cursor:not-allowed; }
 .btn-ghost{ background:transparent; border-color:var(--border); color:var(--text-muted); }
 .btn-ghost:hover{ border-color:var(--text-faint); color:var(--text); }
@@ -247,14 +252,14 @@ input, textarea{ font-family:inherit; }
 }
 .drawer.show{ transform:translateX(0); }
 .drawer-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:22px; }
-.drawer-head h3{ font-family:'Space Grotesk',sans-serif; font-size:16px; }
+.drawer-head h3{ font-family:'Inter',sans-serif; font-size:16px; font-weight:700; }
 .drawer-close{ width:30px; height:30px; border-radius:7px; background:var(--surface-2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; color:var(--text-muted); }
 .drawer-close:hover{ color:var(--text); }
 .drawer-close svg{ width:14px; height:14px; }
 
 /* logged-in view */
 .account-card{ display:flex; align-items:center; gap:12px; background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius); padding:16px; margin-bottom:18px; }
-.avatar{ width:42px; height:42px; border-radius:50%; background:var(--surface-3); display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:15px; color:var(--accent); flex-shrink:0; overflow:hidden; }
+.avatar{ width:42px; height:42px; border-radius:50%; background:var(--surface-3); display:flex; align-items:center; justify-content:center; font-family:'Inter',sans-serif; font-weight:700; font-size:15px; color:var(--accent); flex-shrink:0; overflow:hidden; }
 .avatar img{ width:100%; height:100%; object-fit:cover; }
 .account-info{ overflow:hidden; }
 .account-info b{ display:block; font-size:13.5px; }
@@ -330,7 +335,7 @@ input, textarea{ font-family:inherit; }
 }
 .modal-overlay.show .modal-box{ transform:translateY(0); }
 .modal-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:6px; }
-.modal-head h3{ font-family:'Space Grotesk',sans-serif; font-size:16px; line-height:1.3; }
+.modal-head h3{ font-family:'Inter',sans-serif; font-weight:700; font-size:16px; line-height:1.3; }
 .modal-close{ width:30px; height:30px; border-radius:7px; background:var(--surface-2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; color:var(--text-muted); flex-shrink:0; }
 .modal-close:hover{ color:var(--text); }
 .modal-close svg{ width:14px; height:14px; }
@@ -476,12 +481,12 @@ input, textarea{ font-family:inherit; }
 
       <div class="os-grid">
         <button class="os-card" id="os-android" onclick="selectOS('android')">
-          <svg class="os-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="var(--android)" d="M17.6 9.48H6.4c-.54 0-.98.44-.98.98v5.72c0 .54.44.98.98.98h.67v2.15c0 .61.49 1.1 1.1 1.1s1.1-.49 1.1-1.1v-2.15h5.46v2.15c0 .61.49 1.1 1.1 1.1s1.1-.49 1.1-1.1v-2.15h.67c.54 0 .98-.44.98-.98v-5.72c0-.54-.44-.98-.98-.98ZM3.5 9.73c-.61 0-1.1.49-1.1 1.1v4.7c0 .61.49 1.1 1.1 1.1s1.1-.49 1.1-1.1v-4.7c0-.61-.49-1.1-1.1-1.1Zm17 0c-.61 0-1.1.49-1.1 1.1v4.7c0 .61.49 1.1 1.1 1.1s1.1-.49 1.1-1.1v-4.7c0-.61-.49-1.1-1.1-1.1ZM7.82 4.2 6.43 1.8a.42.42 0 0 1 .73-.42l1.42 2.46A6.84 6.84 0 0 1 12 2.93c1.23 0 2.39.32 3.42.9l1.42-2.45a.42.42 0 1 1 .73.42L16.18 4.2a6.42 6.42 0 0 1 2.33 4.35H5.49A6.42 6.42 0 0 1 7.82 4.2Zm1.1 2.28a.73.73 0 1 0 0-1.46.73.73 0 0 0 0 1.46Zm6.16 0a.73.73 0 1 0 0-1.46.73.73 0 0 0 0 1.46Z"/></svg>
+          <svg class="os-icon os-icon-android" viewBox="0 0 24 24" fill="currentColor"><path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993.0001.5511-.4482.9997-.9993.9997zm-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997zm11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.2439 13.8533 7.8508 12 7.8508s-3.5902.3931-5.1367 1.0989L4.841 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C2.6889 10.6588.3432 13.9946 0 17.9963h24c-.3432-4.0017-2.6889-7.3375-6.1185-8.6749z"/></svg>
           <h3>Android</h3>
           <p>Samsung, Xiaomi, Motorola, Huawei y otras marcas.</p>
         </button>
         <button class="os-card" id="os-apple" onclick="selectOS('apple')">
-          <svg class="os-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="var(--ios)" d="M16.36 12.74c-.03-2.02 1.65-2.99 1.73-3.04-.94-1.37-2.4-1.56-2.91-1.58-1.24-.13-2.42.73-3.05.73-.63 0-1.6-.71-2.63-.69-1.35.02-2.6.79-3.29 2-1.4 2.43-.36 6.03 1 8 .67.97 1.48 2.07 2.54 2.03 1.02-.04 1.41-.66 2.64-.66 1.23 0 1.58.66 2.66.64 1.1-.02 1.79-.99 2.46-1.96.77-1.13 1.09-2.22 1.11-2.28-.02-.01-2.13-.82-2.16-3.19ZM14.37 6.82c.56-.68.94-1.62.84-2.56-.81.03-1.78.54-2.36 1.22-.52.6-.98 1.56-.85 2.48.9.07 1.82-.46 2.37-1.14Z"/></svg>
+          <svg class="os-icon os-icon-apple" viewBox="0 0 24 24" fill="currentColor"><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zm3.821-3.485c.84-1.012 1.402-2.424 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.271 3.714 1.338.104 2.715-.688 3.558-1.702z"/></svg>
           <h3>iPhone</h3>
           <p>Del 6s al 17 Pro Max, con todas sus variantes.</p>
         </button>
