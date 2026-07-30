@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F3RN4N · Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#10141B;
+  --surface:#171D27;
+  --surface-2:#1F2733;
+  --surface-3:#262F3D;
+  --border:#2A3341;
+  --text:#EDF0F4;
+  --text-muted:#8891A0;
+  --text-faint:#5B6474;
+  --ios:#4FA8FF;
+  --ios-soft:#4FA8FF1A;
+  --android:#7CDB6A;
+  --android-soft:#7CDB6A1A;
+  --amber:#FF9C3D;
+  --amber-soft:#FF9C3D1A;
+  --danger:#FF5D5D;
+  --danger-soft:#FF5D5D1A;
+  --ok:#4FD17E;
+  --ok-soft:#4FD17E1A;
+  --manual:#8891A0;
+  --manual-soft:#8891A01A;
+  --radius:10px;
+  --accent:var(--amber);
+  --accent-soft:var(--amber-soft);
+  font-family:'Inter',sans-serif;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{
+  background:
+    radial-gradient(circle at 15% 0%, #1a2130 0%, transparent 45%),
+    radial-gradient(circle at 85% 100%, #161c27 0%, transparent 40%),
+    var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+body.os-apple{ --accent:var(--ios); --accent-soft:var(--ios-soft); }
+body.os-android{ --accent:var(--android); --accent-soft:var(--android-soft); }
+::selection{ background:var(--accent-soft); color:var(--text); }
+button{ font-family:inherit; cursor:pointer; }
+input{ font-family:inherit; }
+a{ color:inherit; }
+
+/* ---------- NAV (compartido) ---------- */
+.topnav{ display:flex; align-items:center; justify-content:space-between; padding:18px 32px; border-bottom:1px solid var(--border); background:#10141Bcc; backdrop-filter:blur(10px); position:sticky; top:0; z-index:50; }
+.brand{ display:flex; align-items:center; gap:10px; }
+.brand-mark{ width:30px; height:30px; border-radius:8px; background:linear-gradient(135deg, var(--amber), #d97a1f); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.brand-mark svg{ width:16px; height:16px; }
+.brand-text{ display:flex; flex-direction:column; line-height:1.15; }
+.brand-text b{ font-family:'Space Grotesk',sans-serif; font-size:15px; letter-spacing:.2px; }
+.brand-text span{ font-size:11px; color:var(--text-muted); }
+.hamburger{ width:40px; height:40px; border-radius:9px; background:var(--surface); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:border-color .15s; position:relative; }
+.hamburger:hover{ border-color:var(--text-faint); }
+.hamburger svg{ width:18px; height:18px; }
+.hamburger .dot{ position:absolute; top:-3px; right:-3px; width:9px; height:9px; border-radius:50%; background:var(--android); border:2px solid var(--bg); display:none; }
+.hamburger.logged .dot{ display:block; }
+
+/* ---------- NAV PAGES ---------- */
+.nav-pages{ display:flex; gap:4px; background:var(--surface); border:1px solid var(--border); border-radius:999px; padding:4px; }
+.nav-pages a{ text-decoration:none; color:var(--text-muted); font-size:13px; font-weight:500; padding:7px 16px; border-radius:999px; transition:color .15s, background .15s; }
+.nav-pages a.active{ background:var(--surface-3); color:var(--text); }
+.nav-pages a:hover{ color:var(--text); }
+
+/* ---------- DRAWER (compartido) ---------- */
+.overlay{ position:fixed; inset:0; background:#080a0ecc; backdrop-filter:blur(2px); opacity:0; pointer-events:none; transition:opacity .2s; z-index:90; }
+.overlay.show{ opacity:1; pointer-events:auto; }
+.drawer{ position:fixed; top:0; right:0; height:100%; width:360px; max-width:92vw; background:var(--surface); border-left:1px solid var(--border); transform:translateX(100%); transition:transform .25s cubic-bezier(.4,0,.2,1); z-index:95; display:flex; flex-direction:column; padding:22px 22px 26px; overflow-y:auto; }
+.drawer.show{ transform:translateX(0); }
+.drawer-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:22px; }
+.drawer-head h3{ font-family:'Space Grotesk',sans-serif; font-size:16px; }
+.drawer-close{ width:30px; height:30px; border-radius:7px; background:var(--surface-2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; color:var(--text-muted); }
+.drawer-close:hover{ color:var(--text); }
+.drawer-close svg{ width:14px; height:14px; }
+.account-card{ display:flex; align-items:center; gap:12px; background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius); padding:16px; margin-bottom:18px; }
+.avatar{ width:42px; height:42px; border-radius:50%; background:var(--surface-3); display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:15px; color:var(--accent); flex-shrink:0; overflow:hidden; }
+.avatar img{ width:100%; height:100%; object-fit:cover; }
+.account-info{ overflow:hidden; }
+.account-info b{ display:block; font-size:13.5px; }
+.account-info span{ display:block; font-size:11.5px; color:var(--text-muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.auth-tabs{ display:flex; gap:4px; background:var(--surface-2); border:1px solid var(--border); border-radius:999px; padding:4px; margin-bottom:20px; }
+.auth-tabs button{ flex:1; background:transparent; border:none; color:var(--text-muted); font-size:12.5px; font-weight:600; padding:8px; border-radius:999px; transition:all .15s; }
+.auth-tabs button.active{ background:var(--surface-3); color:var(--text); }
+.auth-form{ display:none; flex-direction:column; gap:14px; }
+.auth-form.visible{ display:flex; }
+.google-btn{ display:flex; align-items:center; justify-content:center; gap:10px; background:var(--text); color:#1a1a1a; border-radius:8px; padding:11px; font-size:13.5px; font-weight:600; border:1px solid var(--border); width:100%; }
+.google-btn:hover{ filter:brightness(.96); }
+.google-btn svg{ width:17px; height:17px; }
+.auth-divider{ display:flex; align-items:center; gap:10px; color:var(--text-faint); font-size:11.5px; margin:2px 0; }
+.auth-divider::before, .auth-divider::after{ content:''; flex:1; height:1px; background:var(--border); }
+.auth-error{ font-size:12.5px; color:var(--danger); display:none; }
+.auth-error.show{ display:block; }
+.logout-btn{
+  width:100%;
+  transition:background-color .25s ease, color .25s ease, border-color .25s ease, transform .15s ease;
+}
+.logout-btn:hover,
+.logout-btn:focus-visible{
+  background:var(--danger-soft);
+  color:var(--danger);
+  border-color:var(--danger);
+}
+.logout-btn:active{
+  background:var(--danger);
+  color:#10141B;
+  border-color:var(--danger);
+  transform:scale(.98);
+}
+.guest-note{ margin-top:auto; padding-top:18px; border-top:1px solid var(--border); font-size:11.5px; color:var(--text-faint); line-height:1.5; }
+.field label{ display:block; font-size:12.5px; color:var(--text-muted); margin-bottom:7px; font-weight:500; }
+.field input{ width:100%; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:8px; padding:11px 13px; font-size:14px; outline:none; transition:border-color .12s; }
+.field input:focus{ border-color:var(--accent); }
+.field input::placeholder{ color:var(--text-faint); }
+.btn{ border-radius:8px; padding:11px 22px; font-size:13.5px; font-weight:600; border:1px solid transparent; display:inline-flex; align-items:center; gap:8px; transition:all .12s; }
+.btn-primary{ background:var(--accent); color:#0d0f13; }
+.btn-primary:hover{ filter:brightness(1.08); }
+.btn-ghost{ background:transparent; border-color:var(--border); color:var(--text-muted); }
+.btn-ghost:hover{ border-color:var(--text-faint); color:var(--text); }
+.btn-text{ background:transparent; color:var(--text-muted); font-size:13px; text-decoration:underline; text-underline-offset:3px; padding:6px; }
+.btn-text:hover{ color:var(--text); }
+
+/* Toast */
+.toast{ position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--surface-3); border:1px solid var(--accent); color:var(--text); padding:14px 22px; border-radius:10px; font-size:13.5px; font-weight:500; display:flex; align-items:center; gap:10px; opacity:0; pointer-events:none; transition:all .25s; z-index:100; }
+.toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* ---------- DASHBOARD LAYOUT ---------- */
+.wrap{ max-width:1180px; margin:0 auto; padding:44px 32px 100px; }
+@media (max-width:600px){ .wrap{ padding:28px 18px 80px; } }
+.page-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+.page-head h1{ font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:600; }
+.page-head p{ color:var(--text-muted); font-size:14px; margin-top:5px; }
+.page-head-right{ font-size:12px; color:var(--text-faint); }
+
+/* ---------- GATE (bloqueo sin sesión) ---------- */
+.gate-card{
+  margin:60px auto 0; max-width:440px; text-align:center; background:var(--surface);
+  border:1px solid var(--border); border-radius:var(--radius); padding:44px 32px;
+}
+.gate-card .gate-icon{
+  width:52px; height:52px; border-radius:14px; background:var(--accent-soft); color:var(--accent);
+  display:flex; align-items:center; justify-content:center; margin:0 auto 20px;
+}
+.gate-card .gate-icon svg{ width:24px; height:24px; }
+.gate-card h2{ font-family:'Space Grotesk',sans-serif; font-size:19px; margin-bottom:8px; }
+.gate-card p{ font-size:13.5px; color:var(--text-muted); line-height:1.6; margin-bottom:24px; }
+
+/* ---------- STAT CARDS ---------- */
+.stat-grid{ margin-top:26px; display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; }
+@media (max-width:900px){ .stat-grid{ grid-template-columns:repeat(2, 1fr); } }
+@media (max-width:520px){ .stat-grid{ grid-template-columns:1fr; } }
+.stat-card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:18px 20px; }
+.stat-card .stat-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.stat-card .stat-icon{ width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.stat-card .stat-icon svg{ width:15px; height:15px; }
+.stat-card .stat-label{ font-size:11.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-faint); }
+.stat-card .stat-value{ font-family:'Space Grotesk',sans-serif; font-size:24px; font-weight:600; }
+.stat-card .stat-sub{ font-size:11.5px; color:var(--text-muted); margin-top:4px; }
+.stat-card .stat-sub.up{ color:var(--ok); }
+
+/* ---------- EARNINGS PANEL ---------- */
+.panel{ margin-top:22px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:22px; }
+.panel-head{ display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-bottom:18px; }
+.panel-head h3{ font-family:'Space Grotesk',sans-serif; font-size:15.5px; }
+.period-tabs{ display:flex; gap:4px; background:var(--surface-2); border:1px solid var(--border); border-radius:999px; padding:4px; }
+.period-tabs button{ background:transparent; border:none; color:var(--text-muted); font-size:12px; font-weight:600; padding:6px 13px; border-radius:999px; transition:all .15s; }
+.period-tabs button.active{ background:var(--surface-3); color:var(--text); }
+.chart-wrap{ display:flex; align-items:flex-end; gap:8px; height:130px; padding-top:10px; }
+.chart-bar-col{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; gap:8px; }
+.chart-bar{ width:100%; max-width:34px; background:var(--accent); border-radius:5px 5px 2px 2px; min-height:3px; transition:height .4s cubic-bezier(.4,0,.2,1); }
+.chart-bar-label{ font-size:10px; color:var(--text-faint); white-space:nowrap; }
+.chart-empty{ font-size:13px; color:var(--text-faint); text-align:center; padding:30px 0; }
+
+/* ---------- PEDIDOS ---------- */
+.pedidos-toolbar{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
+.search-box{ position:relative; flex:1; min-width:220px; }
+.search-box svg{ position:absolute; left:13px; top:50%; transform:translateY(-50%); width:15px; height:15px; color:var(--text-faint); pointer-events:none; }
+.search-box input{
+  width:100%; background:var(--surface-2); border:1px solid var(--border); color:var(--text);
+  border-radius:8px; padding:10px 13px 10px 36px; font-size:13.5px; outline:none; transition:border-color .12s;
+}
+.search-box input:focus{ border-color:var(--accent); }
+.filter-chips{ display:flex; gap:6px; flex-wrap:wrap; }
+.filter-chip{ background:var(--surface-2); border:1px solid var(--border); color:var(--text-muted); padding:8px 14px; border-radius:999px; font-size:12.5px; font-weight:600; transition:all .12s; white-space:nowrap; }
+.filter-chip:hover{ border-color:var(--text-faint); }
+.filter-chip.active{ background:var(--accent); border-color:var(--accent); color:#0d0f13; }
+
+.pedidos-table{ width:100%; border-collapse:collapse; }
+.pedidos-table th{ text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-faint); font-weight:600; padding:0 12px 10px; }
+.pedidos-table td{ padding:13px 12px; border-top:1px solid var(--border); font-size:13px; vertical-align:middle; }
+.pedidos-table tr:hover td{ background:var(--surface-2); }
+.pedidos-table .cell-device{ font-weight:600; }
+.pedidos-table .cell-sub{ display:block; font-size:11px; color:var(--text-faint); margin-top:2px; }
+.pedidos-table .cell-serial{ font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-muted); }
+.pedidos-table .cell-price{ font-family:'JetBrains Mono',monospace; font-weight:600; }
+.table-scroll{ overflow-x:auto; }
+.pedidos-actions{ display:flex; gap:6px; }
+.icon-btn{ width:30px; height:30px; border-radius:7px; background:var(--surface-2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; color:var(--text-muted); flex-shrink:0; }
+.icon-btn:hover{ color:var(--text); border-color:var(--text-faint); }
+.icon-btn svg{ width:14px; height:14px; }
+
+.status-pill{ display:inline-flex; align-items:center; gap:6px; padding:4px 11px; border-radius:999px; font-size:11px; font-weight:700; letter-spacing:.02em; }
+.status-pill .dot{ width:6px; height:6px; border-radius:50%; }
+.status-ok{ background:var(--ok-soft); color:var(--ok); }
+.status-ok .dot{ background:var(--ok); }
+.status-warn{ background:var(--amber-soft); color:var(--amber); }
+.status-warn .dot{ background:var(--amber); }
+.status-bad{ background:var(--danger-soft); color:var(--danger); }
+.status-bad .dot{ background:var(--danger); }
+.status-manual{ background:var(--manual-soft); color:var(--manual); }
+.status-manual .dot{ background:var(--manual); }
+
+/* Empty state */
+.empty-card{ margin-top:10px; background:var(--surface); border:1px dashed var(--border); border-radius:var(--radius); padding:44px 28px; text-align:center; }
+.empty-card svg{ width:34px; height:34px; color:var(--text-faint); margin-bottom:14px; }
+.empty-card h3{ font-family:'Space Grotesk',sans-serif; font-size:16px; margin-bottom:6px; }
+.empty-card p{ font-size:13.5px; color:var(--text-muted); margin-bottom:20px; }
+
+.dl-btn{ background:var(--accent); color:#0d0f13; }
+.dl-btn.placeholder{ background:var(--surface-3); color:var(--text-muted); border:1px dashed var(--border); }
+
+/* ---------- MODAL GENÉRICO (sobrepuesto) ---------- */
+.modal-overlay{
+  position:fixed; inset:0; background:#080a0ecc; backdrop-filter:blur(3px);
+  opacity:0; pointer-events:none; transition:opacity .2s; z-index:200;
+  display:flex; align-items:center; justify-content:center; padding:20px;
+}
+.modal-overlay.show{ opacity:1; pointer-events:auto; }
+.modal-box{
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  max-width:460px; width:100%; padding:22px; transform:translateY(10px); transition:transform .2s;
+  max-height:86vh; overflow-y:auto;
+}
+.modal-overlay.show .modal-box{ transform:translateY(0); }
+.modal-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:6px; }
+.modal-head h3{ font-family:'Space Grotesk',sans-serif; font-size:16px; line-height:1.3; }
+.modal-close{ width:30px; height:30px; border-radius:7px; background:var(--surface-2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; color:var(--text-muted); flex-shrink:0; }
+.modal-close:hover{ color:var(--text); }
+.modal-close svg{ width:14px; height:14px; }
+.modal-sub{ font-size:12.5px; color:var(--text-muted); margin-bottom:18px; line-height:1.5; }
+
+/* Acciones de un programa dentro del modal */
+.program-action{ display:flex; align-items:center; justify-content:space-between; gap:12px; background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:14px 16px; margin-bottom:10px; }
+.program-action:last-child{ margin-bottom:0; }
+.program-action b{ font-size:13.5px; display:block; margin-bottom:2px; }
+.program-action span{ font-size:11px; color:var(--text-faint); }
+.program-action .btn{ flex-shrink:0; }
+.program-action .btn:disabled{ background:var(--surface-3); color:var(--text-faint); cursor:not-allowed; border-color:var(--border); }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="brand">
+    <div class="brand-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#0d0f13" stroke-width="2" stroke-linecap="round"><path d="M6 10V7a6 6 0 0112 0v3"/><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M12 14v3"/></svg>
+    </div>
+    <div class="brand-text"><b>F3RN4N</b><span>Panel de registro y liberación</span></div>
+  </div>
+  <div class="nav-pages">
+    <a href="index.html">Registro</a>
+    <a href="dashboard.html" class="active">Dashboard</a>
+  </div>
+  <button class="hamburger" id="hamburgerBtn" onclick="openDrawer()" aria-label="Abrir menú de sesión">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="color:var(--text)"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    <span class="dot" id="hamburgerDot"></span>
+  </button>
+</nav>
+
+<div class="overlay" id="overlay" onclick="closeDrawer()"></div>
+
+<aside class="drawer" id="drawer">
+  <div class="drawer-head">
+    <h3>Mi cuenta</h3>
+    <button class="drawer-close" onclick="closeDrawer()" aria-label="Cerrar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+
+  <div id="view-logged" style="display:none;">
+    <div class="account-card">
+      <div class="avatar" id="avatar">–</div>
+      <div class="account-info">
+        <b id="account-name">—</b>
+        <span id="account-email">—</span>
+      </div>
+    </div>
+    <button class="btn btn-ghost logout-btn" onclick="doLogout()">Cerrar sesión</button>
+  </div>
+
+  <div id="view-guest">
+    <div class="auth-tabs">
+      <button id="tab-login" class="active" onclick="switchAuthTab('login')">Iniciar sesión</button>
+      <button id="tab-register" onclick="switchAuthTab('register')">Registrarse</button>
+    </div>
+
+    <button class="google-btn" onclick="doGoogleAuth()">
+      <svg viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 01-1.8 2.72v2.26h2.9c1.7-1.57 2.7-3.88 2.7-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.26c-.8.54-1.84.86-3.06.86-2.35 0-4.34-1.59-5.05-3.72H.98v2.33A9 9 0 009 18z"/><path fill="#FBBC05" d="M3.95 10.7A5.4 5.4 0 013.68 9c0-.59.1-1.17.27-1.7V4.97H.98A9 9 0 000 9c0 1.45.35 2.83.98 4.03l2.97-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.9 11.43 0 9 0A9 9 0 00.98 4.97l2.97 2.33C4.66 5.17 6.65 3.58 9 3.58z"/></svg>
+      Continuar con Google
+    </button>
+
+    <div class="auth-divider">o con tu correo</div>
+
+    <form class="auth-form visible" id="form-login" onsubmit="doEmailLogin(event)">
+      <div class="field">
+        <label for="login-email">Correo</label>
+        <input id="login-email" type="email" placeholder="tu@correo.com" required>
+      </div>
+      <div class="field">
+        <label for="login-pass">Contraseña</label>
+        <input id="login-pass" type="password" placeholder="••••••••" required>
+      </div>
+      <div class="auth-error" id="login-error"></div>
+      <button type="submit" class="btn btn-primary" style="justify-content:center;">Entrar</button>
+    </form>
+
+    <form class="auth-form" id="form-register" onsubmit="doEmailRegister(event)">
+      <div class="field">
+        <label for="reg-name">Nombre</label>
+        <input id="reg-name" type="text" placeholder="Tu nombre" required>
+      </div>
+      <div class="field">
+        <label for="reg-email">Correo</label>
+        <input id="reg-email" type="email" placeholder="tu@correo.com" required>
+      </div>
+      <div class="field">
+        <label for="reg-pass">Contraseña</label>
+        <input id="reg-pass" type="password" placeholder="Mínimo 6 caracteres" required>
+      </div>
+      <div class="auth-error" id="register-error"></div>
+      <button type="submit" class="btn btn-primary" style="justify-content:center;">Crear cuenta</button>
+    </form>
+  </div>
+
+  <div class="guest-note">No necesitas iniciar sesión para registrar clientes ni generar un Check. La cuenta es solo para acceder al Dashboard y tu historial.</div>
+
+  <button class="btn btn-ghost programs-btn" style="width:100%; justify-content:center; margin-top:14px;" onclick="closeDrawer(); openAllProgramsModal();">
+    Programas
+  </button>
+</aside>
+
+<!-- BLOQUEO: solo con cuenta iniciada -->
+<div class="wrap" id="gate-locked" style="display:none;">
+  <div class="gate-card">
+    <div class="gate-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>
+    </div>
+    <h2>Inicia sesión para ver tu Dashboard</h2>
+    <p>Aquí verás tus fondos, ganancias y el historial completo de pedidos, incluyendo búsqueda por número de serie / IMEI. Es exclusivo de cuentas con sesión iniciada.</p>
+    <button class="btn btn-primary" style="justify-content:center; width:100%;" onclick="openDrawer()">Iniciar sesión</button>
+  </div>
+</div>
+
+<!-- CONTENIDO DEL DASHBOARD -->
+<div class="wrap" id="dashboard-content" style="display:none;">
+  <div class="page-head">
+    <div>
+      <h1>Dashboard</h1>
+      <p>Fondos, ganancias y pedidos de tu cuenta.</p>
+    </div>
+    <div class="page-head-right" id="dash-user-label"></div>
+  </div>
+
+  <!-- STAT CARDS -->
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-top">
+        <span class="stat-label">Fondos</span>
+        <div class="stat-icon" style="background:var(--accent-soft); color:var(--accent);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="13" rx="2"/><circle cx="12" cy="12.5" r="3"/><path d="M6 6V5a2 2 0 012-2h8a2 2 0 012 2v1"/></svg>
+        </div>
+      </div>
+      <div class="stat-value" id="stat-funds">$0.00</div>
+      <div class="stat-sub">Disponible de pedidos completados</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-top">
+        <span class="stat-label">Ganancias (mes)</span>
+        <div class="stat-icon" style="background:var(--ok-soft); color:var(--ok);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 7-8"/><path d="M14 7h6v6"/></svg>
+        </div>
+      </div>
+      <div class="stat-value" id="stat-earnings-month">$0.00</div>
+      <div class="stat-sub" id="stat-earnings-today">Hoy: $0.00</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-top">
+        <span class="stat-label">Pedidos totales</span>
+        <div class="stat-icon" style="background:var(--ios-soft); color:var(--ios);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>
+        </div>
+      </div>
+      <div class="stat-value" id="stat-total-orders">0</div>
+      <div class="stat-sub" id="stat-total-orders-sub">Sin pedidos aún</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-top">
+        <span class="stat-label">Pendientes</span>
+        <div class="stat-icon" style="background:var(--amber-soft); color:var(--amber);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        </div>
+      </div>
+      <div class="stat-value" id="stat-pending-orders">0</div>
+      <div class="stat-sub">Por completar o cobrar</div>
+    </div>
+  </div>
+
+  <!-- GANANCIAS -->
+  <div class="panel">
+    <div class="panel-head">
+      <h3>Ganancias</h3>
+      <div class="period-tabs" id="period-tabs">
+        <button data-period="7" class="active" onclick="setChartPeriod('7', this)">7 días</button>
+        <button data-period="30" onclick="setChartPeriod('30', this)">30 días</button>
+      </div>
+    </div>
+    <div id="chart-zone"></div>
+  </div>
+
+  <!-- PEDIDOS -->
+  <div class="panel">
+    <div class="panel-head">
+      <h3>Pedidos</h3>
+    </div>
+    <div class="pedidos-toolbar">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input id="order-search" type="text" placeholder="Buscar por número de serie, IMEI o cliente…" oninput="renderOrdersTable()">
+      </div>
+      <div class="filter-chips" id="filter-chips">
+        <button class="filter-chip active" data-status="all" onclick="setStatusFilter('all', this)">Todos</button>
+        <button class="filter-chip" data-status="pendiente" onclick="setStatusFilter('pendiente', this)">Pendientes</button>
+        <button class="filter-chip" data-status="proceso" onclick="setStatusFilter('proceso', this)">En proceso</button>
+        <button class="filter-chip" data-status="completado" onclick="setStatusFilter('completado', this)">Completados</button>
+      </div>
+    </div>
+
+    <div class="table-scroll">
+      <table class="pedidos-table" id="orders-table" style="display:none;">
+        <thead>
+          <tr>
+            <th>Equipo</th>
+            <th>N.º de serie</th>
+            <th>Cliente</th>
+            <th>Estado</th>
+            <th>Precio</th>
+            <th>Fecha</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="orders-tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div class="empty-card" id="orders-empty" style="display:none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>
+      <h3 id="orders-empty-title">Todavía no hay pedidos</h3>
+      <p id="orders-empty-text">Los pedidos que registres desde Registro de equipo aparecerán aquí.</p>
+      <button class="btn btn-primary" onclick="window.location.href='index.html'">Registrar un equipo</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+/* ---------------- FIREBASE (compartido con Index) ---------------- */
+const firebaseConfig = {
+  apiKey: "AIzaSyDUE6QZa8ClQLNPXSuv0QFa2myLIAT2Y9s",
+  authDomain: "mensaje-76bbc.firebaseapp.com",
+  databaseURL: "https://mensaje-76bbc-default-rtdb.firebaseio.com",
+  projectId: "mensaje-76bbc",
+  storageBucket: "mensaje-76bbc.firebasestorage.app",
+  messagingSenderId: "257129078581",
+  appId: "1:257129078581:web:48c923addfa3d28526f67c",
+  measurementId: "G-7F10K2Z3VJ"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+function switchAuthTab(tab){
+  document.getElementById('tab-login').classList.toggle('active', tab==='login');
+  document.getElementById('tab-register').classList.toggle('active', tab==='register');
+  document.getElementById('form-login').classList.toggle('visible', tab==='login');
+  document.getElementById('form-register').classList.toggle('visible', tab==='register');
+  hideAuthErrors();
+}
+function hideAuthErrors(){
+  document.getElementById('login-error').classList.remove('show');
+  document.getElementById('register-error').classList.remove('show');
+}
+function showAuthError(id, message){
+  const el = document.getElementById(id);
+  el.textContent = friendlyAuthError(message);
+  el.classList.add('show');
+}
+function friendlyAuthError(code){
+  const map = {
+    'auth/invalid-email':'Correo inválido.',
+    'auth/user-not-found':'No existe una cuenta con ese correo.',
+    'auth/wrong-password':'Contraseña incorrecta.',
+    'auth/invalid-credential':'Correo o contraseña incorrectos.',
+    'auth/email-already-in-use':'Ya existe una cuenta con ese correo.',
+    'auth/weak-password':'La contraseña debe tener al menos 6 caracteres.',
+    'auth/popup-closed-by-user':'Se cerró la ventana de Google antes de terminar.',
+  };
+  return map[code] || 'Ocurrió un error. Intenta de nuevo.';
+}
+function doGoogleAuth(){
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider).then(()=>{ closeDrawer(); showToast('Sesión iniciada ✔'); }).catch(err=> showAuthError('login-error', err.code));
+}
+function doEmailLogin(e){
+  e.preventDefault(); hideAuthErrors();
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  auth.signInWithEmailAndPassword(email, pass).then(()=>{ closeDrawer(); showToast('Sesión iniciada ✔'); }).catch(err=> showAuthError('login-error', err.code));
+}
+function doEmailRegister(e){
+  e.preventDefault(); hideAuthErrors();
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pass = document.getElementById('reg-pass').value;
+  auth.createUserWithEmailAndPassword(email, pass).then(cred => cred.user.updateProfile({ displayName: name })).then(()=>{ closeDrawer(); showToast('Cuenta creada ✔'); }).catch(err=> showAuthError('register-error', err.code));
+}
+function doLogout(){ auth.signOut().then(()=> showToast('Sesión cerrada')); }
+auth.onAuthStateChanged(user=>{
+  const loggedView = document.getElementById('view-logged');
+  const guestView = document.getElementById('view-guest');
+  const hamburger = document.getElementById('hamburgerBtn');
+  const gate = document.getElementById('gate-locked');
+  const content = document.getElementById('dashboard-content');
+  if(user){
+    loggedView.style.display = 'block'; guestView.style.display = 'none'; hamburger.classList.add('logged');
+    const name = user.displayName || (user.email ? user.email.split('@')[0] : 'Usuario');
+    document.getElementById('account-name').textContent = name;
+    document.getElementById('account-email').textContent = user.email || '';
+    const avatar = document.getElementById('avatar');
+    avatar.innerHTML = user.photoURL ? `<img src="${user.photoURL}" alt="">` : '';
+    if(!user.photoURL) avatar.textContent = name.charAt(0).toUpperCase();
+
+    gate.style.display = 'none';
+    content.style.display = 'block';
+    document.getElementById('dash-user-label').textContent = 'Conectado como ' + name;
+    loadOrders();
+  } else {
+    loggedView.style.display = 'none'; guestView.style.display = 'block'; hamburger.classList.remove('logged');
+    gate.style.display = 'block';
+    content.style.display = 'none';
+  }
+});
+function openDrawer(){ document.getElementById('drawer').classList.add('show'); document.getElementById('overlay').classList.add('show'); }
+function closeDrawer(){ document.getElementById('drawer').classList.remove('show'); document.getElementById('overlay').classList.remove('show'); }
+function showToast(msg){ const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(()=> t.classList.remove('show'), 2600); }
+
+/* ---------------- MODAL GENÉRICO (sobrepuesto) ---------------- */
+function openModal(titleHtml, subHtml, bodyHtml){
+  let overlay = document.getElementById('modal-overlay');
+  if(!overlay){
+    overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.id = 'modal-overlay';
+    overlay.onclick = (e)=>{ if(e.target === overlay) closeModal(); };
+    overlay.innerHTML = `
+      <div class="modal-box">
+        <div class="modal-head">
+          <h3 id="modal-title"></h3>
+          <button class="modal-close" onclick="closeModal()" aria-label="Cerrar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+        </div>
+        <div class="modal-sub" id="modal-sub"></div>
+        <div id="modal-body"></div>
+      </div>`;
+    document.body.appendChild(overlay);
+    document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeModal(); });
+  }
+  document.getElementById('modal-title').innerHTML = titleHtml || '';
+  const subEl = document.getElementById('modal-sub');
+  subEl.innerHTML = subHtml || '';
+  subEl.style.display = subHtml ? 'block' : 'none';
+  document.getElementById('modal-body').innerHTML = bodyHtml || '';
+  overlay.classList.add('show');
+}
+function closeModal(){
+  const overlay = document.getElementById('modal-overlay');
+  if(overlay) overlay.classList.remove('show');
+}
+
+/* ---------------- MODAL: TODOS LOS PROGRAMAS (menú) ---------------- */
+const ALL_PROGRAMS = [
+  { name:'iBerry Passcode Bypass', url:'https://mega.nz/folder/j6ZSSJyB#nQnIMWLhUi_cT9NFfNIXeQ' },
+  { name:'iHello HFZ (Hello / Passcode)', url:'https://mega.nz/folder/JBEQSBaK#P-MMA1LGZergdz2-3vec6A' },
+  { name:'Aldaz R Activator Bypass Passcode', url:'https://www.mediafire.com/file/0bmxhbyv6k2bg2e/AldazRActivator_Bypass_Passcode_%2526_Hello_A12_macOS.pkg/file' },
+  { name:'F3arRa1n', url:'https://f3arra1n.com/Docs/#Windows' },
+  { name:'REX Activator', url:'https://www.mediafire.com/folder/9nrd4x17fay10/Rex_activator' },
+  { name:'Unlock', url:'https://mega.nz/file/gns1CTYA#Qq4PigKzpZ2INjLMZAbY-7nC26i0Q-7tmTKYRoMfhzU' },
+  { name:'3uTools (verificación de versión de iOS)', url:'https://www.3u.com/productsWin' },
+  { name:'Herramienta USB para programar placa RP2350', url:'https://mega.nz/file/BDcWxKiB#NcJVBRUfRDfrNMb5e3QKtVgaTnAVOnnBBfkVbx8l6W8' },
+];
+function openAllProgramsModal(){
+  const body = ALL_PROGRAMS.map(it => `
+    <div class="program-action">
+      <div><b>${it.name}</b></div>
+      <a class="btn dl-btn" href="${it.url}" target="_blank" rel="noopener">Abrir</a>
+    </div>
+  `).join('');
+  openModal('Programas', 'Todos los programas y herramientas de verificación que se utilizan.', body);
+}
+
+/* ---------------- ICONS ---------------- */
+const ICONS = {
+  edit: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>`,
+  trash: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>`,
+};
+
+/* ================= DASHBOARD ================= */
+let allOrders = [];
+let statusFilter = 'all';
+let chartPeriod = '7';
+
+function loadOrders(){
+  const uid = auth.currentUser ? auth.currentUser.uid : null;
+  let localList = [];
+  try{ localList = JSON.parse(localStorage.getItem('f3rn4n_orders') || '[]'); }catch(e){ localList = []; }
+  const localMine = localList.filter(o => o.ownerUid && uid && o.ownerUid === uid);
+
+  // Muestra de inmediato lo que ya hay en caché local, mientras llega la nube
+  allOrders = localMine;
+  renderStats(); renderChart(); renderOrdersTable();
+
+  if(!uid) return;
+
+  db.collection('orders').where('ownerUid', '==', uid).get()
+    .then(snap=>{
+      const cloudList = snap.docs.map(d => d.data());
+      // Fusiona por id: la nube manda; conserva locales que aún no se hayan subido
+      const byId = {};
+      localMine.forEach(o => byId[o.id] = o);
+      cloudList.forEach(o => byId[o.id] = o);
+      allOrders = Object.values(byId).sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt));
+      mergeIntoLocalCache(allOrders, uid);
+      renderStats(); renderChart(); renderOrdersTable();
+    })
+    .catch(()=>{ /* sin conexión o Firestore no disponible: se queda con la caché local */ });
+}
+
+function mergeIntoLocalCache(orders, uid){
+  try{
+    let list = [];
+    try{ list = JSON.parse(localStorage.getItem('f3rn4n_orders') || '[]'); }catch(e){ list = []; }
+    const others = list.filter(o => !(o.ownerUid && uid && o.ownerUid === uid));
+    localStorage.setItem('f3rn4n_orders', JSON.stringify(others.concat(orders)));
+  }catch(e){}
+}
+
+function saveAllOrders(){
+  const uid = auth.currentUser ? auth.currentUser.uid : null;
+  mergeIntoLocalCache(allOrders, uid);
+}
+
+function syncOrderToCloud(order){
+  db.collection('orders').doc(order.id).set(order).catch(()=>{});
+}
+
+function deleteOrderFromCloud(id){
+  db.collection('orders').doc(id).delete().catch(()=>{});
+}
+
+function money(n){ return '$' + (Number(n)||0).toFixed(2); }
+function sameDay(d1, d2){ return d1.getFullYear()===d2.getFullYear() && d1.getMonth()===d2.getMonth() && d1.getDate()===d2.getDate(); }
+function sameMonth(d1, d2){ return d1.getFullYear()===d2.getFullYear() && d1.getMonth()===d2.getMonth(); }
+
+function renderStats(){
+  const now = new Date();
+  const completed = allOrders.filter(o => o.status === 'completado');
+  const funds = completed.reduce((s,o)=> s + (Number(o.price)||0), 0);
+  const earningsMonth = completed.filter(o => sameMonth(new Date(o.completedAt || o.createdAt), now))
+    .reduce((s,o)=> s + (Number(o.price)||0), 0);
+  const earningsToday = completed.filter(o => sameDay(new Date(o.completedAt || o.createdAt), now))
+    .reduce((s,o)=> s + (Number(o.price)||0), 0);
+  const pending = allOrders.filter(o => o.status !== 'completado').length;
+
+  document.getElementById('stat-funds').textContent = money(funds);
+  document.getElementById('stat-earnings-month').textContent = money(earningsMonth);
+  document.getElementById('stat-earnings-today').textContent = 'Hoy: ' + money(earningsToday);
+  document.getElementById('stat-total-orders').textContent = allOrders.length;
+  document.getElementById('stat-total-orders-sub').textContent = allOrders.length
+    ? (completed.length + ' completados')
+    : 'Sin pedidos aún';
+  document.getElementById('stat-pending-orders').textContent = pending;
+}
+
+function setChartPeriod(period, btn){
+  chartPeriod = period;
+  document.querySelectorAll('#period-tabs button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderChart();
+}
+
+function renderChart(){
+  const zone = document.getElementById('chart-zone');
+  const completed = allOrders.filter(o => o.status === 'completado');
+  if(!completed.length){
+    zone.innerHTML = `<div class="chart-empty">Aún no hay ganancias registradas. Marca un pedido como completado para verlo aquí.</div>`;
+    return;
+  }
+  const days = Number(chartPeriod);
+  const buckets = [];
+  const now = new Date();
+  for(let i = days - 1; i >= 0; i--){
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    buckets.push({ date:d, total:0 });
+  }
+  completed.forEach(o=>{
+    const d = new Date(o.completedAt || o.createdAt);
+    const b = buckets.find(x => sameDay(x.date, d));
+    if(b) b.total += (Number(o.price)||0);
+  });
+  const max = Math.max(...buckets.map(b=>b.total), 1);
+  const showLabels = days <= 7;
+  const cols = buckets.map(b=>{
+    const h = Math.max(3, Math.round((b.total / max) * 100));
+    const label = showLabels ? b.date.toLocaleDateString('es-MX',{ weekday:'short' }).replace('.','') : '';
+    return `<div class="chart-bar-col" title="${b.date.toLocaleDateString('es-MX')} · ${money(b.total)}">
+      <div class="chart-bar" style="height:${h}%"></div>
+      <span class="chart-bar-label">${label}</span>
+    </div>`;
+  }).join('');
+  zone.innerHTML = `<div class="chart-wrap">${cols}</div>`;
+}
+
+function setStatusFilter(status, btn){
+  statusFilter = status;
+  document.querySelectorAll('#filter-chips .filter-chip').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderOrdersTable();
+}
+
+function statusPill(status){
+  if(status === 'completado') return `<span class="status-pill status-ok"><span class="dot"></span>Completado</span>`;
+  if(status === 'proceso') return `<span class="status-pill status-warn"><span class="dot"></span>En proceso</span>`;
+  return `<span class="status-pill status-manual"><span class="dot"></span>Pendiente</span>`;
+}
+
+function renderOrdersTable(){
+  const term = (document.getElementById('order-search').value || '').trim().toLowerCase();
+  let rows = allOrders.slice();
+  if(statusFilter !== 'all') rows = rows.filter(o => o.status === statusFilter);
+  if(term){
+    rows = rows.filter(o =>
+      (o.serial || '').toLowerCase().includes(term) ||
+      (o.client || '').toLowerCase().includes(term) ||
+      (o.device || '').toLowerCase().includes(term) ||
+      (o.phone || '').toLowerCase().includes(term)
+    );
+  }
+
+  const table = document.getElementById('orders-table');
+  const empty = document.getElementById('orders-empty');
+  const tbody = document.getElementById('orders-tbody');
+
+  if(!rows.length){
+    table.style.display = 'none';
+    empty.style.display = 'block';
+    if(!allOrders.length){
+      document.getElementById('orders-empty-title').textContent = 'Todavía no hay pedidos';
+      document.getElementById('orders-empty-text').textContent = 'Los pedidos que registres desde Registro de equipo aparecerán aquí.';
+    } else {
+      document.getElementById('orders-empty-title').textContent = 'Sin resultados';
+      document.getElementById('orders-empty-text').textContent = 'Ningún pedido coincide con tu búsqueda o filtro.';
+    }
+    return;
+  }
+  table.style.display = 'table';
+  empty.style.display = 'none';
+
+  tbody.innerHTML = rows.map(o => {
+    const date = new Date(o.createdAt);
+    const dateStr = isNaN(date) ? '—' : date.toLocaleDateString('es-MX', { day:'2-digit', month:'short', year:'numeric' });
+    return `
+    <tr>
+      <td>
+        <span class="cell-device">${o.device || '—'}</span>
+        <span class="cell-sub">${o.lockLabel || ''}</span>
+      </td>
+      <td><span class="cell-serial">${o.serial || 'Sin registrar'}</span></td>
+      <td>
+        ${o.client || 'Sin nombre'}
+        <span class="cell-sub">${o.phone || ''}</span>
+      </td>
+      <td>${statusPill(o.status)}</td>
+      <td class="cell-price">${o.price ? money(o.price) : '—'}</td>
+      <td>${dateStr}</td>
+      <td>
+        <div class="pedidos-actions">
+          <button class="icon-btn" title="Editar estado y precio" onclick="openEditOrderModal('${o.id}')">${ICONS.edit}</button>
+          <button class="icon-btn" title="Eliminar pedido" onclick="deleteOrder('${o.id}')">${ICONS.trash}</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function openEditOrderModal(id){
+  const o = allOrders.find(x => x.id === id);
+  if(!o) return;
+  const body = `
+    <div class="field" style="margin-bottom:14px;">
+      <label for="edit-status">Estado del pedido</label>
+      <select id="edit-status" style="width:100%; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:8px; padding:11px 13px; font-size:14px; outline:none;">
+        <option value="pendiente" ${o.status==='pendiente'?'selected':''}>Pendiente</option>
+        <option value="proceso" ${o.status==='proceso'?'selected':''}>En proceso</option>
+        <option value="completado" ${o.status==='completado'?'selected':''}>Completado</option>
+      </select>
+    </div>
+    <div class="field" style="margin-bottom:18px;">
+      <label for="edit-price">Precio cobrado (USD)</label>
+      <input id="edit-price" type="number" min="0" step="0.01" value="${o.price || 0}" placeholder="0.00">
+    </div>
+    <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="saveOrderEdit('${o.id}')">Guardar cambios</button>
+  `;
+  openModal('Editar pedido', (o.device || '') + (o.serial ? ' · ' + o.serial : ''), body);
+}
+
+function saveOrderEdit(id){
+  const o = allOrders.find(x => x.id === id);
+  if(!o) return;
+  const status = document.getElementById('edit-status').value;
+  const price = parseFloat(document.getElementById('edit-price').value) || 0;
+  o.status = status;
+  o.price = price;
+  if(status === 'completado' && !o.completedAt) o.completedAt = new Date().toISOString();
+  if(status !== 'completado') o.completedAt = null;
+  saveAllOrders();
+  syncOrderToCloud(o);
+  closeModal();
+  renderStats();
+  renderChart();
+  renderOrdersTable();
+  showToast('Pedido actualizado ✔');
+}
+
+function deleteOrder(id){
+  allOrders = allOrders.filter(o => o.id !== id);
+  saveAllOrders();
+  deleteOrderFromCloud(id);
+  renderStats();
+  renderChart();
+  renderOrdersTable();
+  showToast('Pedido eliminado');
+}
+</script>
+</body>
+</html>

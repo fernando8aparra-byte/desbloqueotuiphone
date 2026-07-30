@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F3RN4N · Registro de equipo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#10141B;
+  --surface:#171D27;
+  --surface-2:#1F2733;
+  --surface-3:#262F3D;
+  --border:#2A3341;
+  --border-soft:#20283420;
+  --text:#EDF0F4;
+  --text-muted:#8891A0;
+  --text-faint:#5B6474;
+  --ios:#4FA8FF;
+  --ios-soft:#4FA8FF1A;
+  --android:#7CDB6A;
+  --android-soft:#7CDB6A1A;
+  --amber:#FF9C3D;
+  --amber-soft:#FF9C3D1A;
+  --danger:#FF5D5D;
+  --danger-soft:#FF5D5D1A;
+  --radius:10px;
+  --accent:var(--amber);
+  --accent-soft:var(--amber-soft);
+  font-family:'Inter',sans-serif;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{
+  background:
+    radial-gradient(circle at 15% 0%, #1a2130 0%, transparent 45%),
+    radial-gradient(circle at 85% 100%, #161c27 0%, transparent 40%),
+    var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+body.os-apple{ --accent:var(--ios); --accent-soft:var(--ios-soft); }
+body.os-android{ --accent:var(--android); --accent-soft:var(--android-soft); }
+
+::selection{ background:var(--accent-soft); color:var(--text); }
+button{ font-family:inherit; cursor:pointer; }
+input, textarea{ font-family:inherit; }
+
+/* ---------- NAV ---------- */
+.topnav{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:18px 32px;
+  border-bottom:1px solid var(--border);
+  background:#10141Bcc;
+  backdrop-filter:blur(10px);
+  position:sticky; top:0; z-index:50;
+}
+.brand{ display:flex; align-items:center; gap:10px; }
+.brand-mark{
+  width:30px; height:30px; border-radius:8px;
+  background:linear-gradient(135deg, var(--amber), #d97a1f);
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+}
+.brand-mark svg{ width:16px; height:16px; }
+.brand-text{ display:flex; flex-direction:column; line-height:1.15; }
+.brand-text b{ font-family:'Space Grotesk',sans-serif; font-size:15px; letter-spacing:.2px; }
+.brand-text span{ font-size:11px; color:var(--text-muted); }
+
+.nav-pages{ display:flex; gap:4px; background:var(--surface); border:1px solid var(--border); border-radius:999px; padding:4px; }
+.nav-pages a{
+  text-decoration:none; color:var(--text-muted); font-size:13px; font-weight:500;
+  padding:7px 16px; border-radius:999px; position:relative;
+  transition:color .15s;
+}
+.nav-pages a.active{ background:var(--surface-3); color:var(--text); }
+.nav-pages a.disabled{ pointer-events:none; opacity:.45; }
+.nav-pages a.disabled::after{
+  content:'Próximamente'; position:absolute; bottom:-26px; left:50%; transform:translateX(-50%);
+  font-size:10px; background:var(--surface-3); padding:3px 7px; border-radius:5px;
+  white-space:nowrap; opacity:0; transition:opacity .15s; pointer-events:none;
+}
+.nav-pages a.disabled:hover::after{ opacity:1; }
+
+/* ---------- LAYOUT ---------- */
+.wrap{
+  max-width:1180px; margin:0 auto; padding:44px 32px 100px;
+  display:grid; grid-template-columns:230px 1fr; gap:56px;
+}
+@media (max-width:880px){ .wrap{ grid-template-columns:1fr; gap:28px; padding:28px 18px 80px; } }
+
+.page-head{ grid-column:1/-1; margin-bottom:6px; }
+.page-head h1{ font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:600; }
+.page-head p{ color:var(--text-muted); font-size:14px; margin-top:5px; }
+
+/* ---------- STEPPER RAIL ---------- */
+.rail{ display:flex; flex-direction:column; gap:2px; position:sticky; top:90px; align-self:start; }
+.rail-step{
+  display:flex; align-items:flex-start; gap:14px; padding:14px 4px;
+  position:relative; opacity:.4; transition:opacity .2s;
+}
+.rail-step.active, .rail-step.done{ opacity:1; }
+.rail-step::before{
+  content:''; position:absolute; left:15px; top:38px; width:1px; height:calc(100% - 6px);
+  background:var(--border);
+}
+.rail-step:last-child::before{ display:none; }
+.rail-num{
+  font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:13px;
+  width:31px; height:31px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--surface); border:1px solid var(--border); color:var(--text-muted);
+  z-index:1; transition:all .2s;
+}
+.rail-step.active .rail-num{ background:var(--accent); border-color:var(--accent); color:#0d0f13; }
+.rail-step.done .rail-num{ background:var(--surface-3); border-color:var(--accent); color:var(--accent); }
+.rail-label b{ display:block; font-size:13.5px; font-weight:600; }
+.rail-label span{ display:block; font-size:11.5px; color:var(--text-muted); margin-top:2px; }
+@media (max-width:880px){
+  .rail{ flex-direction:row; overflow-x:auto; position:static; gap:0; padding-bottom:6px; }
+  .rail-step{ flex-direction:column; align-items:center; text-align:center; min-width:88px; gap:8px; }
+  .rail-step::before{ top:15px; left:56%; width:100%; height:1px; }
+  .rail-label span{ display:none; }
+}
+
+/* ---------- PANEL ---------- */
+.panel{ min-height:420px; }
+.step-block{ display:none; animation:fadeUp .35s ease; }
+.step-block.visible{ display:block; }
+@keyframes fadeUp{ from{ opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;} }
+
+.step-title{ font-family:'Space Grotesk',sans-serif; font-size:19px; font-weight:600; margin-bottom:4px; }
+.step-sub{ color:var(--text-muted); font-size:13.5px; margin-bottom:24px; }
+
+/* OS cards */
+.os-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; max-width:560px; }
+@media (max-width:520px){ .os-grid{ grid-template-columns:1fr; } }
+.os-card{
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:26px 20px; text-align:left; color:var(--text); transition:all .15s;
+  display:flex; flex-direction:column; gap:14px;
+}
+.os-card:hover{ border-color:var(--text-faint); transform:translateY(-2px); }
+.os-card.selected{ border-color:var(--accent); background:var(--accent-soft); }
+.os-icon{ width:38px; height:38px; }
+.os-card h3{ font-family:'Space Grotesk',sans-serif; font-size:16px; }
+.os-card p{ font-size:12.5px; color:var(--text-muted); }
+
+/* Chip grids (generation / brand / lock) */
+.chip-row{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:22px; }
+.chip{
+  background:var(--surface); border:1px solid var(--border); color:var(--text);
+  padding:9px 16px; border-radius:8px; font-size:13.5px; font-weight:500;
+  transition:all .12s;
+}
+.chip:hover{ border-color:var(--text-faint); }
+.chip.selected{ background:var(--accent); border-color:var(--accent); color:#0d0f13; font-weight:600; }
+.chip.small{ padding:7px 13px; font-size:12.5px; }
+
+.variant-zone{ display:none; }
+.variant-zone.visible{ display:block; animation:fadeUp .25s ease; }
+.variant-label{ font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-faint); margin-bottom:10px; }
+
+/* Android brand/model */
+.model-input-wrap{ margin-top:16px; max-width:420px; }
+.field label{ display:block; font-size:12.5px; color:var(--text-muted); margin-bottom:7px; font-weight:500; }
+.field input, .field textarea{
+  width:100%; background:var(--surface); border:1px solid var(--border); color:var(--text);
+  border-radius:8px; padding:11px 13px; font-size:14px; outline:none; transition:border-color .12s;
+}
+.field input:focus, .field textarea:focus{ border-color:var(--accent); }
+.field input::placeholder, .field textarea::placeholder{ color:var(--text-faint); }
+
+/* Lock type cards */
+.lock-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; max-width:620px; }
+@media (max-width:560px){ .lock-grid{ grid-template-columns:1fr; } }
+.lock-card{
+  display:flex; align-items:center; gap:13px; background:var(--surface);
+  border:1px solid var(--border); border-radius:var(--radius); padding:16px;
+  text-align:left; color:var(--text); transition:all .12s;
+}
+.lock-card:hover{ border-color:var(--text-faint); }
+.lock-card.selected{ border-color:var(--accent); background:var(--accent-soft); }
+.lock-icon{ width:36px; height:36px; flex-shrink:0; background:var(--surface-3); border-radius:8px; display:flex; align-items:center; justify-content:center; }
+.lock-icon svg{ width:18px; height:18px; }
+.lock-card b{ font-size:13.5px; display:block; }
+.lock-card span{ font-size:11.5px; color:var(--text-muted); }
+
+/* Client form */
+.client-form{ display:grid; gap:16px; max-width:480px; }
+.skip-row{ display:flex; align-items:center; gap:10px; margin-top:4px; font-size:12.5px; color:var(--text-muted); }
+
+/* Summary */
+.summary-card{
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:22px 24px; max-width:560px; display:flex; flex-direction:column; gap:16px;
+}
+.summary-row{ display:flex; justify-content:space-between; align-items:center; gap:12px; padding-bottom:14px; border-bottom:1px solid var(--border); }
+.summary-row:last-child{ border-bottom:none; padding-bottom:0; }
+.summary-row .k{ font-size:11.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-faint); }
+.summary-row .v{ font-family:'JetBrains Mono',monospace; font-size:13.5px; text-align:right; }
+.summary-row .v.empty{ color:var(--text-faint); font-family:'Inter',sans-serif; font-style:italic; }
+.tag{ display:inline-flex; align-items:center; gap:6px; background:var(--accent-soft); color:var(--accent); padding:3px 10px; border-radius:999px; font-size:11.5px; font-weight:600; font-family:'Inter',sans-serif; }
+
+/* Buttons / nav controls */
+.step-controls{ display:flex; gap:10px; margin-top:30px; align-items:center; }
+.btn{
+  border-radius:8px; padding:11px 22px; font-size:13.5px; font-weight:600; border:1px solid transparent;
+  display:inline-flex; align-items:center; gap:8px; transition:all .12s;
+}
+.btn-primary{ background:var(--accent); color:#0d0f13; }
+.btn-primary:hover{ filter:brightness(1.08); }
+.btn-primary:disabled{ background:var(--surface-3); color:var(--text-faint); cursor:not-allowed; }
+.btn-ghost{ background:transparent; border-color:var(--border); color:var(--text-muted); }
+.btn-ghost:hover{ border-color:var(--text-faint); color:var(--text); }
+.btn-text{ background:transparent; color:var(--text-muted); font-size:13px; text-decoration:underline; text-underline-offset:3px; padding:6px; }
+.btn-text:hover{ color:var(--text); }
+
+/* ---------- HAMBURGER ---------- */
+.hamburger{
+  width:40px; height:40px; border-radius:9px; background:var(--surface);
+  border:1px solid var(--border); display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; transition:border-color .15s; position:relative;
+}
+.hamburger:hover{ border-color:var(--text-faint); }
+.hamburger svg{ width:18px; height:18px; }
+.hamburger .dot{
+  position:absolute; top:-3px; right:-3px; width:9px; height:9px; border-radius:50%;
+  background:var(--android); border:2px solid var(--bg); display:none;
+}
+.hamburger.logged .dot{ display:block; }
+
+/* ---------- DRAWER ---------- */
+.overlay{
+  position:fixed; inset:0; background:#080a0ecc; backdrop-filter:blur(2px);
+  opacity:0; pointer-events:none; transition:opacity .2s; z-index:90;
+}
+.overlay.show{ opacity:1; pointer-events:auto; }
+
+.drawer{
+  position:fixed; top:0; right:0; height:100%; width:360px; max-width:92vw;
+  background:var(--surface); border-left:1px solid var(--border);
+  transform:translateX(100%); transition:transform .25s cubic-bezier(.4,0,.2,1);
+  z-index:95; display:flex; flex-direction:column; padding:22px 22px 26px;
+  overflow-y:auto;
+}
+.drawer.show{ transform:translateX(0); }
+.drawer-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:22px; }
+.drawer-head h3{ font-family:'Space Grotesk',sans-serif; font-size:16px; }
+.drawer-close{ width:30px; height:30px; border-radius:7px; background:var(--surface-2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; color:var(--text-muted); }
+.drawer-close:hover{ color:var(--text); }
+.drawer-close svg{ width:14px; height:14px; }
+
+/* logged-in view */
+.account-card{ display:flex; align-items:center; gap:12px; background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius); padding:16px; margin-bottom:18px; }
+.avatar{ width:42px; height:42px; border-radius:50%; background:var(--surface-3); display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:15px; color:var(--accent); flex-shrink:0; overflow:hidden; }
+.avatar img{ width:100%; height:100%; object-fit:cover; }
+.account-info{ overflow:hidden; }
+.account-info b{ display:block; font-size:13.5px; }
+.account-info span{ display:block; font-size:11.5px; color:var(--text-muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+/* auth forms */
+.auth-tabs{ display:flex; gap:4px; background:var(--surface-2); border:1px solid var(--border); border-radius:999px; padding:4px; margin-bottom:20px; }
+.auth-tabs button{ flex:1; background:transparent; border:none; color:var(--text-muted); font-size:12.5px; font-weight:600; padding:8px; border-radius:999px; transition:all .15s; }
+.auth-tabs button.active{ background:var(--surface-3); color:var(--text); }
+
+.auth-form{ display:none; flex-direction:column; gap:14px; }
+.auth-form.visible{ display:flex; }
+
+.google-btn{
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  background:var(--text); color:#1a1a1a; border-radius:8px; padding:11px; font-size:13.5px; font-weight:600;
+  border:1px solid var(--border); width:100%;
+}
+.google-btn:hover{ filter:brightness(.96); }
+.google-btn svg{ width:17px; height:17px; }
+
+.auth-divider{ display:flex; align-items:center; gap:10px; color:var(--text-faint); font-size:11.5px; margin:2px 0; }
+.auth-divider::before, .auth-divider::after{ content:''; flex:1; height:1px; background:var(--border); }
+
+.auth-error{ font-size:12.5px; color:var(--danger); display:none; }
+.auth-error.show{ display:block; }
+.auth-hint{ font-size:12px; color:var(--text-faint); text-align:center; }
+.auth-hint a{ color:var(--accent); text-decoration:none; font-weight:600; cursor:pointer; }
+
+.logout-btn{
+  width:100%;
+  transition:background-color .25s ease, color .25s ease, border-color .25s ease, transform .15s ease;
+}
+.logout-btn:hover,
+.logout-btn:focus-visible{
+  background:var(--danger-soft);
+  color:var(--danger);
+  border-color:var(--danger);
+}
+.logout-btn:active{
+  background:var(--danger);
+  color:#10141B;
+  border-color:var(--danger);
+  transform:scale(.98);
+}
+
+.guest-note{
+  margin-top:auto; padding-top:18px; border-top:1px solid var(--border);
+  font-size:11.5px; color:var(--text-faint); line-height:1.5;
+}
+
+/* Toast */
+.toast{
+  position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(20px);
+  background:var(--surface-3); border:1px solid var(--accent); color:var(--text);
+  padding:14px 22px; border-radius:10px; font-size:13.5px; font-weight:500;
+  display:flex; align-items:center; gap:10px; opacity:0; pointer-events:none; transition:all .25s;
+  z-index:100;
+}
+.toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* ---------- MODAL GENÉRICO (sobrepuesto) ---------- */
+.modal-overlay{
+  position:fixed; inset:0; background:#080a0ecc; backdrop-filter:blur(3px);
+  opacity:0; pointer-events:none; transition:opacity .2s; z-index:200;
+  display:flex; align-items:center; justify-content:center; padding:20px;
+}
+.modal-overlay.show{ opacity:1; pointer-events:auto; }
+.modal-box{
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  max-width:460px; width:100%; padding:22px; transform:translateY(10px); transition:transform .2s;
+  max-height:86vh; overflow-y:auto;
+}
+.modal-overlay.show .modal-box{ transform:translateY(0); }
+.modal-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:6px; }
+.modal-head h3{ font-family:'Space Grotesk',sans-serif; font-size:16px; line-height:1.3; }
+.modal-close{ width:30px; height:30px; border-radius:7px; background:var(--surface-2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; color:var(--text-muted); flex-shrink:0; }
+.modal-close:hover{ color:var(--text); }
+.modal-close svg{ width:14px; height:14px; }
+.modal-sub{ font-size:12.5px; color:var(--text-muted); margin-bottom:18px; line-height:1.5; }
+
+/* Acciones de un programa dentro del modal */
+.program-action{ display:flex; align-items:center; justify-content:space-between; gap:12px; background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:14px 16px; margin-bottom:10px; }
+.program-action:last-child{ margin-bottom:0; }
+.program-action b{ font-size:13.5px; display:block; margin-bottom:2px; }
+.program-action span{ font-size:11px; color:var(--text-faint); }
+.program-action .btn{ flex-shrink:0; }
+.dl-btn{ background:var(--accent); color:#0d0f13; }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="brand">
+    <div class="brand-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#0d0f13" stroke-width="2" stroke-linecap="round"><path d="M6 10V7a6 6 0 0112 0v3"/><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M12 14v3"/></svg>
+    </div>
+    <div class="brand-text"><b>F3RN4N</b><span>Panel de registro y liberación</span></div>
+  </div>
+  <div class="nav-pages">
+    <a href="index.html" class="active">Registro</a>
+    <a href="dashboard.html">Dashboard</a>
+  </div>
+  <button class="hamburger" id="hamburgerBtn" onclick="openDrawer()" aria-label="Abrir menú de sesión">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="color:var(--text)"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    <span class="dot" id="hamburgerDot"></span>
+  </button>
+</nav>
+
+<div class="overlay" id="overlay" onclick="closeDrawer()"></div>
+
+<aside class="drawer" id="drawer">
+  <div class="drawer-head">
+    <h3>Mi cuenta</h3>
+    <button class="drawer-close" onclick="closeDrawer()" aria-label="Cerrar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+
+  <!-- LOGGED IN -->
+  <div id="view-logged" style="display:none;">
+    <div class="account-card">
+      <div class="avatar" id="avatar">–</div>
+      <div class="account-info">
+        <b id="account-name">—</b>
+        <span id="account-email">—</span>
+      </div>
+    </div>
+    <button class="btn btn-ghost logout-btn" onclick="doLogout()">Cerrar sesión</button>
+  </div>
+
+  <!-- LOGGED OUT -->
+  <div id="view-guest">
+    <div class="auth-tabs">
+      <button id="tab-login" class="active" onclick="switchAuthTab('login')">Iniciar sesión</button>
+      <button id="tab-register" onclick="switchAuthTab('register')">Registrarse</button>
+    </div>
+
+    <button class="google-btn" onclick="doGoogleAuth()">
+      <svg viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 01-1.8 2.72v2.26h2.9c1.7-1.57 2.7-3.88 2.7-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.26c-.8.54-1.84.86-3.06.86-2.35 0-4.34-1.59-5.05-3.72H.98v2.33A9 9 0 009 18z"/><path fill="#FBBC05" d="M3.95 10.7A5.4 5.4 0 013.68 9c0-.59.1-1.17.27-1.7V4.97H.98A9 9 0 000 9c0 1.45.35 2.83.98 4.03l2.97-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.9 11.43 0 9 0A9 9 0 00.98 4.97l2.97 2.33C4.66 5.17 6.65 3.58 9 3.58z"/></svg>
+      Continuar con Google
+    </button>
+
+    <div class="auth-divider">o con tu correo</div>
+
+    <!-- LOGIN FORM -->
+    <form class="auth-form visible" id="form-login" onsubmit="doEmailLogin(event)">
+      <div class="field">
+        <label for="login-email">Correo</label>
+        <input id="login-email" type="email" placeholder="tu@correo.com" required>
+      </div>
+      <div class="field">
+        <label for="login-pass">Contraseña</label>
+        <input id="login-pass" type="password" placeholder="••••••••" required>
+      </div>
+      <div class="auth-error" id="login-error"></div>
+      <button type="submit" class="btn btn-primary" style="justify-content:center;">Entrar</button>
+    </form>
+
+    <!-- REGISTER FORM -->
+    <form class="auth-form" id="form-register" onsubmit="doEmailRegister(event)">
+      <div class="field">
+        <label for="reg-name">Nombre</label>
+        <input id="reg-name" type="text" placeholder="Tu nombre" required>
+      </div>
+      <div class="field">
+        <label for="reg-email">Correo</label>
+        <input id="reg-email" type="email" placeholder="tu@correo.com" required>
+      </div>
+      <div class="field">
+        <label for="reg-pass">Contraseña</label>
+        <input id="reg-pass" type="password" placeholder="Mínimo 6 caracteres" required>
+      </div>
+      <div class="auth-error" id="register-error"></div>
+      <button type="submit" class="btn btn-primary" style="justify-content:center;">Crear cuenta</button>
+    </form>
+  </div>
+
+  <div class="guest-note">No necesitas iniciar sesión para registrar clientes ni generar un Check. La cuenta es solo para acceder al Dashboard y tu historial.</div>
+
+  <button class="btn btn-ghost programs-btn" style="width:100%; justify-content:center; margin-top:14px;" onclick="closeDrawer(); openAllProgramsModal();">
+    Programas
+  </button>
+</aside>
+
+<div class="wrap">
+  <div class="page-head">
+    <h1>Registrar equipo y cliente</h1>
+    <p>Completa los 4 pasos para armar la orden. Pasará a <b style="color:var(--text)">Check</b> al finalizar.</p>
+  </div>
+
+  <!-- RAIL -->
+  <div class="rail" id="rail">
+    <div class="rail-step active" data-rail="1">
+      <div class="rail-num">1</div>
+      <div class="rail-label"><b>Dispositivo</b><span>Sistema y modelo</span></div>
+    </div>
+    <div class="rail-step" data-rail="2">
+      <div class="rail-num">2</div>
+      <div class="rail-label"><b>Bloqueo</b><span>Tipo de bloqueo</span></div>
+    </div>
+    <div class="rail-step" data-rail="3">
+      <div class="rail-num">3</div>
+      <div class="rail-label"><b>Cliente</b><span>Datos (opcional)</span></div>
+    </div>
+    <div class="rail-step" data-rail="4">
+      <div class="rail-num">4</div>
+      <div class="rail-label"><b>Revisión</b><span>Enviar a Check</span></div>
+    </div>
+  </div>
+
+  <!-- PANEL -->
+  <div class="panel">
+
+    <!-- STEP 1: DEVICE -->
+    <div class="step-block visible" id="step-1">
+      <div class="step-title">¿Qué sistema es el equipo?</div>
+      <div class="step-sub">Selecciona la plataforma para mostrar solo los modelos correspondientes.</div>
+
+      <div class="os-grid">
+        <button class="os-card" id="os-android" onclick="selectOS('android')">
+          <svg class="os-icon" viewBox="0 0 24 24" fill="none" stroke="var(--android)" stroke-width="1.6"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 6h6M9 18h6"/><circle cx="12" cy="10.5" r="2.2"/></svg>
+          <h3>Android</h3>
+          <p>Samsung, Xiaomi, Motorola, Huawei y otras marcas.</p>
+        </button>
+        <button class="os-card" id="os-apple" onclick="selectOS('apple')">
+          <svg class="os-icon" viewBox="0 0 24 24" fill="none" stroke="var(--ios)" stroke-width="1.6"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><circle cx="12" cy="18" r="0.9" fill="var(--ios)"/></svg>
+          <h3>iPhone</h3>
+          <p>Del 6s al 17 Pro Max, con todas sus variantes.</p>
+        </button>
+      </div>
+
+      <!-- APPLE: generations -->
+      <div class="variant-zone" id="apple-gen-zone" style="margin-top:26px;">
+        <div class="variant-label">Generación</div>
+        <div class="chip-row" id="apple-gen-row"></div>
+        <div class="variant-zone" id="apple-variant-zone">
+          <div class="variant-label">Modelo exacto</div>
+          <div class="chip-row" id="apple-variant-row"></div>
+        </div>
+      </div>
+
+      <!-- ANDROID: brand + model -->
+      <div class="variant-zone" id="android-zone" style="margin-top:26px;">
+        <div class="variant-label">Marca</div>
+        <div class="chip-row" id="android-brand-row"></div>
+        <div class="variant-zone" id="android-quick-zone">
+          <div class="variant-label">Modelos frecuentes</div>
+          <div class="chip-row" id="android-quick-row"></div>
+        </div>
+        <div class="model-input-wrap field">
+          <label for="android-model-input">Modelo (si no aparece arriba, escríbelo)</label>
+          <input id="android-model-input" type="text" placeholder="Ej. Galaxy S21 FE" oninput="setAndroidCustom(this.value)">
+        </div>
+      </div>
+
+      <div class="step-controls">
+        <button class="btn btn-primary" id="btn-step1-next" disabled onclick="goTo(2)">Continuar</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: LOCK TYPE -->
+    <div class="step-block" id="step-2">
+      <div class="step-title">Tipo de bloqueo</div>
+      <div class="step-sub">Selecciona el bloqueo que presenta el equipo.</div>
+
+      <div class="lock-grid" id="lock-grid"></div>
+
+      <div class="step-controls">
+        <button class="btn btn-ghost" onclick="goTo(1)">Atrás</button>
+        <button class="btn btn-primary" id="btn-step2-next" disabled onclick="goTo(3)">Continuar</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: CLIENT -->
+    <div class="step-block" id="step-3">
+      <div class="step-title">Datos del cliente</div>
+      <div class="step-sub">Es opcional. Puedes omitir este paso y completarlo después.</div>
+
+      <div class="client-form">
+        <div class="field">
+          <label for="c-name">Nombre</label>
+          <input id="c-name" type="text" placeholder="Nombre del cliente">
+        </div>
+        <div class="field">
+          <label for="c-phone">Teléfono</label>
+          <input id="c-phone" type="tel" placeholder="Ej. 662 123 4567">
+        </div>
+        <div class="field">
+          <label for="c-serial">Número de serie / IMEI</label>
+          <input id="c-serial" type="text" placeholder="Ej. C7XJXXXXXXXX o 35XXXXXXXXXXXXX">
+        </div>
+        <div class="field">
+          <label for="c-note">Nota</label>
+          <textarea id="c-note" rows="3" placeholder="Detalles adicionales del equipo o del cliente"></textarea>
+        </div>
+      </div>
+
+      <div class="step-controls">
+        <button class="btn btn-ghost" onclick="goTo(2)">Atrás</button>
+        <button class="btn btn-primary" onclick="goTo(4)">Guardar y continuar</button>
+        <button class="btn btn-text" onclick="skipClient()">Omitir y continuar a Check →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: REVIEW -->
+    <div class="step-block" id="step-4">
+      <div class="step-title">Revisión final</div>
+      <div class="step-sub">Confirma los datos antes de enviarlos a Check.</div>
+
+      <div class="summary-card">
+        <div class="summary-row">
+          <span class="k">Dispositivo</span>
+          <span class="v" id="sum-device">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="k">Bloqueo</span>
+          <span class="v" id="sum-lock">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="k">Cliente</span>
+          <span class="v" id="sum-client">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="k">Teléfono</span>
+          <span class="v" id="sum-phone">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="k">N.º de serie / IMEI</span>
+          <span class="v mono" id="sum-serial">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="k">Nota</span>
+          <span class="v" id="sum-note">—</span>
+        </div>
+      </div>
+
+      <div class="step-controls">
+        <button class="btn btn-ghost" onclick="goTo(3)">Editar</button>
+        <button class="btn btn-primary" onclick="sendToCheck()">Enviar a Check</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+/* ---------------- FIREBASE ---------------- */
+const firebaseConfig = {
+  apiKey: "AIzaSyDUE6QZa8ClQLNPXSuv0QFa2myLIAT2Y9s",
+  authDomain: "mensaje-76bbc.firebaseapp.com",
+  databaseURL: "https://mensaje-76bbc-default-rtdb.firebaseio.com",
+  projectId: "mensaje-76bbc",
+  storageBucket: "mensaje-76bbc.firebasestorage.app",
+  messagingSenderId: "257129078581",
+  appId: "1:257129078581:web:48c923addfa3d28526f67c",
+  measurementId: "G-7F10K2Z3VJ"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+function switchAuthTab(tab){
+  document.getElementById('tab-login').classList.toggle('active', tab==='login');
+  document.getElementById('tab-register').classList.toggle('active', tab==='register');
+  document.getElementById('form-login').classList.toggle('visible', tab==='login');
+  document.getElementById('form-register').classList.toggle('visible', tab==='register');
+  hideAuthErrors();
+}
+function hideAuthErrors(){
+  document.getElementById('login-error').classList.remove('show');
+  document.getElementById('register-error').classList.remove('show');
+}
+function showAuthError(id, message){
+  const el = document.getElementById(id);
+  el.textContent = friendlyAuthError(message);
+  el.classList.add('show');
+}
+function friendlyAuthError(code){
+  const map = {
+    'auth/invalid-email':'Correo inválido.',
+    'auth/user-not-found':'No existe una cuenta con ese correo.',
+    'auth/wrong-password':'Contraseña incorrecta.',
+    'auth/invalid-credential':'Correo o contraseña incorrectos.',
+    'auth/email-already-in-use':'Ya existe una cuenta con ese correo.',
+    'auth/weak-password':'La contraseña debe tener al menos 6 caracteres.',
+    'auth/popup-closed-by-user':'Se cerró la ventana de Google antes de terminar.',
+  };
+  return map[code] || 'Ocurrió un error. Intenta de nuevo.';
+}
+
+function doGoogleAuth(){
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider)
+    .then(()=>{ closeDrawer(); showToast('Sesión iniciada ✔'); })
+    .catch(err=> showAuthError('login-error', err.code));
+}
+
+function doEmailLogin(e){
+  e.preventDefault();
+  hideAuthErrors();
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  auth.signInWithEmailAndPassword(email, pass)
+    .then(()=>{ closeDrawer(); showToast('Sesión iniciada ✔'); })
+    .catch(err=> showAuthError('login-error', err.code));
+}
+
+function doEmailRegister(e){
+  e.preventDefault();
+  hideAuthErrors();
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pass = document.getElementById('reg-pass').value;
+  auth.createUserWithEmailAndPassword(email, pass)
+    .then(cred => cred.user.updateProfile({ displayName: name }))
+    .then(()=>{ closeDrawer(); showToast('Cuenta creada ✔'); })
+    .catch(err=> showAuthError('register-error', err.code));
+}
+
+function doLogout(){
+  auth.signOut().then(()=> showToast('Sesión cerrada'));
+}
+
+auth.onAuthStateChanged(user=>{
+  const loggedView = document.getElementById('view-logged');
+  const guestView = document.getElementById('view-guest');
+  const dot = document.getElementById('hamburgerDot');
+  const hamburger = document.getElementById('hamburgerBtn');
+
+  if(user){
+    loggedView.style.display = 'block';
+    guestView.style.display = 'none';
+    hamburger.classList.add('logged');
+
+    const name = user.displayName || (user.email ? user.email.split('@')[0] : 'Usuario');
+    document.getElementById('account-name').textContent = name;
+    document.getElementById('account-email').textContent = user.email || '';
+
+    const avatar = document.getElementById('avatar');
+    if(user.photoURL){
+      avatar.innerHTML = `<img src="${user.photoURL}" alt="">`;
+    } else {
+      avatar.textContent = name.charAt(0).toUpperCase();
+    }
+  } else {
+    loggedView.style.display = 'none';
+    guestView.style.display = 'block';
+    hamburger.classList.remove('logged');
+  }
+});
+
+/* ---------------- DRAWER ---------------- */
+function openDrawer(){
+  document.getElementById('drawer').classList.add('show');
+  document.getElementById('overlay').classList.add('show');
+}
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('show');
+  document.getElementById('overlay').classList.remove('show');
+}
+
+/* ---------------- MODAL GENÉRICO (sobrepuesto) ---------------- */
+function openModal(titleHtml, subHtml, bodyHtml){
+  let overlay = document.getElementById('modal-overlay');
+  if(!overlay){
+    overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.id = 'modal-overlay';
+    overlay.onclick = (e)=>{ if(e.target === overlay) closeModal(); };
+    overlay.innerHTML = `
+      <div class="modal-box">
+        <div class="modal-head">
+          <h3 id="modal-title"></h3>
+          <button class="modal-close" onclick="closeModal()" aria-label="Cerrar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+        </div>
+        <div class="modal-sub" id="modal-sub"></div>
+        <div id="modal-body"></div>
+      </div>`;
+    document.body.appendChild(overlay);
+    document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeModal(); });
+  }
+  document.getElementById('modal-title').innerHTML = titleHtml || '';
+  const subEl = document.getElementById('modal-sub');
+  subEl.innerHTML = subHtml || '';
+  subEl.style.display = subHtml ? 'block' : 'none';
+  document.getElementById('modal-body').innerHTML = bodyHtml || '';
+  overlay.classList.add('show');
+}
+function closeModal(){
+  const overlay = document.getElementById('modal-overlay');
+  if(overlay) overlay.classList.remove('show');
+}
+
+/* ---------------- MODAL: TODOS LOS PROGRAMAS (menú) ---------------- */
+const ALL_PROGRAMS = [
+  { name:'iBerry Passcode Bypass', url:'https://mega.nz/folder/j6ZSSJyB#nQnIMWLhUi_cT9NFfNIXeQ' },
+  { name:'iHello HFZ (Hello / Passcode)', url:'https://mega.nz/folder/JBEQSBaK#P-MMA1LGZergdz2-3vec6A' },
+  { name:'Aldaz R Activator Bypass Passcode', url:'https://www.mediafire.com/file/0bmxhbyv6k2bg2e/AldazRActivator_Bypass_Passcode_%2526_Hello_A12_macOS.pkg/file' },
+  { name:'F3arRa1n', url:'https://f3arra1n.com/Docs/#Windows' },
+  { name:'REX Activator', url:'https://www.mediafire.com/folder/9nrd4x17fay10/Rex_activator' },
+  { name:'Unlock', url:'https://mega.nz/file/gns1CTYA#Qq4PigKzpZ2INjLMZAbY-7nC26i0Q-7tmTKYRoMfhzU' },
+  { name:'3uTools (verificación de versión de iOS)', url:'https://www.3u.com/productsWin' },
+  { name:'Herramienta USB para programar placa RP2350', url:'https://mega.nz/file/BDcWxKiB#NcJVBRUfRDfrNMb5e3QKtVgaTnAVOnnBBfkVbx8l6W8' },
+];
+function openAllProgramsModal(){
+  const body = ALL_PROGRAMS.map(it => `
+    <div class="program-action">
+      <div><b>${it.name}</b></div>
+      <a class="btn dl-btn" href="${it.url}" target="_blank" rel="noopener">Abrir</a>
+    </div>
+  `).join('');
+  openModal('Programas', 'Todos los programas y herramientas de verificación que se utilizan.', body);
+}
+
+/* ---------------- DATA ---------------- */
+const APPLE_GENERATIONS = [
+  { key:'se',  label:'SE',        models:['SE (1.ª gen)','SE (2.ª gen)','SE (3.ª gen)'] },
+  { key:'6s',  label:'6s',        models:['6s','6s Plus'] },
+  { key:'7',   label:'7',         models:['7','7 Plus'] },
+  { key:'8',   label:'8',         models:['8','8 Plus'] },
+  { key:'x',   label:'X / XR / XS', models:['X','XR','XS','XS Max'] },
+  { key:'11',  label:'11',        models:['11','11 Pro','11 Pro Max'] },
+  { key:'12',  label:'12',        models:['12 mini','12','12 Pro','12 Pro Max'] },
+  { key:'13',  label:'13',        models:['13 mini','13','13 Pro','13 Pro Max'] },
+  { key:'14',  label:'14',        models:['14','14 Plus','14 Pro','14 Pro Max'] },
+  { key:'15',  label:'15',        models:['15','15 Plus','15 Pro','15 Pro Max'] },
+  { key:'16',  label:'16',        models:['16e','16','16 Plus','16 Pro','16 Pro Max'] },
+  { key:'17',  label:'17',        models:['17','17 Air','17 Pro','17 Pro Max'] },
+];
+
+const ANDROID_BRANDS = [
+  { key:'samsung',  label:'Samsung',  quick:['Galaxy S24','Galaxy S23','Galaxy S22','Galaxy A54','Galaxy A34','Note 20'] },
+  { key:'xiaomi',   label:'Xiaomi',   quick:['Redmi Note 13','Redmi 12','POCO X6','Mi 11'] },
+  { key:'motorola', label:'Motorola', quick:['Moto G84','Edge 40','Moto G54'] },
+  { key:'huawei',   label:'Huawei',   quick:['P60','Mate 60','Nova 11'] },
+  { key:'otro',     label:'Otra marca', quick:[] },
+];
+
+const LOCKS = {
+  apple: [
+    { key:'icloud',  label:'Bloqueo de iCloud',           desc:'Cuenta Apple activa en el equipo', icon:'cloud' },
+    { key:'pin',     label:'Bloqueo de PIN',               desc:'Código de acceso desconocido',     icon:'dots'  },
+    { key:'carrier', label:'Bloqueo de compañía',          desc:'Ligado a un operador telefónico',  icon:'signal'},
+    { key:'mdm',     label:'Bloqueo MDM',                  desc:'Gestión remota corporativa',       icon:'shield'},
+  ],
+  android: [
+    { key:'frp',     label:'FRP (cuenta Google)',          desc:'Protección de restablecimiento',   icon:'cloud' },
+    { key:'pin',     label:'PIN / Patrón',                 desc:'Código o patrón desconocido',      icon:'dots'  },
+    { key:'carrier', label:'Bloqueo de compañía',          desc:'Ligado a un operador telefónico',  icon:'signal'},
+    { key:'mdm',     label:'Bloqueo MDM',                  desc:'Gestión remota corporativa',       icon:'shield'},
+  ]
+};
+
+const LOCK_ICON_SVG = {
+  cloud:  `<svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 18a4 4 0 01-.5-7.97A5.5 5.5 0 0116.9 8.05 4.5 4.5 0 0117 18H6.5z"/></svg>`,
+  dots:   `<svg viewBox="0 0 24 24" fill="none"><circle cx="7" cy="7" r="1.6" fill="var(--accent)"/><circle cx="12" cy="7" r="1.6" fill="var(--accent)"/><circle cx="17" cy="7" r="1.6" fill="var(--accent)"/><circle cx="7" cy="12" r="1.6" fill="var(--accent)"/><circle cx="12" cy="12" r="1.6" fill="var(--accent)"/><circle cx="17" cy="12" r="1.6" fill="var(--accent)"/><rect x="5" y="16" width="14" height="4.5" rx="1.2" stroke="var(--accent)" stroke-width="1.4"/></svg>`,
+  signal: `<svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.7" stroke-linecap="round"><path d="M12 3v6"/><path d="M8 6l4 3 4-3"/><path d="M5 21a7 7 0 0114 0"/><path d="M2 21a10 10 0 0120 0"/></svg>`,
+  shield: `<svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9.5 12l1.8 1.8L14.8 10"/></svg>`,
+};
+
+/* ---------------- STATE ---------------- */
+const state = {
+  os:null, deviceGroup:null, device:null,
+  lockKey:null, lockLabel:null,
+  client:{ name:'', phone:'', note:'', serial:'' }
+};
+let currentStep = 1;
+
+/* ---------------- STEP 1: OS + DEVICE ---------------- */
+function selectOS(os){
+  state.os = os;
+  state.device = null; state.deviceGroup = null;
+  document.body.className = os === 'apple' ? 'os-apple' : 'os-android';
+  document.getElementById('os-android').classList.toggle('selected', os==='android');
+  document.getElementById('os-apple').classList.toggle('selected', os==='apple');
+
+  document.getElementById('apple-gen-zone').classList.toggle('visible', os==='apple');
+  document.getElementById('android-zone').classList.toggle('visible', os==='android');
+
+  if(os==='apple') buildAppleGenerations();
+  if(os==='android') buildAndroidBrands();
+  buildLockGrid();
+  updateStep1Button();
+}
+
+function buildAppleGenerations(){
+  const row = document.getElementById('apple-gen-row');
+  row.innerHTML = '';
+  APPLE_GENERATIONS.forEach(gen=>{
+    const b = document.createElement('button');
+    b.className = 'chip';
+    b.textContent = gen.label;
+    b.onclick = ()=> selectAppleGen(gen, b);
+    row.appendChild(b);
+  });
+}
+function selectAppleGen(gen, btn){
+  [...document.getElementById('apple-gen-row').children].forEach(c=>c.classList.remove('selected'));
+  btn.classList.add('selected');
+  state.deviceGroup = gen.label;
+  state.device = null;
+
+  const zone = document.getElementById('apple-variant-zone');
+  const row = document.getElementById('apple-variant-row');
+  row.innerHTML = '';
+  gen.models.forEach(model=>{
+    const b = document.createElement('button');
+    b.className = 'chip small';
+    b.textContent = 'iPhone ' + model;
+    b.onclick = ()=> selectDevice('iPhone ' + model, b, row);
+    row.appendChild(b);
+  });
+  zone.classList.add('visible');
+  updateStep1Button();
+}
+
+function buildAndroidBrands(){
+  const row = document.getElementById('android-brand-row');
+  row.innerHTML = '';
+  ANDROID_BRANDS.forEach(brand=>{
+    const b = document.createElement('button');
+    b.className = 'chip';
+    b.textContent = brand.label;
+    b.onclick = ()=> selectAndroidBrand(brand, b);
+    row.appendChild(b);
+  });
+}
+function selectAndroidBrand(brand, btn){
+  [...document.getElementById('android-brand-row').children].forEach(c=>c.classList.remove('selected'));
+  btn.classList.add('selected');
+  state.deviceGroup = brand.label;
+  state.device = null;
+  document.getElementById('android-model-input').value = '';
+
+  const zone = document.getElementById('android-quick-zone');
+  const row = document.getElementById('android-quick-row');
+  row.innerHTML = '';
+  if(brand.quick.length){
+    brand.quick.forEach(model=>{
+      const b = document.createElement('button');
+      b.className = 'chip small';
+      b.textContent = model;
+      b.onclick = ()=>{
+        document.getElementById('android-model-input').value = model;
+        selectDevice(brand.label + ' ' + model, b, row);
+      };
+      row.appendChild(b);
+    });
+    zone.classList.add('visible');
+  } else {
+    zone.classList.remove('visible');
+  }
+  updateStep1Button();
+}
+function setAndroidCustom(value){
+  [...document.getElementById('android-quick-row').children].forEach(c=>c.classList.remove('selected'));
+  const brandLabel = state.deviceGroup || '';
+  state.device = value.trim() ? (brandLabel + ' ' + value.trim()).trim() : null;
+  updateStep1Button();
+}
+
+function selectDevice(fullName, btn, row){
+  [...row.children].forEach(c=>c.classList.remove('selected'));
+  btn.classList.add('selected');
+  state.device = fullName;
+  updateStep1Button();
+}
+
+function updateStep1Button(){
+  document.getElementById('btn-step1-next').disabled = !(state.os && state.device);
+}
+
+/* ---------------- STEP 2: LOCK ---------------- */
+function buildLockGrid(){
+  const grid = document.getElementById('lock-grid');
+  grid.innerHTML = '';
+  const list = LOCKS[state.os] || [];
+  list.forEach(item=>{
+    const b = document.createElement('button');
+    b.className = 'lock-card';
+    b.innerHTML = `<div class="lock-icon">${LOCK_ICON_SVG[item.icon]}</div>
+      <div><b>${item.label}</b><span>${item.desc}</span></div>`;
+    b.onclick = ()=>{
+      [...grid.children].forEach(c=>c.classList.remove('selected'));
+      b.classList.add('selected');
+      state.lockKey = item.key;
+      state.lockLabel = item.label;
+      document.getElementById('btn-step2-next').disabled = false;
+    };
+    grid.appendChild(b);
+  });
+}
+
+/* ---------------- STEP 3: CLIENT ---------------- */
+function readClientForm(){
+  state.client.name = document.getElementById('c-name').value.trim();
+  state.client.phone = document.getElementById('c-phone').value.trim();
+  state.client.serial = document.getElementById('c-serial').value.trim();
+  state.client.note = document.getElementById('c-note').value.trim();
+}
+function skipClient(){
+  state.client = { name:'', phone:'', note:'', serial:'' };
+  document.getElementById('c-name').value='';
+  document.getElementById('c-phone').value='';
+  document.getElementById('c-serial').value='';
+  document.getElementById('c-note').value='';
+  goTo(4);
+}
+
+/* ---------------- NAVIGATION ---------------- */
+function goTo(step){
+  if(step===4) readClientForm();
+  currentStep = step;
+  document.querySelectorAll('.step-block').forEach(el=>el.classList.remove('visible'));
+  document.getElementById('step-'+step).classList.add('visible');
+
+  document.querySelectorAll('.rail-step').forEach(el=>{
+    const n = parseInt(el.dataset.rail);
+    el.classList.toggle('active', n===step);
+    el.classList.toggle('done', n<step);
+  });
+
+  if(step===4) renderSummary();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function renderSummary(){
+  document.getElementById('sum-device').textContent =
+    (state.os==='apple' ? '' : (state.os==='android' ? '' : '')) + (state.device || '—');
+  document.getElementById('sum-lock').textContent = state.lockLabel || '—';
+
+  const nameEl = document.getElementById('sum-client');
+  if(state.client.name){ nameEl.textContent = state.client.name; nameEl.classList.remove('empty'); }
+  else { nameEl.textContent = 'Sin nombre registrado'; nameEl.classList.add('empty'); }
+
+  const phoneEl = document.getElementById('sum-phone');
+  if(state.client.phone){ phoneEl.textContent = state.client.phone; phoneEl.classList.remove('empty'); }
+  else { phoneEl.textContent = 'Sin teléfono'; phoneEl.classList.add('empty'); }
+
+  const serialEl = document.getElementById('sum-serial');
+  if(state.client.serial){ serialEl.textContent = state.client.serial; serialEl.classList.remove('empty'); }
+  else { serialEl.textContent = 'Sin registrar'; serialEl.classList.add('empty'); }
+
+  const noteEl = document.getElementById('sum-note');
+  if(state.client.note){ noteEl.textContent = state.client.note; noteEl.classList.remove('empty'); }
+  else { noteEl.textContent = 'Sin nota'; noteEl.classList.add('empty'); }
+}
+
+/* ---------------- SEND TO CHECK ---------------- */
+function sendToCheck(){
+  const payload = {
+    os: state.os,
+    deviceGroup: state.deviceGroup,
+    device: state.device,
+    lockKey: state.lockKey,
+    lockLabel: state.lockLabel,
+    client: state.client,
+    createdAt: new Date().toISOString()
+  };
+  try{
+    localStorage.setItem('f3rn4n_pending_check', JSON.stringify(payload));
+  }catch(e){}
+  saveOrderToHistory(payload);
+  showToast('Orden lista. Abriendo Check…');
+  setTimeout(()=>{ window.location.href = 'check.html'; }, 700);
+}
+
+/* Guarda un registro del pedido para que aparezca en el Dashboard (por cuenta) */
+function saveOrderToHistory(payload){
+  const record = {
+    id: 'ord_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7),
+    ownerUid: auth.currentUser ? auth.currentUser.uid : null,
+    os: payload.os,
+    device: payload.device,
+    lockLabel: payload.lockLabel,
+    client: payload.client.name || '',
+    phone: payload.client.phone || '',
+    serial: payload.client.serial || '',
+    note: payload.client.note || '',
+    status: 'pendiente',
+    price: 0,
+    completedAt: null,
+    createdAt: payload.createdAt
+  };
+  try{
+    const list = JSON.parse(localStorage.getItem('f3rn4n_orders') || '[]');
+    list.unshift(record);
+    localStorage.setItem('f3rn4n_orders', JSON.stringify(list.slice(0, 500)));
+  }catch(e){}
+  // Sincroniza a la nube si hay sesión iniciada (para verlo desde cualquier dispositivo)
+  if(record.ownerUid){
+    db.collection('orders').doc(record.id).set(record).catch(()=>{});
+  }
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=> t.classList.remove('show'), 2600);
+}
+</script>
+</body>
+</html>
