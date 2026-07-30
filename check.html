@@ -50,18 +50,55 @@ button{ font-family:inherit; cursor:pointer; }
 input{ font-family:inherit; }
 a{ color:inherit; }
 
-/* ---------- NAV (compartido) ---------- */
-.topnav{ display:flex; align-items:center; justify-content:space-between; padding:18px 32px; border-bottom:1px solid var(--border); background:#10141Bcc; backdrop-filter:blur(10px); position:sticky; top:0; z-index:50; }
+/* ---------- NAV (compartido con Index) ---------- */
+.topnav{ display:flex; align-items:center; justify-content:space-between; padding:18px 32px; border-bottom:1px solid var(--border); background:#10141Bcc; backdrop-filter:blur(10px); position:sticky; top:0; z-index:50; gap:14px; }
 .brand{ display:flex; align-items:center; gap:10px; }
 .brand-mark{ width:30px; height:30px; border-radius:8px; background:linear-gradient(135deg, var(--amber), #d97a1f); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
 .brand-mark svg{ width:16px; height:16px; }
 .brand-text{ display:flex; flex-direction:column; line-height:1.15; }
 .brand-text b{ font-family:'Space Grotesk',sans-serif; font-size:15px; letter-spacing:.2px; }
 .brand-text span{ font-size:11px; color:var(--text-muted); }
-.hamburger{ width:40px; height:40px; border-radius:9px; background:var(--surface); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:border-color .15s; position:relative; }
-.hamburger:hover{ border-color:var(--text-faint); }
-.hamburger svg{ width:18px; height:18px; }
-.hamburger .dot{ position:absolute; top:-3px; right:-3px; width:9px; height:9px; border-radius:50%; background:var(--android); border:2px solid var(--bg); display:none; }
+
+.nav-right{ display:flex; align-items:center; gap:12px; }
+
+/* ---------- SALDO (pill en el nav) ---------- */
+.balance-pill{
+  display:flex; align-items:center; gap:9px;
+  background:linear-gradient(180deg, var(--surface-2), var(--surface));
+  border:1px solid var(--border); border-radius:999px; padding:7px 14px 7px 8px;
+  transition:all .15s; flex-shrink:0;
+  box-shadow:0 1px 0 #ffffff08 inset;
+}
+.balance-pill:hover{ border-color:var(--accent); }
+.balance-pill .icon{
+  width:24px; height:24px; border-radius:50%; background:var(--ok-soft); color:var(--ok);
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.balance-pill .icon svg{ width:13px; height:13px; }
+.balance-pill .b-texts{ display:flex; flex-direction:column; line-height:1.15; }
+.balance-pill .b-label{ font-size:9.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-faint); }
+.balance-pill .b-value{ font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:600; color:var(--text); }
+.balance-pill.low .b-value{ color:var(--danger); }
+.balance-pill.guest .b-value{ color:var(--text-faint); font-family:'Inter',sans-serif; font-weight:500; font-size:12px; }
+@media (max-width:640px){ .balance-pill .b-label{ display:none; } }
+
+/* ---------- HAMBURGER (rediseñado) ---------- */
+.hamburger{
+  width:42px; height:42px; border-radius:12px;
+  background:linear-gradient(180deg, var(--surface-2), var(--surface));
+  border:1px solid var(--border); display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; transition:all .18s; position:relative;
+  box-shadow:0 1px 0 #ffffff08 inset, 0 4px 10px -6px #000000a0;
+}
+.hamburger svg{ width:18px; height:18px; color:var(--text-muted); transition:color .18s; }
+.hamburger:hover{ border-color:var(--accent); background:linear-gradient(180deg, var(--surface-3), var(--surface-2)); }
+.hamburger:hover svg{ color:var(--accent); }
+.hamburger:active{ transform:scale(.94); }
+.hamburger .dot{
+  position:absolute; top:-3px; right:-3px; width:10px; height:10px; border-radius:50%;
+  background:var(--android); border:2px solid var(--bg); display:none;
+  box-shadow:0 0 0 2px #7CDB6A33;
+}
 .hamburger.logged .dot{ display:block; }
 
 /* ---------- NAV PAGES ---------- */
@@ -70,22 +107,46 @@ a{ color:inherit; }
 .nav-pages a.active{ background:var(--surface-3); color:var(--text); }
 .nav-pages a:hover{ color:var(--text); }
 
-/* ---------- DRAWER (compartido) ---------- */
+/* ---------- DRAWER (rediseñado, compartido) ---------- */
 .overlay{ position:fixed; inset:0; background:#080a0ecc; backdrop-filter:blur(2px); opacity:0; pointer-events:none; transition:opacity .2s; z-index:90; }
 .overlay.show{ opacity:1; pointer-events:auto; }
 .drawer{ position:fixed; top:0; right:0; height:100%; width:360px; max-width:92vw; background:var(--surface); border-left:1px solid var(--border); transform:translateX(100%); transition:transform .25s cubic-bezier(.4,0,.2,1); z-index:95; display:flex; flex-direction:column; padding:22px 22px 26px; overflow-y:auto; }
 .drawer.show{ transform:translateX(0); }
-.drawer-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:22px; }
-.drawer-head h3{ font-family:'Space Grotesk',sans-serif; font-size:16px; }
-.drawer-close{ width:30px; height:30px; border-radius:7px; background:var(--surface-2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; color:var(--text-muted); }
-.drawer-close:hover{ color:var(--text); }
+.drawer-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:22px; padding-bottom:16px; border-bottom:1px solid var(--border); }
+.drawer-head h3{ font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:700; letter-spacing:-.2px; }
+.drawer-close{
+  width:32px; height:32px; border-radius:9px;
+  background:linear-gradient(180deg, var(--surface-3), var(--surface-2));
+  border:1px solid var(--border); display:flex; align-items:center; justify-content:center; color:var(--text-muted);
+  transition:all .15s;
+}
+.drawer-close:hover{ color:var(--danger); border-color:var(--danger); background:var(--danger-soft); }
 .drawer-close svg{ width:14px; height:14px; }
-.account-card{ display:flex; align-items:center; gap:12px; background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius); padding:16px; margin-bottom:18px; }
-.avatar{ width:42px; height:42px; border-radius:50%; background:var(--surface-3); display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:15px; color:var(--accent); flex-shrink:0; overflow:hidden; }
+.account-card{
+  display:flex; align-items:center; gap:14px;
+  background:linear-gradient(135deg, var(--surface-2), var(--surface-3));
+  border:1px solid var(--border); border-radius:14px; padding:16px; margin-bottom:14px;
+  box-shadow:0 1px 0 #ffffff08 inset;
+}
+.avatar{
+  width:46px; height:46px; border-radius:50%;
+  background:linear-gradient(135deg, var(--amber), #d97a1f);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:16px; color:#10141B; flex-shrink:0; overflow:hidden;
+  box-shadow:0 0 0 3px var(--surface-2), 0 0 0 4px var(--accent-soft);
+}
 .avatar img{ width:100%; height:100%; object-fit:cover; }
 .account-info{ overflow:hidden; }
-.account-info b{ display:block; font-size:13.5px; }
-.account-info span{ display:block; font-size:11.5px; color:var(--text-muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.account-info b{ display:block; font-size:14px; }
+.account-info span{ display:block; font-size:11.5px; color:var(--text-muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-top:2px; }
+
+.balance-card-drawer{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  background:var(--surface-2); border:1px solid var(--border); border-radius:12px; padding:14px 16px; margin-bottom:18px;
+}
+.balance-card-drawer .k{ font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em; }
+.balance-card-drawer .v{ font-family:'JetBrains Mono',monospace; font-size:17px; font-weight:700; color:var(--ok); margin-top:3px; }
+
 .auth-tabs{ display:flex; gap:4px; background:var(--surface-2); border:1px solid var(--border); border-radius:999px; padding:4px; margin-bottom:20px; }
 .auth-tabs button{ flex:1; background:transparent; border:none; color:var(--text-muted); font-size:12.5px; font-weight:600; padding:8px; border-radius:999px; transition:all .15s; }
 .auth-tabs button.active{ background:var(--surface-3); color:var(--text); }
@@ -100,18 +161,18 @@ a{ color:inherit; }
 .auth-error.show{ display:block; }
 .logout-btn{
   width:100%;
+  display:flex; align-items:center; justify-content:center; gap:9px;
+  padding:11px 13px;
+  background:var(--danger-soft); border-color:transparent; color:var(--danger);
   transition:background-color .25s ease, color .25s ease, border-color .25s ease, transform .15s ease;
 }
 .logout-btn:hover,
 .logout-btn:focus-visible{
-  background:var(--danger-soft);
-  color:var(--danger);
-  border-color:var(--danger);
-}
-.logout-btn:active{
   background:var(--danger);
   color:#10141B;
   border-color:var(--danger);
+}
+.logout-btn:active{
   transform:scale(.98);
 }
 .guest-note{ margin-top:auto; padding-top:18px; border-top:1px solid var(--border); font-size:11.5px; color:var(--text-faint); line-height:1.5; }
@@ -122,10 +183,25 @@ a{ color:inherit; }
 .btn{ border-radius:8px; padding:11px 22px; font-size:13.5px; font-weight:600; border:1px solid transparent; display:inline-flex; align-items:center; gap:8px; transition:all .12s; }
 .btn-primary{ background:var(--accent); color:#0d0f13; }
 .btn-primary:hover{ filter:brightness(1.08); }
+.btn-primary:disabled{ background:var(--surface-3); color:var(--text-faint); cursor:not-allowed; }
 .btn-ghost{ background:transparent; border-color:var(--border); color:var(--text-muted); }
 .btn-ghost:hover{ border-color:var(--text-faint); color:var(--text); }
 .btn-text{ background:transparent; color:var(--text-muted); font-size:13px; text-decoration:underline; text-underline-offset:3px; padding:6px; }
 .btn-text:hover{ color:var(--text); }
+
+.drawer-action{
+  width:100%; justify-content:flex-start; margin-top:10px; text-decoration:none;
+  display:flex; align-items:center; gap:11px; padding:11px 13px 11px 11px;
+  background:var(--surface-2);
+}
+.drawer-action:hover{ background:var(--surface-3); }
+.drawer-action .action-icon{
+  width:30px; height:30px; border-radius:8px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--surface-3);
+}
+.drawer-action svg{ width:15px; height:15px; flex-shrink:0; }
+.programs-btn .action-icon{ background:#3B82F620; color:#60A5FA; }
 
 /* Toast */
 .toast{ position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--surface-3); border:1px solid var(--accent); color:var(--text); padding:14px 22px; border-radius:10px; font-size:13.5px; font-weight:500; display:flex; align-items:center; gap:10px; opacity:0; pointer-events:none; transition:all .25s; z-index:100; }
@@ -137,15 +213,30 @@ a{ color:inherit; }
 .page-head h1{ font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:600; }
 .page-head p{ color:var(--text-muted); font-size:14px; margin-top:5px; }
 
+/* Banner ECID (arriba de todo, solo lectura / bloqueado) */
+.ecid-banner{
+  margin-top:22px; display:flex; align-items:center; gap:14px;
+  background:linear-gradient(135deg, var(--surface-2), var(--surface-3));
+  border:1px solid var(--accent); border-radius:var(--radius); padding:16px 20px;
+  box-shadow:0 1px 0 #ffffff08 inset;
+}
+.ecid-banner .lock-icon{
+  width:38px; height:38px; border-radius:10px; background:var(--accent-soft); color:var(--accent);
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.ecid-banner .lock-icon svg{ width:18px; height:18px; }
+.ecid-banner .texts{ overflow:hidden; }
+.ecid-banner .k{ font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-faint); }
+.ecid-banner .v{ font-family:'JetBrains Mono',monospace; font-size:16px; font-weight:600; margin-top:2px; word-break:break-all; }
+
 /* Summary strip */
 .order-strip{
-  margin-top:26px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  margin-top:14px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
   padding:18px 22px; display:flex; flex-wrap:wrap; gap:22px; align-items:center; justify-content:space-between;
 }
 .order-strip-item{ display:flex; flex-direction:column; gap:4px; }
 .order-strip-item .k{ font-size:10.5px; text-transform:uppercase; letter-spacing:.07em; color:var(--text-faint); }
 .order-strip-item .v{ font-size:14px; font-weight:600; font-family:'Space Grotesk',sans-serif; }
-.order-strip-item .v.mono{ font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:500; }
 .order-actions{ display:flex; gap:8px; }
 
 /* Result card */
@@ -173,7 +264,8 @@ a{ color:inherit; }
 .callout-req{ background:var(--surface-2); border:1px solid var(--border); }
 .callout-req b{ color:var(--text); }
 
-.result-actions{ display:flex; flex-wrap:wrap; gap:10px; margin-top:22px; align-items:center; }
+.result-actions{ display:flex; flex-wrap:wrap; gap:10px; margin-bottom:22px; align-items:center; }
+.result-actions.top{ margin-top:0; margin-bottom:20px; padding-bottom:20px; border-bottom:1px solid var(--border); }
 .dl-btn{ background:var(--accent); color:#0d0f13; }
 .dl-btn.placeholder{ background:var(--surface-3); color:var(--text-muted); border:1px dashed var(--border); }
 .dl-note{ font-size:11.5px; color:var(--text-faint); }
@@ -248,6 +340,10 @@ a{ color:inherit; }
 .modal-close svg{ width:14px; height:14px; }
 .modal-sub{ font-size:12.5px; color:var(--text-muted); margin-bottom:18px; line-height:1.5; }
 
+/* Aviso de costo dentro del modal de registro */
+.modal-cost-note{ display:flex; gap:10px; padding:12px 14px; border-radius:9px; margin-bottom:16px; background:var(--amber-soft); border:1px solid #FF9C3D33; color:#ffd6ab; font-size:12.5px; line-height:1.5; }
+.modal-cost-note svg{ width:16px; height:16px; flex-shrink:0; margin-top:1px; }
+
 /* Opciones de placa RP2350 dentro del modal */
 .board-option{ display:flex; align-items:center; justify-content:space-between; gap:12px; background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:14px 16px; margin-bottom:10px; }
 .board-option:last-child{ margin-bottom:0; }
@@ -265,6 +361,16 @@ a{ color:inherit; }
 .program-action span{ font-size:11px; color:var(--text-faint); }
 .program-action .btn{ flex-shrink:0; }
 .program-action .btn:disabled{ background:var(--surface-3); color:var(--text-faint); cursor:not-allowed; border-color:var(--border); }
+
+/* Sección de pago dividida (sin señal / con señal) */
+.pay-options-label{ font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-faint); margin:18px 0 10px; }
+.pay-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+@media (max-width:420px){ .pay-grid{ grid-template-columns:1fr; } }
+.pay-card{ background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:14px 15px; display:flex; flex-direction:column; gap:10px; }
+.pay-card .pay-title{ font-size:12.5px; font-weight:700; }
+.pay-card .pay-price{ font-family:'JetBrains Mono',monospace; font-size:16px; color:var(--ok); font-weight:700; }
+.pay-card .pay-note{ font-size:10.5px; color:var(--text-faint); line-height:1.4; }
+.pay-card .btn{ width:100%; justify-content:center; margin-top:2px; }
 </style>
 </head>
 <body>
@@ -280,10 +386,21 @@ a{ color:inherit; }
     <a href="index.html">Registro</a>
     <a href="dashboard.html">Dashboard</a>
   </div>
-  <button class="hamburger" id="hamburgerBtn" onclick="openDrawer()" aria-label="Abrir menú de sesión">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="color:var(--text)"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-    <span class="dot" id="hamburgerDot"></span>
-  </button>
+  <div class="nav-right">
+    <div class="balance-pill guest" id="balancePill" onclick="handleBalancePillClick()" title="Tu saldo de técnico">
+      <span class="icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 15.2c.5.8 1.4 1.3 2.5 1.3 1.5 0 2.7-.9 2.7-2 0-1.3-1.2-1.8-2.7-2.2-1.5-.4-2.7-.9-2.7-2.2 0-1.1 1.2-2 2.7-2 1.1 0 2 .5 2.5 1.3M12 7.5v1M12 15.5v1"/></svg>
+      </span>
+      <span class="b-texts">
+        <span class="b-label">Saldo</span>
+        <span class="b-value" id="balanceValue">Inicia sesión</span>
+      </span>
+    </div>
+    <button class="hamburger" id="hamburgerBtn" onclick="openDrawer()" aria-label="Abrir menú de sesión">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      <span class="dot" id="hamburgerDot"></span>
+    </button>
+  </div>
 </nav>
 
 <div class="overlay" id="overlay" onclick="closeDrawer()"></div>
@@ -304,7 +421,16 @@ a{ color:inherit; }
         <span id="account-email">—</span>
       </div>
     </div>
-    <button class="btn btn-ghost logout-btn" onclick="doLogout()">Cerrar sesión</button>
+    <div class="balance-card-drawer">
+      <div>
+        <div class="k">Saldo actual</div>
+        <div class="v" id="drawerBalanceValue">$0.00 USD</div>
+      </div>
+    </div>
+    <button class="btn btn-ghost logout-btn" onclick="doLogout()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+      Cerrar sesión
+    </button>
   </div>
 
   <div id="view-guest">
@@ -351,9 +477,10 @@ a{ color:inherit; }
     </form>
   </div>
 
-  <div class="guest-note">No necesitas iniciar sesión para registrar clientes ni generar un Check. La cuenta es solo para acceder al Dashboard y tu historial.</div>
+  <div class="guest-note">No necesitas iniciar sesión para registrar clientes ni generar un Check. La cuenta es solo para acceder al Dashboard, tu historial y tu saldo.</div>
 
-  <button class="btn btn-ghost programs-btn" style="width:100%; justify-content:center; margin-top:14px;" onclick="closeDrawer(); openAllProgramsModal();">
+  <button class="btn btn-ghost drawer-action programs-btn" onclick="closeDrawer(); openAllProgramsModal();">
+    <span class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1.3" fill="currentColor" stroke="none"/><circle cx="3.5" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="3.5" cy="18" r="1.3" fill="currentColor" stroke="none"/></svg></span>
     Programas
   </button>
 </aside>
@@ -362,6 +489,17 @@ a{ color:inherit; }
   <div class="page-head">
     <h1>Check de compatibilidad</h1>
     <p>Esto es lo que puedes hacer con el equipo, según el dispositivo y el bloqueo que registraste en Index.</p>
+  </div>
+
+  <!-- ECID / SERIE (arriba de todo, bloqueado, solo lectura) -->
+  <div class="ecid-banner" id="ecid-banner" style="display:none;">
+    <span class="lock-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>
+    </span>
+    <div class="texts">
+      <div class="k" id="ecid-banner-label">Identificador</div>
+      <div class="v" id="ecid-banner-value">—</div>
+    </div>
   </div>
 
   <!-- ORDER STRIP -->
@@ -399,6 +537,7 @@ a{ color:inherit; }
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
 /* ---------------- FIREBASE (compartido con Index) ---------------- */
 const firebaseConfig = {
@@ -413,6 +552,56 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
+const db = firebase.firestore();
+
+/* ---------------- SALDO DEL TÉCNICO ----------------
+   Se guarda en Firestore en technicians/{uid}.balance (USD).
+   Solo existe / se muestra si el técnico inició sesión.       */
+function technicianRef(uid){ return db.collection('technicians').doc(uid); }
+
+async function refreshBalanceUI(){
+  const pill = document.getElementById('balancePill');
+  const valueEl = document.getElementById('balanceValue');
+  const drawerValueEl = document.getElementById('drawerBalanceValue');
+  if(!auth.currentUser){
+    pill.classList.add('guest'); pill.classList.remove('low');
+    valueEl.textContent = 'Inicia sesión';
+    return;
+  }
+  pill.classList.remove('guest');
+  try{
+    const doc = await technicianRef(auth.currentUser.uid).get();
+    const bal = doc.exists ? (doc.data().balance || 0) : 0;
+    valueEl.textContent = '$' + bal.toFixed(2) + ' USD';
+    if(drawerValueEl) drawerValueEl.textContent = '$' + bal.toFixed(2) + ' USD';
+    pill.classList.toggle('low', bal <= 0);
+    return bal;
+  }catch(e){
+    valueEl.textContent = 'Error';
+  }
+}
+function handleBalancePillClick(){
+  if(!auth.currentUser) openDrawer();
+}
+
+/* Descuenta `amount` del saldo del técnico de forma segura (transacción).
+   Lanza un error con message 'INSUFFICIENT_FUNDS' si no alcanza. */
+async function deductTechnicianBalance(uid, amount){
+  const ref = technicianRef(uid);
+  const newBalance = await db.runTransaction(async (tx)=>{
+    const doc = await tx.get(ref);
+    const current = doc.exists ? (doc.data().balance || 0) : 0;
+    if(current < amount){
+      const err = new Error('INSUFFICIENT_FUNDS');
+      err.current = current;
+      throw err;
+    }
+    const next = +(current - amount).toFixed(2);
+    tx.set(ref, { balance: next }, { merge:true });
+    return next;
+  });
+  return newBalance;
+}
 
 function switchAuthTab(tab){
   document.getElementById('tab-login').classList.toggle('active', tab==='login');
@@ -475,6 +664,7 @@ auth.onAuthStateChanged(user=>{
   } else {
     loggedView.style.display = 'none'; guestView.style.display = 'block'; hamburger.classList.remove('logged');
   }
+  refreshBalanceUI();
 });
 function openDrawer(){ document.getElementById('drawer').classList.add('show'); document.getElementById('overlay').classList.add('show'); }
 function closeDrawer(){ document.getElementById('drawer').classList.remove('show'); document.getElementById('overlay').classList.remove('show'); }
@@ -515,8 +705,6 @@ function closeModal(){
 }
 
 /* ---------------- MODAL: PLACAS RP2350 ---------------- */
-// Lista pensada para 4 opciones en total. Por ahora hay 2 confirmadas;
-// las otras 2 se agregan aquí mismo cuando se definan (mismo formato).
 const RP2350_BOARDS = [
   { name:'Waveshare RP2350 USB-A Board', note:'Placa recomendada' },
   { name:'Raspberry Pi Pico 2 RP2350', note:'Alternativa compatible' },
@@ -562,6 +750,7 @@ function openAllProgramsModal(){
 const ICONS = {
   warn: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2L12 3z"/><path d="M12 10v4"/><circle cx="12" cy="17" r="0.6" fill="currentColor"/></svg>`,
   chip: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3"/></svg>`,
+  cost: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 15.2c.5.8 1.4 1.3 2.5 1.3 1.5 0 2.7-.9 2.7-2 0-1.3-1.2-1.8-2.7-2.2-1.5-.4-2.7-.9-2.7-2.2 0-1.1 1.2-2 2.7-2 1.1 0 2 .5 2.5 1.3M12 7.5v1M12 15.5v1"/></svg>`,
 };
 
 /* ---------------- DEVICE TIER RULES ---------------- */
@@ -586,6 +775,10 @@ function parseIOS(str){
 let order = null;
 try{ order = JSON.parse(localStorage.getItem('f3rn4n_pending_check')); }catch(e){}
 
+function persistOrder(){
+  try{ localStorage.setItem('f3rn4n_pending_check', JSON.stringify(order)); }catch(e){}
+}
+
 function init(){
   if(!order || !order.lockKey){
     document.getElementById('empty-state').style.display = 'block';
@@ -596,6 +789,17 @@ function init(){
   document.getElementById('strip-device').textContent = order.device || '—';
   document.getElementById('strip-lock').textContent = order.lockLabel || '—';
   document.getElementById('strip-client').textContent = (order.client && order.client.name) ? order.client.name : 'Sin datos';
+
+  // El ECID / número de serie llega ya capturado desde Index y se muestra
+  // arriba de todo, bloqueado (solo lectura). Solo aparece si además se
+  // registró un cliente con teléfono en Index — si no hay cliente, no hay
+  // nada que mostrar como "bloqueado" todavía.
+  const hasClientPhone = !!(order.client && order.client.name && order.client.phone);
+  if(order.deviceId && order.deviceId.value && hasClientPhone){
+    document.getElementById('ecid-banner').style.display = 'flex';
+    document.getElementById('ecid-banner-label').textContent = order.deviceId.type === 'ecid' ? 'ECID bloqueado' : 'Número de serie bloqueado';
+    document.getElementById('ecid-banner-value').textContent = order.deviceId.value;
+  }
 
   renderResult();
 }
@@ -618,29 +822,31 @@ function renderResult(){
   }
 }
 
-/* ---------------- CARD BUILDER ---------------- */
+/* ---------------- CARD BUILDER ----------------
+   Si showDownload es true, el botón de descarga se coloca hasta arriba
+   de la tarjeta (antes del pill de estado), no al final. */
 function card({ pillClass, pillText, title, desc, warnHtml, reqHtml, showDownload, downloadPlaceholder }){
   const el = document.createElement('div');
   el.className = 'result-card';
+
+  const downloadHtml = showDownload ? `
+    <div class="result-actions top">
+      <a class="btn dl-btn placeholder" href="#" id="download-link">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+        Descargar software
+      </a>
+      <span class="dl-note">${downloadPlaceholder || 'Enlace pendiente de configurar'}</span>
+    </div>
+  ` : '';
+
   el.innerHTML = `
+    ${downloadHtml}
     <span class="status-pill ${pillClass}"><span class="dot"></span>${pillText}</span>
     <div class="result-title">${title}</div>
     <div class="result-desc">${desc}</div>
     ${warnHtml || ''}
     ${reqHtml || ''}
   `;
-  if(showDownload){
-    const actions = document.createElement('div');
-    actions.className = 'result-actions';
-    actions.innerHTML = `
-      <a class="btn dl-btn placeholder" href="#" id="download-link">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
-        Descargar software
-      </a>
-      <span class="dl-note">${downloadPlaceholder || 'Enlace pendiente de configurar'}</span>
-    `;
-    el.appendChild(actions);
-  }
   return el;
 }
 
@@ -669,7 +875,6 @@ function buildIcloudResult(tier){
     el.appendChild(buildUnlockOptions(order.device));
     return el;
   }
-  // tier 3: iPhone 12 al 17 Pro Max
   const el = card({
     pillClass:'status-warn', pillText:'Depende de la versión de iOS',
     title:'Solo se puede desbloquear sin señal',
@@ -742,12 +947,12 @@ const UNLOCK_PROGRAMS = {
     time: 'Minutos',
     downloadUrl: 'https://mega.nz/folder/JBEQSBaK#P-MMA1LGZergdz2-3vec6A',
     prices: {
-      'iPhone XS': [{label:'Sin señal', price:16.5},{label:'Passcode Bypass', price:18.5}],
-      'iPhone XR': [{label:'Sin señal', price:16.5},{label:'Passcode Bypass', price:18.5}],
-      'iPhone XS Max': [{label:'Sin señal', price:16.5},{label:'Passcode Bypass', price:18.07}],
-      'iPhone 11': [{label:'Sin señal', price:21.5},{label:'Passcode Bypass', price:23.5}],
-      'iPhone 11 Pro': [{label:'Sin señal', price:21.5},{label:'Passcode Bypass', price:23.5}],
-      'iPhone 11 Pro Max': [{label:'Sin señal', price:21.5},{label:'Passcode Bypass', price:23.5}],
+      'iPhone XS': [{label:'Sin señal', price:16.5},{label:'Con señal (Passcode Bypass)', price:18.5}],
+      'iPhone XR': [{label:'Sin señal', price:16.5},{label:'Con señal (Passcode Bypass)', price:18.5}],
+      'iPhone XS Max': [{label:'Sin señal', price:16.5},{label:'Con señal (Passcode Bypass)', price:18.07}],
+      'iPhone 11': [{label:'Sin señal', price:21.5},{label:'Con señal (Passcode Bypass)', price:23.5}],
+      'iPhone 11 Pro': [{label:'Sin señal', price:21.5},{label:'Con señal (Passcode Bypass)', price:23.5}],
+      'iPhone 11 Pro Max': [{label:'Sin señal', price:21.5},{label:'Con señal (Passcode Bypass)', price:23.5}],
       'iPhone SE (2.ª gen)': [{label:'Estándar', price:18.5}],
     }
   },
@@ -770,7 +975,7 @@ const UNLOCK_PROGRAMS = {
   }
 };
 
-/* Programas de precio fijo ($5 USD, sin importar el modelo) para 6s–X y 12–17 */
+/* Programas de precio fijo ($ USD, sin importar el modelo) para 6s–X y 12–17 */
 const CHECKM8_PROGRAMS = {
   f3arra1n: {
     name: 'F3arRa1n',
@@ -863,26 +1068,143 @@ function buildFlatProgramOptions(programs, deviceName){
   return wrap;
 }
 
-/* ---------------- MODAL: ACCIONES DE UN PROGRAMA ---------------- */
+/* ---------------- MODAL: ACCIONES DE UN PROGRAMA ----------------
+   - Siempre se puede descargar el programa.
+   - "Registrar en el servidor" se muestra como uno o dos contenedores de
+     pago (solo dos cuando el programa distingue sin señal / con señal,
+     como iHello). Cada contenedor descuenta su propio precio del saldo
+     del técnico al presionar "Pagar y registrar".                       */
+function getProgramPriceOptions(program, deviceName){
+  if(program.price !== undefined) return [{ label:'Estándar', price: program.price }];
+  const entry = program.prices ? program.prices[deviceName] : undefined;
+  if(entry === undefined) return [];
+  if(Array.isArray(entry)) return entry;
+  return [{ label:'Estándar', price: entry }];
+}
+
 function openProgramActionModal(program, deviceName){
   const downloadHtml = program.downloadUrl
     ? `<a class="btn dl-btn" href="${program.downloadUrl}" target="_blank" rel="noopener">Descargar</a>`
     : `<a class="btn dl-btn placeholder" href="#" onclick="return false;">Descargar</a>`;
+
+  const hasIdValue = !!(order.deviceId && order.deviceId.value);
+  const idLine = hasIdValue
+    ? `${order.deviceId.type === 'ecid' ? 'ECID' : 'N. de serie'}: ${order.deviceId.value}`
+    : 'Sin capturar';
+  const hasClient = !!(order.client && order.client.name && order.client.phone);
+  const registerNote = hasClient ? `${idLine} · incluye datos del cliente` : `${idLine} · sin cliente registrado`;
+
+  const priceOptions = getProgramPriceOptions(program, deviceName);
+
+  let costNoteHtml = `
+    <div class="modal-cost-note">${ICONS.cost}<div>Al registrar este equipo con este programa, <b>se descontará el costo de tu saldo de técnico</b>. Necesitas sesión iniciada y saldo suficiente.</div></div>
+  `;
+
+  let payHtml = '';
+  if(order.registered){
+    payHtml = `<div class="program-action"><div><b>Registro</b><span>${registerNote}</span></div><button class="btn btn-ghost" disabled>Ya registrado ✔</button></div>`;
+  } else if(priceOptions.length === 0){
+    payHtml = `<div class="program-action"><div><b>Registro</b><span>No hay precio definido para este modelo</span></div><button class="btn btn-ghost" disabled>Registrar</button></div>`;
+  } else if(priceOptions.length === 1){
+    const opt = priceOptions[0];
+    const btnId = 'pay-btn-0';
+    const disabled = !hasIdValue ? 'disabled title="Falta el ECID/número de serie"' : '';
+    payHtml = `
+      <div class="program-action">
+        <div><b>Registrar en el servidor</b><span>${registerNote} · se descontarán $${opt.price.toFixed(2)} USD</span></div>
+        <button class="btn btn-primary" id="${btnId}" ${disabled} onclick="payAndRegister(0)">Pagar y registrar</button>
+      </div>
+    `;
+  } else {
+    payHtml = `<div class="pay-options-label">Elige cómo vas a registrar y pagar</div><div class="pay-grid">` +
+      priceOptions.map((opt, i)=>{
+        const btnId = 'pay-btn-' + i;
+        const disabled = !hasIdValue ? 'disabled title="Falta el ECID/número de serie"' : '';
+        return `
+          <div class="pay-card">
+            <div class="pay-title">${opt.label}</div>
+            <div class="pay-price">$${opt.price.toFixed(2)} USD</div>
+            <div class="pay-note">${registerNote}</div>
+            <button class="btn btn-primary" id="${btnId}" ${disabled} onclick="payAndRegister(${i})">Pagar y registrar</button>
+          </div>
+        `;
+      }).join('') + `</div>`;
+  }
+
+  window.__currentProgram = program;
+  window.__currentDevice = deviceName;
+  window.__currentPriceOptions = priceOptions;
+
   const body = `
     <div class="program-action">
       <div><b>Descarga el programa aquí</b><span>${program.name} · ${program.platform}</span></div>
       ${downloadHtml}
     </div>
-    <div class="program-action">
-      <div><b>Registra tu ECID</b><span>Aún no disponible</span></div>
-      <button class="btn btn-ghost" disabled onclick="return false;">Registrar</button>
-    </div>
+    ${costNoteHtml}
+    ${payHtml}
   `;
   openModal(
     `${program.name}${deviceName ? ' · ' + deviceName : ''}`,
     '',
     body
   );
+}
+
+/* Pagar (descontar saldo del técnico) y registrar en Firestore.
+   El ECID/serie siempre se guarda; los datos extra del cliente (nombre,
+   teléfono, monto) se guardan junto solo si se capturaron en Index.     */
+async function payAndRegister(optionIndex){
+  const program = window.__currentProgram;
+  const deviceName = window.__currentDevice;
+  const opt = (window.__currentPriceOptions || [])[optionIndex];
+  if(!program || !opt || !order || !order.deviceId || !order.deviceId.value){
+    showToast('No hay ECID/serie para registrar');
+    return;
+  }
+  if(!auth.currentUser){
+    showToast('Inicia sesión para registrar y pagar');
+    openDrawer();
+    return;
+  }
+
+  const btn = document.getElementById('pay-btn-' + optionIndex);
+  const originalLabel = btn ? btn.textContent : 'Pagar y registrar';
+  if(btn){ btn.disabled = true; btn.textContent = 'Procesando...'; }
+
+  try{
+    const newBalance = await deductTechnicianBalance(auth.currentUser.uid, opt.price);
+
+    const hasClient = !!(order.client && order.client.name && order.client.phone);
+    const payload = {
+      ownerUid: auth.currentUser.uid,
+      os: order.os || null,
+      device: order.device || null,
+      lockLabel: order.lockLabel || null,
+      deviceIdType: order.deviceId.type,
+      deviceIdValue: order.deviceId.value,
+      program: program.name,
+      payOption: opt.label,
+      amountCharged: opt.price,
+      client: hasClient ? order.client.name : null,
+      phone: hasClient ? order.client.phone : null,
+      amount: hasClient ? (order.client.amount || null) : null,
+      createdAt: new Date().toISOString()
+    };
+    await db.collection('orders').add(payload);
+
+    order.registered = true;
+    persistOrder();
+    refreshBalanceUI();
+    showToast(`Registrado ✔ — se descontaron $${opt.price.toFixed(2)} USD (saldo: $${newBalance.toFixed(2)})`);
+    closeModal();
+  }catch(err){
+    if(err.message === 'INSUFFICIENT_FUNDS'){
+      showToast(`Saldo insuficiente. Tienes $${(err.current||0).toFixed(2)} USD y se requieren $${opt.price.toFixed(2)} USD.`);
+    } else {
+      showToast('Error al registrar: ' + err.message);
+    }
+    if(btn){ btn.disabled = false; btn.textContent = originalLabel; }
+  }
 }
 
 /* ---------------- PIN ---------------- */
@@ -910,7 +1232,6 @@ function buildPinResult(tier){
     el.appendChild(buildUnlockOptions(order.device));
     return el;
   }
-  // tier 3: iPhone 12 al 17 Pro Max — no soportado por PIN
   return card({
     pillClass:'status-bad', pillText:'No disponible',
     title:'Por el momento no se puede desbloquear',
