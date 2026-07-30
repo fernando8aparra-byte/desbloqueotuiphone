@@ -68,21 +68,6 @@ input, textarea{ font-family:inherit; }
 .brand-text b{ font-family:'Inter',sans-serif; font-weight:800; font-size:15px; letter-spacing:.2px; }
 .brand-text span{ font-size:11px; color:var(--text-muted); }
 
-.nav-pages{ display:flex; gap:4px; background:var(--surface); border:1px solid var(--border); border-radius:999px; padding:4px; }
-.nav-pages a{
-  text-decoration:none; color:var(--text-muted); font-size:13px; font-weight:500;
-  padding:7px 16px; border-radius:999px; position:relative;
-  transition:color .15s;
-}
-.nav-pages a.active{ background:var(--accent); color:#0B0E11; font-weight:700; }
-.nav-pages a.disabled{ pointer-events:none; opacity:.45; }
-.nav-pages a.disabled::after{
-  content:'Próximamente'; position:absolute; bottom:-26px; left:50%; transform:translateX(-50%);
-  font-size:10px; background:var(--surface-3); padding:3px 7px; border-radius:5px;
-  white-space:nowrap; opacity:0; transition:opacity .15s; pointer-events:none;
-}
-.nav-pages a.disabled:hover::after{ opacity:1; }
-
 /* ---------- LAYOUT ---------- */
 .wrap{
   max-width:1180px; margin:0 auto; padding:44px 32px 100px;
@@ -93,6 +78,9 @@ input, textarea{ font-family:inherit; }
 .page-head{ grid-column:1/-1; margin-bottom:6px; }
 .page-head h1{ font-family:'Inter',sans-serif; font-size:26px; font-weight:800; letter-spacing:-.3px; }
 .page-head p{ color:var(--text-muted); font-size:14px; margin-top:5px; }
+.tagline{ min-height:18px; }
+.tagline::after{ content:'|'; color:var(--accent); animation:blink 1s step-end infinite; margin-left:1px; }
+@keyframes blink{ 50%{ opacity:0; } }
 
 /* ---------- STEPPER RAIL ---------- */
 .rail{ display:flex; flex-direction:column; gap:2px; position:sticky; top:90px; align-self:start; }
@@ -145,10 +133,10 @@ input, textarea{ font-family:inherit; }
 .os-card.selected{ border-color:var(--accent); background:var(--accent-soft); box-shadow:0 0 0 1px var(--accent) inset; }
 .os-icon{ width:34px; height:34px; color:var(--text-muted); transition:color .15s; }
 .os-card:hover .os-icon{ color:var(--text); }
-.os-card.selected .os-icon{ color:var(--accent); }
 .os-card:hover .os-icon-android{ color:var(--android); }
 .os-card:hover .os-icon-apple{ color:var(--ios); }
-.os-card.selected .os-icon-android, .os-card.selected .os-icon-apple{ color:var(--accent); }
+.os-card.selected .os-icon-android{ color:var(--android); }
+.os-card.selected .os-icon-apple{ color:var(--ios); }
 .os-card h3{ font-family:'Inter',sans-serif; font-size:16px; font-weight:700; }
 .os-card p{ font-size:12.5px; color:var(--text-muted); }
 
@@ -194,6 +182,7 @@ input, textarea{ font-family:inherit; }
 
 /* Client form */
 .client-form{ display:grid; gap:16px; max-width:480px; }
+.client-yesno{ display:flex; gap:10px; }
 .skip-row{ display:flex; align-items:center; gap:10px; margin-top:4px; font-size:12.5px; color:var(--text-muted); }
 
 /* Summary */
@@ -224,15 +213,20 @@ input, textarea{ font-family:inherit; }
 
 /* ---------- HAMBURGER ---------- */
 .hamburger{
-  width:40px; height:40px; border-radius:9px; background:var(--surface);
+  width:42px; height:42px; border-radius:12px;
+  background:linear-gradient(180deg, var(--surface-2), var(--surface));
   border:1px solid var(--border); display:flex; align-items:center; justify-content:center;
-  flex-shrink:0; transition:border-color .15s; position:relative;
+  flex-shrink:0; transition:all .18s; position:relative;
+  box-shadow:0 1px 0 #ffffff08 inset, 0 4px 10px -6px #000000a0;
 }
-.hamburger:hover{ border-color:var(--text-faint); }
-.hamburger svg{ width:18px; height:18px; }
+.hamburger svg{ width:18px; height:18px; color:var(--text-muted); transition:color .18s; }
+.hamburger:hover{ border-color:var(--accent); background:linear-gradient(180deg, var(--surface-3), var(--surface-2)); }
+.hamburger:hover svg{ color:var(--accent); }
+.hamburger:active{ transform:scale(.94); }
 .hamburger .dot{
-  position:absolute; top:-3px; right:-3px; width:9px; height:9px; border-radius:50%;
+  position:absolute; top:-3px; right:-3px; width:10px; height:10px; border-radius:50%;
   background:var(--android); border:2px solid var(--bg); display:none;
+  box-shadow:0 0 0 2px #3DDC8433;
 }
 .hamburger.logged .dot{ display:block; }
 
@@ -251,19 +245,35 @@ input, textarea{ font-family:inherit; }
   overflow-y:auto;
 }
 .drawer.show{ transform:translateX(0); }
-.drawer-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:22px; }
-.drawer-head h3{ font-family:'Inter',sans-serif; font-size:16px; font-weight:700; }
-.drawer-close{ width:30px; height:30px; border-radius:7px; background:var(--surface-2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; color:var(--text-muted); }
-.drawer-close:hover{ color:var(--text); }
+.drawer-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:22px; padding-bottom:16px; border-bottom:1px solid var(--border); }
+.drawer-head h3{ font-family:'Inter',sans-serif; font-size:17px; font-weight:800; letter-spacing:-.2px; }
+.drawer-close{
+  width:32px; height:32px; border-radius:9px;
+  background:linear-gradient(180deg, var(--surface-3), var(--surface-2));
+  border:1px solid var(--border); display:flex; align-items:center; justify-content:center; color:var(--text-muted);
+  transition:all .15s;
+}
+.drawer-close:hover{ color:var(--danger); border-color:var(--danger); background:var(--danger-soft); }
 .drawer-close svg{ width:14px; height:14px; }
 
 /* logged-in view */
-.account-card{ display:flex; align-items:center; gap:12px; background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius); padding:16px; margin-bottom:18px; }
-.avatar{ width:42px; height:42px; border-radius:50%; background:var(--surface-3); display:flex; align-items:center; justify-content:center; font-family:'Inter',sans-serif; font-weight:700; font-size:15px; color:var(--accent); flex-shrink:0; overflow:hidden; }
+.account-card{
+  display:flex; align-items:center; gap:14px;
+  background:linear-gradient(135deg, var(--surface-2), var(--surface-3));
+  border:1px solid var(--border); border-radius:14px; padding:16px; margin-bottom:20px;
+  box-shadow:0 1px 0 #ffffff08 inset;
+}
+.avatar{
+  width:46px; height:46px; border-radius:50%;
+  background:linear-gradient(135deg, var(--gold), #C99400);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Inter',sans-serif; font-weight:800; font-size:16px; color:#0d0f13; flex-shrink:0; overflow:hidden;
+  box-shadow:0 0 0 3px var(--surface-2), 0 0 0 4px var(--accent-soft);
+}
 .avatar img{ width:100%; height:100%; object-fit:cover; }
 .account-info{ overflow:hidden; }
-.account-info b{ display:block; font-size:13.5px; }
-.account-info span{ display:block; font-size:11.5px; color:var(--text-muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.account-info b{ display:block; font-size:14px; }
+.account-info span{ display:block; font-size:11.5px; color:var(--text-muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-top:2px; }
 
 /* auth forms */
 .auth-tabs{ display:flex; gap:4px; background:var(--surface-2); border:1px solid var(--border); border-radius:999px; padding:4px; margin-bottom:20px; }
@@ -306,6 +316,24 @@ input, textarea{ font-family:inherit; }
   transform:scale(.98);
 }
 
+.drawer-action{
+  width:100%; justify-content:flex-start; margin-top:10px; text-decoration:none;
+  display:flex; align-items:center; gap:11px; padding:11px 13px 11px 11px;
+  background:var(--surface-2);
+}
+.drawer-action:hover{ background:var(--surface-3); }
+.drawer-action .action-icon{
+  width:30px; height:30px; border-radius:8px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--surface-3); transition:background .15s;
+}
+.drawer-action svg{ width:15px; height:15px; flex-shrink:0; }
+#dash-link .action-icon{ background:var(--accent-soft); color:var(--accent); }
+.programs-btn .action-icon{ background:#3B82F620; color:#60A5FA; }
+#logout-link{ color:var(--danger); border-color:transparent; background:var(--danger-soft); margin-top:22px; }
+#logout-link .action-icon{ background:#F6465D26; color:var(--danger); }
+#logout-link:hover{ background:var(--danger); color:#10141B; }
+#logout-link:hover .action-icon{ background:#10141B33; color:#10141B; }
 .guest-note{
   margin-top:auto; padding-top:18px; border-top:1px solid var(--border);
   font-size:11.5px; color:var(--text-faint); line-height:1.5;
@@ -359,12 +387,8 @@ input, textarea{ font-family:inherit; }
     </div>
     <div class="brand-text"><b>F3RN4N</b><span>Panel de registro y liberación</span></div>
   </div>
-  <div class="nav-pages">
-    <a href="index.html" class="active">Registro</a>
-    <a href="dashboard.html">Dashboard</a>
-  </div>
   <button class="hamburger" id="hamburgerBtn" onclick="openDrawer()" aria-label="Abrir menú de sesión">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="color:var(--text)"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
     <span class="dot" id="hamburgerDot"></span>
   </button>
 </nav>
@@ -388,7 +412,6 @@ input, textarea{ font-family:inherit; }
         <span id="account-email">—</span>
       </div>
     </div>
-    <button class="btn btn-ghost logout-btn" onclick="doLogout()">Cerrar sesión</button>
   </div>
 
   <!-- LOGGED OUT -->
@@ -436,19 +459,30 @@ input, textarea{ font-family:inherit; }
       <div class="auth-error" id="register-error"></div>
       <button type="submit" class="btn btn-primary" style="justify-content:center;">Crear cuenta</button>
     </form>
+
+    <div class="guest-note">No necesitas iniciar sesión para registrar clientes ni generar un Check. La cuenta es solo para acceder al Dashboard y tu historial.</div>
   </div>
 
-  <div class="guest-note">No necesitas iniciar sesión para registrar clientes ni generar un Check. La cuenta es solo para acceder al Dashboard y tu historial.</div>
+  <a class="btn btn-ghost drawer-action" id="dash-link" style="display:none;" href="dashboard.html">
+    <span class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg></span>
+    Dashboard
+  </a>
 
-  <button class="btn btn-ghost programs-btn" style="width:100%; justify-content:center; margin-top:14px;" onclick="closeDrawer(); openAllProgramsModal();">
+  <button class="btn btn-ghost drawer-action programs-btn" onclick="closeDrawer(); openAllProgramsModal();">
+    <span class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1.3" fill="currentColor" stroke="none"/><circle cx="3.5" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="3.5" cy="18" r="1.3" fill="currentColor" stroke="none"/></svg></span>
     Programas
+  </button>
+
+  <button class="btn btn-ghost drawer-action" id="logout-link" style="display:none;" onclick="doLogout()">
+    <span class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg></span>
+    Cerrar sesión
   </button>
 </aside>
 
 <div class="wrap">
   <div class="page-head">
-    <h1>Registrar equipo y cliente</h1>
-    <p>Completa los 4 pasos para armar la orden. Pasará a <b style="color:var(--text)">Check</b> al finalizar.</p>
+    <h1>Registro y Check — Team F3RN4N</h1>
+    <p class="tagline" id="tagline"></p>
   </div>
 
   <!-- RAIL -->
@@ -463,11 +497,7 @@ input, textarea{ font-family:inherit; }
     </div>
     <div class="rail-step" data-rail="3">
       <div class="rail-num">3</div>
-      <div class="rail-label"><b>Cliente</b><span>Datos (opcional)</span></div>
-    </div>
-    <div class="rail-step" data-rail="4">
-      <div class="rail-num">4</div>
-      <div class="rail-label"><b>Revisión</b><span>Enviar a Check</span></div>
+      <div class="rail-label"><b>Cliente</b><span>Registrar y enviar</span></div>
     </div>
   </div>
 
@@ -536,70 +566,37 @@ input, textarea{ font-family:inherit; }
 
     <!-- STEP 3: CLIENT -->
     <div class="step-block" id="step-3">
-      <div class="step-title">Datos del cliente</div>
-      <div class="step-sub">Es opcional. Puedes omitir este paso y completarlo después.</div>
+      <div class="step-title">¿Quieres registrar un cliente?</div>
+      <div class="step-sub">Puedes registrarlo ahora o continuar directo a Check.</div>
 
-      <div class="client-form">
+      <div class="client-yesno">
+        <button class="btn btn-primary" id="btn-open-client" onclick="toggleClientPanel()">Sí</button>
+        <button class="btn btn-ghost" onclick="skipClient()">Ahora no</button>
+      </div>
+
+      <div class="client-form" id="client-panel" style="display:none; margin-top:20px;">
         <div class="field">
           <label for="c-name">Nombre</label>
           <input id="c-name" type="text" placeholder="Nombre del cliente">
         </div>
         <div class="field">
-          <label for="c-phone">Teléfono</label>
+          <label for="c-phone">Teléfono celular</label>
           <input id="c-phone" type="tel" placeholder="Ej. 662 123 4567">
         </div>
-        <div class="field">
-          <label for="c-serial">Número de serie / IMEI</label>
-          <input id="c-serial" type="text" placeholder="Ej. C7XJXXXXXXXX o 35XXXXXXXXXXXXX">
+        <div class="field" id="device-id-field" style="display:none;">
+          <label for="device-id-value" id="device-id-label">Número de serie</label>
+          <input id="device-id-value" type="text" placeholder="">
         </div>
         <div class="field">
-          <label for="c-note">Nota</label>
-          <textarea id="c-note" rows="3" placeholder="Detalles adicionales del equipo o del cliente"></textarea>
+          <label for="c-amount">Monto cobrado</label>
+          <input id="c-amount" type="number" min="0" step="0.01" placeholder="Ej. 250">
         </div>
+        <button class="btn btn-primary" style="justify-content:center;" onclick="registerClient()">Registrar</button>
+        <p style="font-size:11.5px; color:var(--text-faint); margin-top:-6px;">Esto envía el ECID/número de serie y los datos del cliente a Check. El registro final en el servidor y el cobro se completan ahí, al seleccionar el software que se va a usar.</p>
       </div>
 
       <div class="step-controls">
         <button class="btn btn-ghost" onclick="goTo(2)">Atrás</button>
-        <button class="btn btn-primary" onclick="goTo(4)">Guardar y continuar</button>
-        <button class="btn btn-text" onclick="skipClient()">Omitir y continuar a Check →</button>
-      </div>
-    </div>
-
-    <!-- STEP 4: REVIEW -->
-    <div class="step-block" id="step-4">
-      <div class="step-title">Revisión final</div>
-      <div class="step-sub">Confirma los datos antes de enviarlos a Check.</div>
-
-      <div class="summary-card">
-        <div class="summary-row">
-          <span class="k">Dispositivo</span>
-          <span class="v" id="sum-device">—</span>
-        </div>
-        <div class="summary-row">
-          <span class="k">Bloqueo</span>
-          <span class="v" id="sum-lock">—</span>
-        </div>
-        <div class="summary-row">
-          <span class="k">Cliente</span>
-          <span class="v" id="sum-client">—</span>
-        </div>
-        <div class="summary-row">
-          <span class="k">Teléfono</span>
-          <span class="v" id="sum-phone">—</span>
-        </div>
-        <div class="summary-row">
-          <span class="k">N.º de serie / IMEI</span>
-          <span class="v mono" id="sum-serial">—</span>
-        </div>
-        <div class="summary-row">
-          <span class="k">Nota</span>
-          <span class="v" id="sum-note">—</span>
-        </div>
-      </div>
-
-      <div class="step-controls">
-        <button class="btn btn-ghost" onclick="goTo(3)">Editar</button>
-        <button class="btn btn-primary" onclick="sendToCheck()">Enviar a Check</button>
       </div>
     </div>
 
@@ -695,10 +692,14 @@ auth.onAuthStateChanged(user=>{
   const dot = document.getElementById('hamburgerDot');
   const hamburger = document.getElementById('hamburgerBtn');
 
+  const dashLink = document.getElementById('dash-link');
+  const logoutLink = document.getElementById('logout-link');
   if(user){
     loggedView.style.display = 'block';
     guestView.style.display = 'none';
     hamburger.classList.add('logged');
+    dashLink.style.display = 'flex';
+    logoutLink.style.display = 'flex';
 
     const name = user.displayName || (user.email ? user.email.split('@')[0] : 'Usuario');
     document.getElementById('account-name').textContent = name;
@@ -714,6 +715,8 @@ auth.onAuthStateChanged(user=>{
     loggedView.style.display = 'none';
     guestView.style.display = 'block';
     hamburger.classList.remove('logged');
+    dashLink.style.display = 'none';
+    logoutLink.style.display = 'none';
   }
 });
 
@@ -832,7 +835,7 @@ const LOCK_ICON_SVG = {
 const state = {
   os:null, deviceGroup:null, device:null,
   lockKey:null, lockLabel:null,
-  client:{ name:'', phone:'', note:'', serial:'' }
+  client:{ name:'', phone:'', amount:'' }
 };
 let currentStep = 1;
 
@@ -961,25 +964,61 @@ function buildLockGrid(){
   });
 }
 
+/* ---------------- ECID / N. DE SERIE (según modelo y bloqueo) ---------------- */
+/* Chips A12/A13: XS, XS Max, XR, 11, 11 Pro, 11 Pro Max piden ECID.
+   El resto de los modelos (chips A11 o anteriores, y A14 en adelante) solo piden número de serie. */
+const ECID_MODELS = ['XS Max','XS','XR','11 Pro Max','11 Pro','11'];
+function getRequiredIdType(){
+  if(state.os !== 'apple') return null;
+  if(!['icloud','pin','mdm'].includes(state.lockKey)) return null;
+  if(!state.device) return 'serial';
+  const name = state.device.replace(/^iPhone\s*/i,'').trim().toLowerCase();
+  const isEcid = ECID_MODELS.some(m => name === m.toLowerCase());
+  return isEcid ? 'ecid' : 'serial';
+}
+function updateIdField(){
+  const type = getRequiredIdType();
+  const wrap = document.getElementById('device-id-field');
+  if(!type){ wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  document.getElementById('device-id-label').textContent = type==='ecid' ? 'ECID' : 'Número de serie';
+  document.getElementById('device-id-value').placeholder = type==='ecid' ? 'Ej. 0x1A2B3C4D5E' : 'Ej. C7XJXXXXXXXX';
+}
+function getDeviceIdPayload(){
+  const type = getRequiredIdType();
+  if(!type) return null;
+  return { type, value: document.getElementById('device-id-value').value.trim() };
+}
+function deviceIdMissing(){
+  const idData = getDeviceIdPayload();
+  if(idData && !idData.value){ showToast(idData.type==='ecid' ? 'Falta el ECID' : 'Falta el número de serie'); return true; }
+  return false;
+}
+
 /* ---------------- STEP 3: CLIENT ---------------- */
-function readClientForm(){
-  state.client.name = document.getElementById('c-name').value.trim();
-  state.client.phone = document.getElementById('c-phone').value.trim();
-  state.client.serial = document.getElementById('c-serial').value.trim();
-  state.client.note = document.getElementById('c-note').value.trim();
+function toggleClientPanel(){
+  document.getElementById('client-panel').style.display = 'grid';
+  updateIdField();
 }
 function skipClient(){
-  state.client = { name:'', phone:'', note:'', serial:'' };
-  document.getElementById('c-name').value='';
-  document.getElementById('c-phone').value='';
-  document.getElementById('c-serial').value='';
-  document.getElementById('c-note').value='';
-  goTo(4);
+  state.client = { name:'', phone:'', amount:'' };
+  sendToCheck(getDeviceIdPayload());
+}
+function registerClient(){
+  if(deviceIdMissing()) return;
+  state.client.name = document.getElementById('c-name').value.trim();
+  state.client.phone = document.getElementById('c-phone').value.trim();
+  state.client.amount = document.getElementById('c-amount').value.trim();
+  if(!state.client.name || !state.client.phone){
+    showToast('Falta nombre o teléfono');
+    return;
+  }
+  showToast('Enviado a Check ✔');
+  sendToCheck(getDeviceIdPayload());
 }
 
 /* ---------------- NAVIGATION ---------------- */
 function goTo(step){
-  if(step===4) readClientForm();
   currentStep = step;
   document.querySelectorAll('.step-block').forEach(el=>el.classList.remove('visible'));
   document.getElementById('step-'+step).classList.add('visible');
@@ -989,53 +1028,35 @@ function goTo(step){
     el.classList.toggle('active', n===step);
     el.classList.toggle('done', n<step);
   });
-
-  if(step===4) renderSummary();
   window.scrollTo({top:0, behavior:'smooth'});
 }
 
-function renderSummary(){
-  document.getElementById('sum-device').textContent =
-    (state.os==='apple' ? '' : (state.os==='android' ? '' : '')) + (state.device || '—');
-  document.getElementById('sum-lock').textContent = state.lockLabel || '—';
-
-  const nameEl = document.getElementById('sum-client');
-  if(state.client.name){ nameEl.textContent = state.client.name; nameEl.classList.remove('empty'); }
-  else { nameEl.textContent = 'Sin nombre registrado'; nameEl.classList.add('empty'); }
-
-  const phoneEl = document.getElementById('sum-phone');
-  if(state.client.phone){ phoneEl.textContent = state.client.phone; phoneEl.classList.remove('empty'); }
-  else { phoneEl.textContent = 'Sin teléfono'; phoneEl.classList.add('empty'); }
-
-  const serialEl = document.getElementById('sum-serial');
-  if(state.client.serial){ serialEl.textContent = state.client.serial; serialEl.classList.remove('empty'); }
-  else { serialEl.textContent = 'Sin registrar'; serialEl.classList.add('empty'); }
-
-  const noteEl = document.getElementById('sum-note');
-  if(state.client.note){ noteEl.textContent = state.client.note; noteEl.classList.remove('empty'); }
-  else { noteEl.textContent = 'Sin nota'; noteEl.classList.add('empty'); }
-}
-
 /* ---------------- SEND TO CHECK ---------------- */
-function sendToCheck(){
+/* Importante: esto NO registra nada en Firebase todavía. Solo empaqueta la
+   orden (dispositivo, bloqueo, ECID/serial, y datos del cliente si se
+   capturaron) y la manda a Check. El registro real en el servidor ocurre en
+   Check, al seleccionar un software y presionar "Registrar" ahí. */
+function sendToCheck(deviceIdPayload){
   const payload = {
     os: state.os,
     deviceGroup: state.deviceGroup,
     device: state.device,
     lockKey: state.lockKey,
     lockLabel: state.lockLabel,
+    deviceId: deviceIdPayload,
     client: state.client,
+    registered: false,
     createdAt: new Date().toISOString()
   };
   try{
     localStorage.setItem('f3rn4n_pending_check', JSON.stringify(payload));
   }catch(e){}
   saveOrderToHistory(payload);
-  showToast('Orden lista. Abriendo Check…');
   setTimeout(()=>{ window.location.href = 'check.html'; }, 700);
 }
 
-/* Guarda un registro del pedido para que aparezca en el Dashboard (por cuenta) */
+/* Guarda un registro local del pedido (Check es quien sube el ECID/serie y
+   los datos del cliente a Firebase al seleccionar un software) */
 function saveOrderToHistory(payload){
   const record = {
     id: 'ord_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7),
@@ -1043,12 +1064,10 @@ function saveOrderToHistory(payload){
     os: payload.os,
     device: payload.device,
     lockLabel: payload.lockLabel,
+    deviceId: payload.deviceId,
     client: payload.client.name || '',
     phone: payload.client.phone || '',
-    serial: payload.client.serial || '',
-    note: payload.client.note || '',
     status: 'pendiente',
-    price: 0,
     completedAt: null,
     createdAt: payload.createdAt
   };
@@ -1057,11 +1076,38 @@ function saveOrderToHistory(payload){
     list.unshift(record);
     localStorage.setItem('f3rn4n_orders', JSON.stringify(list.slice(0, 500)));
   }catch(e){}
-  // Sincroniza a la nube si hay sesión iniciada (para verlo desde cualquier dispositivo)
-  if(record.ownerUid){
-    db.collection('orders').doc(record.id).set(record).catch(()=>{});
-  }
 }
+
+/* ---------------- LEYENDAS ANIMADAS ---------------- */
+const TAGLINES = [
+  'Inicia sesión para registrar tus clientes',
+  'Un sistema bien ordenado da mejores resultados',
+  'A veces los mejores clientes son los que pagan más :)',
+  'La organización de hoy es la velocidad de mañana',
+  'El café es opcional, el orden no',
+  'Cada equipo registrado es un cliente que confía en ti',
+  'Tip: en Check puedes ver el estado de un equipo en proceso',
+  'Un buen registro evita errores costosos',
+  'Un cliente feliz vuelve, uno bien cobrado vuelve más',
+  'Tu historial vive en el Dashboard, siempre a un clic',
+  'Menos post-its perdidos, más sistema',
+  'La disciplina en los datos construye reputación'
+];
+let taglineIdx = 0;
+function typeTagline(){
+  const el = document.getElementById('tagline');
+  if(!el) return;
+  const text = TAGLINES[taglineIdx];
+  taglineIdx = (taglineIdx + 1) % TAGLINES.length;
+  el.textContent = '';
+  let i = 0;
+  const t = setInterval(()=>{
+    el.textContent = text.slice(0, ++i);
+    if(i >= text.length) clearInterval(t);
+  }, 28);
+}
+typeTagline();
+setInterval(typeTagline, 4000);
 
 function showToast(msg){
   const t = document.getElementById('toast');
